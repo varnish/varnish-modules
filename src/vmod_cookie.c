@@ -76,7 +76,7 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 		return;
 	}
 
-	VSLb(ctx->vsl, SLT_Debug, "cookie: cookie string is %lu bytes.", strlen(cookieheader));
+	VSLb(ctx->vsl, SLT_Debug, "cookie: cookie string is %zu bytes.", strlen(cookieheader));
 
 	if (strlen(cookieheader) >= MAX_COOKIE_STRING) {
 		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: cookie string overflowed, abort");
@@ -110,7 +110,7 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 		value = sepindex + 1;
 		*sepindex = '\0';
 
-		VSLb(ctx->vsl, SLT_Debug, "value length is %lu.", strlen(value));
+		VSLb(ctx->vsl, SLT_Debug, "value length is %zu.", strlen(value));
 		vmod_set(ctx, priv, token, value);
 		i++;
 	}
