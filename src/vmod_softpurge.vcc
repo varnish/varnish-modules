@@ -1,2 +1,51 @@
 $Module softpurge VMOD
+DESCRIPTION
+===========
+
+``Softpurge`` is cache invalidation in Varnish that reduces TTL but
+keeps the grace value of a resource.
+
+This makes it possible to serve stale content to users if the backend
+is unavailable and fresh content can not be fetched.
+
 $Function VOID softpurge()
+Description
+	Performs a soft purge. Valid in vcl_hit and vcl_miss.
+
+Example::
+
+	sub vcl_hit {
+	    if (req.method == "PURGE") {
+	        softpurge.softpurge();
+	    }
+	}
+
+USAGE
+=====
+In your VCL you could then use this vmod along the following lines::
+
+    import softpurge;
+
+    sub vcl_recv {
+        if (req.method == "PURGE") {
+            return (hash);
+        }
+    }
+
+    sub vcl_backend_response {
+        set beresp.grace = 10m;
+    }
+
+    sub vcl_hit {
+        if (req.method == "PURGE") {
+            softpurge.softpurge();
+            return (synth(200, "Successful softpurge"));
+        }
+    }
+
+    sub vcl_miss {
+        if (req.method == "PURGE") {
+            softpurge.softpurge();
+            return (synth(200, "Successful softpurge"));
+        }
+    }
