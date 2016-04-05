@@ -50,7 +50,7 @@ $Function VOID clear(PRIV_TASK)
 Description
 	Clears out all the variables.
 Example
-	clrea();
+	clear();
 
 
 
