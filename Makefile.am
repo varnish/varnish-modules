@@ -6,6 +6,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	VMOD_DIR='$${libdir}/varnish/vmods'
 
 EXTRA_DIST = README.rst \
+	doc \
 	LICENSE \
 	CHANGES.rst
 
