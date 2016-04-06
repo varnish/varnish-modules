@@ -7,7 +7,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 
 EXTRA_DIST = README.rst \
 	LICENSE \
-	doc \
+	man \
 	CHANGES.rst
 
 doc_DATA = README.rst LICENSE

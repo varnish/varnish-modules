@@ -61,8 +61,8 @@ Usage
 
 
 Each module has a different set of functions and usage, described in
-separate documents in `docs/`. For completeness, here is a snippet from
-`docs/cookie.rst`::
+separate documents in `src/vmod_'.vcc`. For completeness, here is a snippet from
+`src/vmod_cookie.vcc`::
 
     import cookie;
 
