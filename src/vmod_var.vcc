@@ -1,19 +1,56 @@
 $Module var 3 Variable VMOD for Varnish
-# Shortcut for strings
-$Function VOID set(PRIV_TASK, STRING, STRING)
+
+DESCRIPTION
+===========
+
+Association list in VCL. Can be used to mimick variables.
+
+
+$Function VOID set_string(PRIV_TASK, STRING, STRING)
+Description
+	Sets the variable identified by S to the value T.
+Example
+	var.set_string("bar", "some random string");
+
+$Function STRING get_string(PRIV_TASK, STRING)
+Description
+	Returns the string identified by the supplied string.
+Example
+	set resp.http.foo = var.get_string("bar");
+
+Similar functions
+-----------------
+
+There are similar functions named:
 $Function STRING get(PRIV_TASK, STRING)
 
-$Function VOID global_set(STRING, STRING)
+$Function DURATION get_duration(PRIV_TASK, STRING)
+
+$Function INT get_int(PRIV_TASK, STRING)
+
+$Function IP get_ip(PRIV_TASK, STRING)
+
+$Function REAL get_real(PRIV_TASK, STRING)
+
 $Function STRING global_get(STRING)
 
-$Function VOID set_int(PRIV_TASK, STRING, INT)
-$Function INT get_int(PRIV_TASK, STRING)
-$Function VOID set_string(PRIV_TASK, STRING, STRING)
-$Function STRING get_string(PRIV_TASK, STRING)
-$Function VOID set_real(PRIV_TASK, STRING, REAL)
-$Function REAL get_real(PRIV_TASK, STRING)
+$Function VOID global_set(STRING, STRING)
+
+$Function VOID set(PRIV_TASK, STRING, STRING)
+
 $Function VOID set_duration(PRIV_TASK, STRING, DURATION)
-$Function DURATION get_duration(PRIV_TASK, STRING)
+
+$Function VOID set_int(PRIV_TASK, STRING, INT)
+
 $Function VOID set_ip(PRIV_TASK, STRING, IP)
-$Function IP get_ip(PRIV_TASK, STRING)
+
+$Function VOID set_real(PRIV_TASK, STRING, REAL)
+
 $Function VOID clear(PRIV_TASK)
+Description
+	Clears out all the variables.
+Example
+	clear();
+
+
+

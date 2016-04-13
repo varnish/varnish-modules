@@ -10,26 +10,36 @@ vmod_LTLIBRARIES = libvmod_cookie.la \
 	libvmod_vsthrottle.la \
 	libvmod_xkey.la
 
+dist_man_MANS = vmod_cookie.3 vmod_header.3 vmod_saintmode.3 vmod_vsthrottle.3 vmod_softpurge.3 vmod_tcp.3 vmod_var.3 vmod_xkey.3
 
 libvmod_cookie_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_cookie_la_SOURCES = vcc_cookie_if.c vcc_cookie_if.h vmod_cookie.c
-vcc_cookie_if.c vcc_cookie_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_cookie.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_cookie_if $(top_srcdir)/src/vmod_cookie.vcc
+MAINTAINERCLEANFILES = $(dist_man_MANS)
+vcc_cookie_if.c vcc_cookie_if.h vmod_cookie.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_cookie.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_cookie_if $(top_srcdir)/src/vmod_cookie.vcc
+
+vmod_cookie.3: ../man/vmod_cookie.man.rst
 
 libvmod_header_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_header_la_SOURCES = vcc_header_if.c vcc_header_if.h vmod_header.c
-vcc_header_if.c vcc_header_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_header.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_header_if $(top_srcdir)/src/vmod_header.vcc
+vcc_header_if.c vcc_header_if.h vmod_header.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_header.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_header_if $(top_srcdir)/src/vmod_header.vcc
+
+vmod_header.3: ../man/vmod_header.man.rst
 
 libvmod_vsthrottle_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_vsthrottle_la_SOURCES = vcc_vsthrottle_if.c vcc_vsthrottle_if.h vmod_vsthrottle.c
-vcc_vsthrottle_if.c vcc_vsthrottle_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_vsthrottle.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_vsthrottle_if $(top_srcdir)/src/vmod_vsthrottle.vcc
+vcc_vsthrottle_if.c vcc_vsthrottle_if.h vmod_vsthrottle.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_vsthrottle.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_vsthrottle_if $(top_srcdir)/src/vmod_vsthrottle.vcc
+
+vmod_vsthrottle.3: ../man/vmod_vsthrottle.man.rst
 
 libvmod_saintmode_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_saintmode_la_SOURCES = vcc_saintmode_if.c vcc_saintmode_if.h vmod_saintmode.c
-vcc_saintmode_if.c vcc_saintmode_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_saintmode.vcc
-	@VMODTOOL@ -w ../docs/ -w ../docs/ -o vcc_saintmode_if $(top_srcdir)/src/vmod_saintmode.vcc
+vcc_saintmode_if.c vcc_saintmode_if.h vmod_saintmode.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_saintmode.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_saintmode_if $(top_srcdir)/src/vmod_saintmode.vcc
+
+vmod_saintmode.3: ../man/vmod_saintmode.man.rst
 
 libvmod_softpurge_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_softpurge_la_SOURCES = \
@@ -37,25 +47,41 @@ libvmod_softpurge_la_SOURCES = \
 	vcc_softpurge_if.h \
         foreign/hash/hash_slinger.h \
 	vmod_softpurge.c
-vcc_softpurge_if.c vcc_softpurge_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_softpurge.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_softpurge_if $(top_srcdir)/src/vmod_softpurge.vcc
+vcc_softpurge_if.c vcc_softpurge_if.h vmod_softpurge.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_softpurge.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_softpurge_if $(top_srcdir)/src/vmod_softpurge.vcc
+
+vmod_softpurge.3: ../man/vmod_softpurge.man.rst
 
 libvmod_tcp_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_tcp_la_SOURCES = vcc_tcp_if.c vcc_tcp_if.h vmod_tcp.c
-vcc_tcp_if.c vcc_tcp_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_tcp.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_tcp_if $(top_srcdir)/src/vmod_tcp.vcc
+vcc_tcp_if.c vcc_tcp_if.h vmod_tcp.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_tcp.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_tcp_if $(top_srcdir)/src/vmod_tcp.vcc
+
+vmod_tcp.3: ../man/vmod_tcp.man.rst
 
 libvmod_var_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_var_la_SOURCES = vcc_var_if.c vcc_var_if.h vmod_var.c
-vcc_var_if.c vcc_var_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_var.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_var_if $(top_srcdir)/src/vmod_var.vcc
+vcc_var_if.c vcc_var_if.h vmod_var.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_var.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_var_if $(top_srcdir)/src/vmod_var.vcc
 
+vmod_var.3: ../man/vmod_var.man.rst
 
 libvmod_xkey_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-version -shared
 libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h vmod_xkey.c
-vcc_xkey_if.c vcc_xkey_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_xkey.vcc
-	@VMODTOOL@ -w ../docs/ -o vcc_xkey_if $(top_srcdir)/src/vmod_xkey.vcc
+vcc_xkey_if.c vcc_xkey_if.h vmod_xkey.man.rst: @VMODTOOL@ $(top_srcdir)/src/vmod_xkey.vcc
+	@VMODTOOL@ -w ../man/ -o vcc_xkey_if $(top_srcdir)/src/vmod_xkey.vcc
 
+vmod_xkey.3: ../man/vmod_xkey.man.rst
+
+%.1 %.2 %.3 %.4 %.5 %.6 %.7 %.8 %.9:
+if HAVE_RST2MAN
+	${RST2MAN} $< $@
+else
+	@echo "========================================"
+	@echo "You need rst2man installed to make dist"
+	@echo "========================================"
+	@false
+endif
 
 
 VMOD_TESTS = $(top_srcdir)/src/tests/*/*.vtc
@@ -70,5 +96,6 @@ EXTRA_DIST = foreign *vcc $(VMOD_TESTS) \
 	vtree.h
 
 CLEANFILES = $(builddir)/vcc*if.c $(builddir)/vcc*if.h \
-	$(builddir)/../docs/vmod_*.man.rst \
-	$(builddir)/../docs/vmod_*.rst
+	$(builddir)/../man/vmod_*.man.rst \
+	$(builddir)/../man/vmod_*.rst \
+	$(dist_man_MANS)
