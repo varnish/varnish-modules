@@ -62,7 +62,8 @@ VMOD_TESTS = $(top_srcdir)/src/tests/*/*.vtc
 .PHONY: $(VMOD_TESTS)
 
 $(top_srcdir)/src/tests/*/*.vtc:
-	@VARNISHTEST@ -Dvmoddir=$(vmoddir) -Dvarnishd=@VARNISHD@ -Dvmod_builddir=$(abs_top_builddir)/src -Dvmod_directors="directors from \"$(vmoddir)/libvmod_directors.so\"" $@
+	PATH=@LIBVARNISHAPI_SBINDIR@:$$PATH \
+	@VARNISHTEST@ -Dvmoddir=$(vmoddir) -Dvmod_builddir=$(abs_top_builddir)/src -Dvmod_directors="directors" $@
 
 check: $(VMOD_TESTS)
 

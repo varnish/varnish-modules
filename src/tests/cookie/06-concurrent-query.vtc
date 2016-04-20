@@ -1,8 +1,10 @@
 varnishtest "Test cookie vmod concurrency"
 
+barrier b1 cond 2
+
 server s1 {
        rxreq
-       sema r1 sync 2
+       barrier b1 sync
        expect req.url == "/s1"
        txresp
 } -start
@@ -39,7 +41,7 @@ client c1 {
 } -start
 
 client c2 {
-       sema r1 sync 2
+       barrier b1 sync
        txreq -url "/s2" -hdr "Cookie: a=foo"
        rxresp
        expect resp.http.x-val == "foo"
