@@ -1,8 +1,10 @@
 varnishtest "Test vcl reload"
 
+barrier b1 cond 2
+
 server s1 {
        rxreq
-       sema r1 sync 2
+       barrier b1 sync
        txresp
 } -start
 
@@ -36,6 +38,6 @@ varnish v1 -vcl+backend {
 	}
 }
 
-sema r1 sync 2
+barrier b1 sync
 
 client c1 -wait

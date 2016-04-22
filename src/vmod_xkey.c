@@ -451,9 +451,8 @@ xkey_cb_remove(struct worker *wrk, struct objcore *objcore, void *priv)
 	AZ(pthread_mutex_unlock(&mtx));
 }
 
-static void __match_proto__(exp_callback_f)
-xkey_cb(struct worker *wrk, struct objcore *objcore,
-    enum exp_event_e event, void *priv)
+static void __match_proto__(obj_event_f)
+xkey_cb(struct worker *wrk, void *priv, struct objcore *objcore, unsigned event)
 {
 
 	(void)wrk;
@@ -461,17 +460,14 @@ xkey_cb(struct worker *wrk, struct objcore *objcore,
 	(void)event;
 	(void)priv;
 
-	switch (event) {
-	case EXP_INSERT:
-	case EXP_INJECT:
-		xkey_cb_insert(wrk, objcore, priv);
-		break;
-	case EXP_REMOVE:
+	if ((event & (OEV_INSERT | OEV_EXPIRE)) == 0)
+		WRONG("received event which we didn't subscribe to");
+
+	if (event & OEV_EXPIRE)
 		xkey_cb_remove(wrk, objcore, priv);
-		break;
-	default:
-		WRONG("enum exp_event_e");
-	}
+
+	if (event & OEV_INSERT)
+		xkey_cb_insert(wrk, objcore, priv);
 }
 
 /**************************/
@@ -508,22 +504,22 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		if (oc->objcore->flags & OC_F_BUSY)
 			continue;
 		if (do_soft &&
-		    oc->objcore->exp.ttl <= (ctx->now - oc->objcore->exp.t_origin))
+		    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
 			continue;
 #ifdef VARNISH_PLUS
 		/* Varnish Plus interface for EXP_Rearm() is different. */
 		if (do_soft)
 			EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
-			    oc->objcore->exp.grace, oc->objcore->exp.keep);
+			    oc->objcore->grace, oc->objcore->keep);
 		else
-			EXP_Rearm(ctx->req->wrk, oc->objcore, oc->objcore->exp.t_origin, 0,
+			EXP_Rearm(ctx->req->wrk, oc->objcore, oc->objcore->t_origin, 0,
 			    0, 0);
 #else
 		if (do_soft)
 			EXP_Rearm(oc->objcore, ctx->now, 0,
-			    oc->objcore->exp.grace, oc->objcore->exp.keep);
+			    oc->objcore->grace, oc->objcore->keep);
 		else
-			EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin, 0,
+			EXP_Rearm(oc->objcore, oc->objcore->t_origin, 0,
 			    0, 0);
 #endif
 
@@ -555,8 +551,8 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
 		if (n_init == 0) {
-			xkey_cb_handle =
-			    EXP_Register_Callback(xkey_cb, NULL);
+			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
+			    OEV_INSERT | OEV_EXPIRE);
 			AN(xkey_cb_handle);
 		}
 		n_init++;
@@ -569,7 +565,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		if (n_init == 0) {
 			/* Do cleanup */
 			AN(xkey_cb_handle);
-			EXP_Deregister_Callback(&xkey_cb_handle);
+			ObjUnsubscribeEvents(&xkey_cb_handle);
 			AZ(xkey_cb_handle);
 			xkey_cleanup();
 		}

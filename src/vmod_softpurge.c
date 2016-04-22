@@ -60,12 +60,12 @@ vmod_softpurge(VRT_CTX)
 	now = ctx->req->t_prev;
 	Lck_Lock(&oh->mtx);
 	assert(oh->refcnt > 0);
-	VTAILQ_FOREACH(oc, &oh->objcs, list) {
+	VTAILQ_FOREACH(oc, &oh->objcs, hsh_list) {
 		CHECK_OBJ_NOTNULL(oc, OBJCORE_MAGIC);
 		assert(oc->objhead == oh);
 		if (oc->flags & OC_F_BUSY)
 			continue;
-		if (oc->exp_flags & OC_EF_DYING)
+		if (oc->exp_flags & OC_F_DYING)
 			continue;
 		if (spc < sizeof *ocp)
 			break;
@@ -82,7 +82,7 @@ vmod_softpurge(VRT_CTX)
 		/* Varnish Plus interface for EXP_Rearm() is different. */
 		EXP_Rearm(ctx->req->wrk, oc, now, 0, oc->exp.grace, oc->exp.keep);
 #else
-		EXP_Rearm(oc, now, 0, oc->exp.grace, oc->exp.keep);
+		EXP_Rearm(oc, now, 0, oc->grace, oc->keep);
 #endif
 		(void)HSH_DerefObjCore(ctx->req->wrk, &oc);
 
