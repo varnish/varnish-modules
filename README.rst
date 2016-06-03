@@ -34,6 +34,8 @@ development files.
 
 Source code is built with autotools::
 
+    sudo apt-get install automake          || sudo yum install automake
+    sudo apt-get install libtool           || sudo yum install libtool
     sudo apt-get install libvarnishapi-dev || sudo yum install varnish-libs-devel
     ./bootstrap   # If running from git.
     ./configure
