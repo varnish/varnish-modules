@@ -37,6 +37,8 @@ Source code is built with autotools::
     sudo apt-get install automake          || sudo yum install automake
     sudo apt-get install libtool           || sudo yum install libtool
     sudo apt-get install libvarnishapi-dev || sudo yum install varnish-libs-devel
+    # python-docutils are optional, but required to build manpages
+    sudo apt-get install python-docutils   || sudo yum install python-docutils
     ./bootstrap   # If running from git.
     ./configure
     make
