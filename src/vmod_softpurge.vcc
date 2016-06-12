@@ -1,2 +1,2 @@
-$Module softpurge VMOD
+$Module softpurge 3 Soft purge vmod
 $Function VOID softpurge()
