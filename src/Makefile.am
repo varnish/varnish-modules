@@ -35,7 +35,7 @@ libvmod_softpurge_la_LDFLAGS = $(AM_LDFLAGS) -module -export-dynamic -avoid-vers
 libvmod_softpurge_la_SOURCES = \
 	vcc_softpurge_if.c \
 	vcc_softpurge_if.h \
-        foreign/hash/hash_slinger.h \
+	foreign/hash/hash_slinger.h \
 	vmod_softpurge.c
 vcc_softpurge_if.c vcc_softpurge_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_softpurge.vcc
 	@VMODTOOL@ -w ../docs/ -o vcc_softpurge_if $(top_srcdir)/src/vmod_softpurge.vcc
