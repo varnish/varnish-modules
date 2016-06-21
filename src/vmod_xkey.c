@@ -486,9 +486,11 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	int i;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+#ifdef VARNISH_PLUS
+        /* These are only used in the Varnish Plus mode of rearm */
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req->wrk, WORKER_MAGIC);
-
+#endif
 	if (!key || !*key)
 		return (0);
 
