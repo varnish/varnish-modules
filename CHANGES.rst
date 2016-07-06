@@ -5,6 +5,7 @@ varnish-modules dev (UNRELEASED)
 
 Changes since 0.9.0:
 
+* Forgotten vmod-var documentation added. (Issue #24)
 * Licenses added to source files. (#9)
 * [vmod-cookie] Bugfixes from libvmod-cookie.git forgotten on initial import applied.
   More robust filter parsing, superfluous debug log entries removed, avoid
