@@ -45,39 +45,37 @@ saintmode capabilities.
 
 Example::
 
-    backend b0 {
-        .host = "foo";
-        .port = "8080";
-    }
+	vcl 4.0;
 
-    backend b1 {
-        .host = "bar";
-        .port = "8080";
-    }
+	import saintmode;
+	import directors;
 
-    sub vcl_init {
-        # Instantiate sm0, sm1 for backends b0, b1
-        new sm0 = saintmode.saintmode(b0, 10);
-        new sm1 = saintmode.saintmode(b1, 10);
+	backend tile1 { .host = "192.0.2.11"; .port = "80"; }
+	backend tile2 { .host = "192.0.2.12"; .port = "80"; }
 
-        # Add both to a director. Use sm0, sm1 in place of b0, b1
-        new mydir = directors.random();
-        mydir.add_backend(sm0.backend(), 1);
-        mydir.add_backend(sm1.backend(), 1);
-    }
+	sub vcl_init {
+		# Instantiate sm1, sm2 for backends tile1, tile2
+		new sm1 = saintmode.saintmode(tile1, 10);
+		new sm2 = saintmode.saintmode(tile2, 10);
 
-    sub vcl_backend_fetch {
-        set bereq.backend = mydir.backend();
-    }
+		# Add both to a director. Use sm0, sm1 in place of tile1, tile2.
+		new imagedirector = directors.random();
+		imagedirector.add_backend(sm1.backend(), 1);
+		imagedirector.add_backend(sm2.backend(), 1);
+	}
 
-    sub vcl_backend_response {
-        if (beresp.status == 500) {
-            # This marks the backend as sick for this specific
-            # object for the next 20s.
-            saintmode.blacklist(20s);
-            return (retry);
-        }
-    }
+	sub vcl_backend_fetch {
+		set bereq.backend = imagedirector.backend();
+	}
+
+	sub vcl_backend_response {
+		if (beresp.status >= 500) {
+			# This marks the backend as sick for this specific
+			# object for the next 20s.
+			saintmode.blacklist(20s);
+			return (retry);
+		}
+	}
 
 
 CONTENTS
@@ -123,9 +121,9 @@ blacklisted before the whole backend is regarded as sick. Corresponds with the
 
 Example::
 
-        sub vcl_init {
-                new sm = saintmode.saintmode(b, 10);
-        }
+    sub vcl_init {
+        new sm = saintmode.saintmode(b, 10);
+    }
 
 
 .. _func_saintmode.backend:
