@@ -1,6 +1,6 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.9.1 (unreleased)
+varnish-modules 0.9.1 (2016-07-07)
 ----------------------------------
 
 Changes since 0.9.0:
@@ -15,7 +15,7 @@ Changes since 0.9.0:
 This release is intended to work with Varnish Cache 4.1.3 and higher.
 
 
-varnish-modules 0.9.0 (2014-03-04)
+varnish-modules 0.9.0 (2016-03-04)
 ----------------------------------
 
 Initial release. This package contains the source files extracted from
