@@ -30,7 +30,10 @@ Source releases can be downloaded from:
 
 
 Installation requires an installed version of Varnish Cache, including the
-development files.
+development files. Requirement can be found in the `Varnish documentation`_.
+
+.. _`Varnish documentation`: https://www.varnish-cache.org/docs/4.1/installation/install.html#compiling-varnish-from-source
+
 
 Source code is built with autotools::
 
