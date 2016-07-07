@@ -1,37 +1,27 @@
+..
+.. NB:  This file is machine generated, DO NOT EDIT!
+..
+.. Edit vmod.vcc and run make instead
+..
+
+.. role:: ref(emphasis)
+
+.. _vmod_xkey(3):
+
 =========
 vmod_xkey
 =========
 
-------------------------------------
-Varnish surrogate keys Module (xkey)
-------------------------------------
+----------------------------------------
+Surrogate keys support for Varnish Cache
+----------------------------------------
+
+:Manual section: 3
 
 SYNOPSIS
 ========
 
-::
-
-    import xkey;
-
-    # Example of purging using xkey.
-    #
-    # The key to be purged is specified in the xkey-purge header.
-    sub vcl_recv {
-        if (req.http.xkey-purge) {
-            if (xkey.purge(req.http.xkey-purge) != 0) {
-                return (synth(200, "Purged"));
-            } else {
-                return (synth(404, "Key not found"));
-            }
-        }
-    }
-
-    # Normally the backend is responsible for setting the header.
-    # If you were to do it in VCL it will look something like this:
-    sub vcl_backend_response {
-        set beresp.http.xkey = "purgeable_hash_key1 purgeable_hash_key2";
-    }
-
+import xkey [from "path"] ;
 
 DESCRIPTION
 ===========
@@ -94,42 +84,38 @@ Varnish will find the objects and clear them out, responding with::
 
 The objects are now cleared.
 
+CONTENTS
+========
 
-FUNCTIONS
-=========
+* :ref:`func_purge`
+* :ref:`func_softpurge`
 
-purge
------
+.. _func_purge:
 
-Prototype
-	::
-
-	   purge(STRING S)
-
-Return value
-	INT
-
-Description
-
-	Purges all objects hashed on the given key. Returns the number
-	of objects that were purged.
-
-softpurge
----------
+INT purge(STRING)
+-----------------
 
 Prototype
-	::
-
-	   softpurge(STRING S)
-
-Return value
-	INT
+	INT purge(STRING key)
 
 Description
+    Purges all objects hashed on `key`. Returns the number of objects that were
+    purged.
 
-	Performs a "soft purge" for all objects hashed on the given
-	key. Returns the number of objects that were purged.
+
+.. _func_softpurge:
+
+INT softpurge(STRING)
+---------------------
+
+Prototype
+	INT softpurge(STRING key)
+
+Description
+	Performs a "soft purge" for all objects hashed on `key`.
+	Returns the number of objects that were purged.
 
 	A softpurge differs from a regular purge in that it resets an
 	object's TTL but keeps it available for grace mode and conditional
 	requests for the remainder of its configured grace and keep time.
+

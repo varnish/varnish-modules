@@ -42,4 +42,4 @@ Makefile.in
 /stamp-h1
 /m4/
 /src/vcc*if.[ch]
-/docs/vmod_*.rst
+/docs/vmod_*.man.rst

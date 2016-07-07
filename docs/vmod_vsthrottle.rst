@@ -1,15 +1,27 @@
+..
+.. NB:  This file is machine generated, DO NOT EDIT!
+..
+.. Edit vmod.vcc and run make instead
+..
+
+.. role:: ref(emphasis)
+
+.. _vmod_vsthrottle(3):
+
 ===============
 vmod_vsthrottle
 ===============
 
--------------------------
-Varnish Throttling Module
--------------------------
+---------------
+Throttling VMOD
+---------------
+
+:Manual section: 3
 
 SYNOPSIS
 ========
 
-import vsthrottle;
+import vsthrottle [from "path"] ;
 
 DESCRIPTION
 ===========
@@ -33,26 +45,24 @@ Memory usage is around 100 bytes per key tracked.
 
 .. _token-bucket algorithm: http://en.wikipedia.org/wiki/Token_bucket
 
+CONTENTS
+========
 
-FUNCTIONS
-=========
+* :ref:`func_is_denied`
 
-is_denied
----------
+.. _func_is_denied:
+
+BOOL is_denied(STRING, INT, DURATION)
+-------------------------------------
 
 Prototype
-        ::
+	BOOL is_denied(STRING jey, INT limit, DURATION period)
 
-                is_denied(STRING key, INT limit, DURATION period)
 Arguments
-	key: A unique identifier to define what is being throttled - more examples below
-	
-	limit: How many requests in the specified period
-	
-	period: The time period
-	
-Return value
-	BOOL
+    key: A unique identifier to define what is being throttled - more examples below
+    limit: How many requests in the specified period
+    period: The time period
+
 Description
 	Can be used to rate limit the traffic for a specific key to a
 	maximum of 'limit' requests per 'period' time. A token bucket
@@ -72,17 +82,17 @@ Example
 			# ...
 		}
 
-
 USAGE
 =====
 
 In your VCL you can now use this vmod along the following lines::
-        
-        import vsthrottle;
-        
-        sub vcl_recv {
-        	if (vsthrottle.is_denied(client.identity, 15, 10s)) {
-        		# Client has exceeded 15 reqs per 10s
-        		return (synth(429, "Too Many Requests"));
-        	}
-        }
+
+    import vsthrottle;
+
+    sub vcl_recv {
+        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
+            # Client has exceeded 15 reqs per 10s
+            return (synth(429, "Too Many Requests"));
+    	}
+    }
+
