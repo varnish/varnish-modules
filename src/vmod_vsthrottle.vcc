@@ -49,17 +49,3 @@ Example
 			# ...
 		}
 
-USAGE
-=====
-
-In your VCL you can now use this vmod along the following lines::
-
-    import vsthrottle;
-
-    sub vcl_recv {
-        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
-            # Client has exceeded 15 reqs per 10s
-            return (synth(429, "Too Many Requests"));
-    	}
-    }
-
