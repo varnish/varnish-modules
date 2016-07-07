@@ -1,61 +1,68 @@
-$Module var 3 Variable VMOD for Varnish
+$Module var 3 Variable support for Varnish VCL
 
-DESCRIPTION
-===========
+This VMOD implements basic variable support in VCL.
 
-Association list in VCL. Can be used to mimick variables.
+It supports strings, integers and real numbers. There are methods to get and
+set each data type.
 
+Global variables have a lifespan that extends across requests and
+VCLs, for as long as the vmod is loaded.
 
-$Function VOID set_string(PRIV_TASK, STRING, STRING)
+The remaining functions have PRIV_TASK lifespan and are local to a single
+request or backend request.
 
-Sets the variable identified by S to the value T.
+$Function VOID set(PRIV_TASK, STRING key, STRING value)
 
-Example::
+Set `key` to `value`.
 
-	var.set_string("bar", "some random string");
+$Function STRING get(PRIV_TASK, STRING )
 
-
-$Function STRING get_string(PRIV_TASK, STRING)
-
-Returns the string identified by the supplied string.
-
-Example::
-
-	set resp.http.foo = var.get_string("bar");
-
-Similar functions
------------------
-
-There are similar functions named:
-$Function STRING get(PRIV_TASK, STRING)
-
-$Function DURATION get_duration(PRIV_TASK, STRING)
-
-$Function INT get_int(PRIV_TASK, STRING)
-
-$Function IP get_ip(PRIV_TASK, STRING)
-
-$Function REAL get_real(PRIV_TASK, STRING)
-
-$Function STRING global_get(STRING)
+Get `key` with data type STRING. If stored `key` is not a STRING an empty string is returned.
 
 $Function VOID global_set(STRING, STRING)
 
-$Function VOID set(PRIV_TASK, STRING, STRING)
+$Function STRING global_get(STRING)
 
-$Function VOID set_duration(PRIV_TASK, STRING, DURATION)
+$Function VOID set_int(PRIV_TASK, STRING key, INT value)
 
-$Function VOID set_int(PRIV_TASK, STRING, INT)
+Set `key` to `value`.
 
-$Function VOID set_ip(PRIV_TASK, STRING, IP)
+$Function INT get_int(PRIV_TASK, STRING key)
 
-$Function VOID set_real(PRIV_TASK, STRING, REAL)
+Get `key` with data type INT. If stored `key` is not an INT zero will be returned.
+
+$Function VOID set_string(PRIV_TASK, STRING key, STRING value)
+
+Identical to set().
+
+$Function STRING get_string(PRIV_TASK, STRING key)
+
+Identical to get().
+
+$Function VOID set_real(PRIV_TASK, STRING key, REAL value)
+
+Set `key` to `value`.
+
+$Function REAL get_real(PRIV_TASK, STRING key)
+
+Get `key` with data type REAL. If stored `key` is not a REAL zero will be returned.
+
+$Function VOID set_duration(PRIV_TASK, STRING key, DURATION value)
+
+Set `key` to `value`.
+
+$Function DURATION get_duration(PRIV_TASK, STRING key)
+
+Get `key` with data type DURATION. If stored `key` is not a DURATION zero will be returned.
+
+$Function VOID set_ip(PRIV_TASK, STRING key, IP value)
+
+Set `key` to `value`.
+
+$Function IP get_ip(PRIV_TASK, STRING key)
+
+Get `key` with data type IP. If stored `key` is not an IP null will be returned.
 
 $Function VOID clear(PRIV_TASK)
-Description
-	Clears out all the variables.
-Example
-	clear();
 
-
-
+Clear all non-global variables.
