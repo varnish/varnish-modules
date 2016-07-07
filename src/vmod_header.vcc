@@ -43,14 +43,6 @@ Example
 	        header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
 
 
-$Function STRING version()
-Description
-        Returns the string constant version-number of the header vmod.
-Example
-	::
-
-		set resp.http.X-header-version = header.version();
-
 
 ACKNOWLEDGEMENTS
 ================

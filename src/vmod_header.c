@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2011-2013 Varnish Software
+ * Copyright (c) 2011-2016 Varnish Software
  * All rights reserved.
  *
  * Author: Kristian Lyngstol <kristian@bohemians.org>
@@ -268,10 +268,3 @@ vmod_remove(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 	header_http_Unset(ctx, hp, hdr->what, priv->priv);
 }
 
-VCL_STRING __match_proto__()
-vmod_version(VRT_CTX)
-{
-	(void)ctx;
-
-	return (VERSION);
-}
