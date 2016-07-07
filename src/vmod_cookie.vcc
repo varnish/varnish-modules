@@ -9,20 +9,19 @@ get/set/delete functions are available. A filter_except() method removes all
 but a set comma-separated list of cookies.
 
 A convenience function for formatting the Set-Cookie Expires date field
-is also included. It might be needed to use libvmod-header if there might
-be multiple Set-Cookie response headers.
+is also included. If there are multiple Set-Cookie headers vmod-header
+should be used.
 
-Important: The state loaded with cookie.parse() can only be guaranteed
-within a single VCL call. Do the cookie operations in vcl_recv, and store
-any additional variables you need later on as fake request headers.
+The state loaded with cookie.parse() has a lifetime of the current request
+or backend request context. To pass variables to the backend request, store
+the contents as fake bereq headers.
 
-It is currently not safe/tested to call this VMOD in any fetch threads.
-(vcl_backend_fetch and similar)
 
 $Function VOID clean(PRIV_TASK)
+
 Description
-        Clean up all previously parse()-d cookies. Probably of limited
-        use. It is not necessary to run clean() in normal operation.
+        Clean up previously parsed cookies. It is not necessary to run clean()
+        in normal operations.
 Example
         ::
 
@@ -30,9 +29,10 @@ Example
                         cookie.clean();
                 }
 
-$Function VOID delete(PRIV_TASK, STRING)
+$Function VOID delete(PRIV_TASK, STRING cookiename)
+
 Description
-        Delete a cookie from internal vmod storage if it exists.
+        Delete `cookiename` from internal vmod storage if it exists.
 
 Example
         ::
@@ -43,11 +43,11 @@ Example
 		    // get_string() will now yield "cookie1: value1";
 		}
 
-$Function VOID filter_except(PRIV_TASK, STRING)
+$Function VOID filter_except(PRIV_TASK, STRING filterstring)
+
 Description
         Delete all cookies from internal vmod storage that is not in the
         comma-separated argument cookienames.
-
 Example
         ::
 
@@ -58,14 +58,14 @@ Example
                         // "cookie1: value1; cookie2: value2;";
                 }
 
-$Function STRING format_rfc1123(TIME, DURATION)
+$Function STRING format_rfc1123(TIME now, DURATION timedelta)
+
 Description
         Get a RFC1123 formatted date string suitable for inclusion in a
         Set-Cookie response header.
 
         Care should be taken if the response has multiple Set-Cookie headers.
         In that case the header vmod should be used.
-
 Example
         ::
 
@@ -74,10 +74,10 @@ Example
                         set resp.http.Set-Cookie = "userid=" + req.http.userid + "; Expires=" + cookie.format_rfc1123(now, 5m) + "; httpOnly";
                 }
 
-$Function STRING get(PRIV_TASK, STRING)
-Description
-        Get the value of a cookie, as stored in internal vmod storage. If the cookie name does not exists, an empty string is returned.
+$Function STRING get(PRIV_TASK, STRING cookiename)
 
+Description
+        Get the value of `cookiename`, as stored in internal vmod storage. If `cookiename` does not exist an empty string is returned.
 Example
         ::
 
@@ -88,8 +88,10 @@ Example
                 }
 
 $Function STRING get_string(PRIV_TASK)
+
 Description
-        Get a Cookie string value with all cookies in internal vmod storage.
+        Get a Cookie string value with all cookies in internal vmod storage. Does
+	not modify internal storage.
 Example
         ::
 
@@ -99,9 +101,10 @@ Example
                         set req.http.cookie = cookie.get_string();
                 }
 
-$Function BOOL isset(PRIV_TASK, STRING)
+$Function BOOL isset(PRIV_TASK, STRING cookiename)
+
 Description
-        Check if a given cookie is set in the internal vmod storage.
+        Check if `cookiename` is set in the internal vmod storage.
 
 Example
         ::
@@ -114,10 +117,10 @@ Example
                         }
                 }
 
-$Function VOID parse(PRIV_TASK, STRING)
+$Function VOID parse(PRIV_TASK, STRING cookieheader)
+
 Description
-        Parse the cookie string in string S. The parsed values are only guaranteed
-        to exist within a single VCL function. Implicit clean() if run more than once.
+        Parse the cookie string in `cookieheader`. If state already exists, clean() will be run first.
 Example
         ::
 
@@ -127,9 +130,10 @@ Example
 
 
 
-$Function VOID set(PRIV_TASK, STRING, STRING)
+$Function VOID set(PRIV_TASK, STRING cookiename, STRING value)
+
 Description
-        Set the internal vmod storage value for a cookie to a value.
+        Set the internal vmod storage for `cookiename` to `value`.
 
 Example
         ::
@@ -138,3 +142,4 @@ Example
                         cookie.set("cookie1", "value1");
                         std.log("cookie1 value is: " + cookie.get("cookie1"));
                 }
+

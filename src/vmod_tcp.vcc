@@ -2,51 +2,58 @@ $Module tcp 3 TCP vmod
 DESCRIPTION
 ===========
 
-The TCP vmod is a set of functions that accesses and changes attributes
-on the (client) TCP connection.
-It allows you to access TCP_INFO data, and also change the congestion control
-algorithm used.
-This VMOD works with Varnish Cache 4.0 and similar.
+The TCP vmod is a set of functions that accesses and changes attributes on the
+(client) TCP connection. It allows you to access TCP_INFO data, and also change
+the congestion control algorithm used.
+
+Varnish Cache 4.1 and newer is supported.
+
 The VMOD is Linux-specific and requires a recent kernel to be useful. (>=3.13)
-The interface/functions provided by this vmod are not stable, expect changes.
 
-$Function INT congestion_algorithm(STRING)
-Description
-	Set the client socket congestion control algorithm to S. Returns 0 on success, and -1 on error.
-Example
-        ::
 
-                set req.http.x-tcp = tcp.congestion_algorithm("cubic");
+$Function INT congestion_algorithm(STRING algorithm)
+
+Set the client socket congestion control algorithm to S. Returns 0 on success, and -1 on error.
+
+Example::
+
+    sub vcl_recv {
+        set req.http.x-tcp = tcp.congestion_algorithm("cubic");
+    }
+
 
 $Function VOID dump_info()
-Description
-	Write the contents of the TCP_INFO data structure into varnishlog.
+
+Write the contents of the TCP_INFO data structure into varnishlog.
+
 Example
         ::
 
                 tcp.dump_info();
 
+
 $Function REAL get_estimated_rtt()
-Description
-	Get the estimated round-trip-time for the client socket. Unit: milliseconds.
-Example
-        ::
+
+Get the estimated round-trip-time for the client socket. Unit: milliseconds.
+
+Example::
 
                 if (tcp.get_estimated_rtt() > 300) {
                     std.log("client is far away.");
                 }
 
+
 $Function VOID set_socket_pace(INT)
-Description
-    Set socket pacing on client-side TCP connection to PACE KB/s. Network
-    interface used must be using a supported scheduler. (fq)
-Example
-        ::
+
+Set socket pacing on client-side TCP connection to PACE KB/s. Network interface
+used must be using a supported scheduler. (fq)
+
+Example::
 
                 tcp.set_socket_pace(1000);
 
-USAGE
-=====
+Usage
+-----
 
 In your VCL you could then use this vmod along the following lines::
 

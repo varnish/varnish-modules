@@ -2,40 +2,41 @@ $Module header 3 Header VMOD for Varnish
 DESCRIPTION
 ===========
 
-Varnish Module (vmod) for manipulation of duplicated headers (for instance
-multiple set-cookie headers).
+Varnish Module (vmod) for manipulation of duplicated HTTP headers, for instance
+multiple Set-Cookie headers.
 
 $Event event_function
-
-$Function VOID append(HEADER,STRING_LIST)
+$Function VOID append(HEADER, STRING_LIST)
 Description
-        Append lets you add an extra occurrence of an existing header.
+        Append an extra occurrence to an existing header.
 Example
 	::
 
-		header.append(beresp.http.Set-Cookie,"foo=bar")
+		header.append(beresp.http.Set-Cookie, "foo=bar")
 
-$Function VOID copy(HEADER,HEADER)
+$Function VOID copy(HEADER, HEADER)
+
 Description
-        Copies all of the source headers to a new header.
+        Copy all source headers to a new header.
 Example
 	::
 
 		header.copy(beresp.http.set-cookie, beresp.http.x-old-cookie);
 
-$Function STRING get(PRIV_CALL,HEADER,STRING)
+$Function STRING get(PRIV_CALL, HEADER header, STRING regex)
+
 Description
-        Get fetches the value of the first `header` that matches the given
-        regular expression.
+        Fetches the value of the first `header` that matches the given
+        regular expression `regex`.
 Example
 	::
 
 		set beresp.http.xusr = header.get(beresp.http.set-cookie,"user=");
 
-$Function VOID remove(PRIV_CALL,HEADER,STRING)
+$Function VOID remove(PRIV_CALL, HEADER header, STRING regex)
+
 Description
-        remove() removes all occurences of `header` that matches the given
-        regular expression. The example is a white-list of "funcookie=".
+        Remove all occurences of `header` that matches `regex`.
 Example
 	::
 
@@ -50,27 +51,17 @@ Example
 
 		set resp.http.X-header-version = header.version();
 
+
 ACKNOWLEDGEMENTS
 ================
 
 The development of this plugin was made possible by the sponsorship of
 Softonic, http://en.softonic.com/ .
 
-Also thanks to: Imo Klabun and Anders Nordby for bug reports.
+Also thanks to Imo Klabun and Anders Nordby for bug reports.
 
 BUGS
 ====
 
 You can't use dynamic regular expressions, which also holds true for normal
-regular expressions in regsub(), but VCL isn't able to warn you about this
-when it comes to vmods yet.
-
-Some overlap with varnishd exists, this will be mended as Varnish 3.0
-evolves.
-
-SEE ALSO
-========
-
-* varnishd(1)
-* vcl(7)
-* https://github.com/varnish/libvmod-header
+regular expressions in regsub().

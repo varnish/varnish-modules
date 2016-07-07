@@ -62,16 +62,20 @@ The objects are now cleared.
 
 $Event vmod_event
 
-$Function INT purge(STRING)
-Description
-	Purges all objects hashed on the given key. Returns the number
-	of objects that were purged.
+$Function INT purge(STRING key)
 
-$Function INT softpurge(STRING)
 Description
-	Performs a "soft purge" for all objects hashed on the given
-	key. Returns the number of objects that were purged.
+    Purges all objects hashed on `key`. Returns the number of objects that were
+    purged.
+
+
+$Function INT softpurge(STRING key)
+
+Description
+	Performs a "soft purge" for all objects hashed on `key`.
+	Returns the number of objects that were purged.
 
 	A softpurge differs from a regular purge in that it resets an
 	object's TTL but keeps it available for grace mode and conditional
 	requests for the remainder of its configured grace and keep time.
+

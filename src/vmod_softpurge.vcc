@@ -8,17 +8,19 @@ keeps the grace value of a resource.
 This makes it possible to serve stale content to users if the backend
 is unavailable and fresh content can not be fetched.
 
+
 $Function VOID softpurge()
-Description
-	Performs a soft purge. Valid in vcl_hit and vcl_miss.
+
+Performs a soft purge. Valid in vcl_hit and vcl_miss.
 
 Example::
 
-	sub vcl_hit {
-	    if (req.method == "PURGE") {
-	        softpurge.softpurge();
-	    }
-	}
+    sub vcl_hit {
+        if (req.method == "PURGE") {
+            softpurge.softpurge();
+        }
+    }
+
 
 USAGE
 =====

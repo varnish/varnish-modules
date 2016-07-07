@@ -7,15 +7,20 @@ Association list in VCL. Can be used to mimick variables.
 
 
 $Function VOID set_string(PRIV_TASK, STRING, STRING)
-Description
-	Sets the variable identified by S to the value T.
-Example
+
+Sets the variable identified by S to the value T.
+
+Example::
+
 	var.set_string("bar", "some random string");
 
+
 $Function STRING get_string(PRIV_TASK, STRING)
-Description
-	Returns the string identified by the supplied string.
-Example
+
+Returns the string identified by the supplied string.
+
+Example::
+
 	set resp.http.foo = var.get_string("bar");
 
 Similar functions

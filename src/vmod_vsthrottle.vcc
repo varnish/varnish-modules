@@ -23,13 +23,12 @@ Memory usage is around 100 bytes per key tracked.
 
 $Event event_function
 
-$Function BOOL is_denied(STRING, INT, DURATION)
+$Function BOOL is_denied(STRING jey, INT limit, DURATION period)
+
 Arguments
-	key: A unique identifier to define what is being throttled - more examples below
-
-	limit: How many requests in the specified period
-
-	period: The time period
+    key: A unique identifier to define what is being throttled - more examples below
+    limit: How many requests in the specified period
+    period: The time period
 
 Description
 	Can be used to rate limit the traffic for a specific key to a
@@ -55,11 +54,12 @@ USAGE
 
 In your VCL you can now use this vmod along the following lines::
 
-        import vsthrottle;
+    import vsthrottle;
 
-        sub vcl_recv {
-		if (vsthrottle.is_denied(client.identity, 15, 10s)) {
-			# Client has exceeded 15 reqs per 10s
-				return (synth(429, "Too Many Requests"));
-		}
-	}
+    sub vcl_recv {
+        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
+            # Client has exceeded 15 reqs per 10s
+            return (synth(429, "Too Many Requests"));
+    	}
+    }
+
