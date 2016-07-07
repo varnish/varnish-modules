@@ -213,7 +213,7 @@ vmod_append(VRT_CTX, VCL_HEADER hdr, const char *fmt, ...)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	assert(fmt != NULL);
-	
+
 	hp = VRT_selecthttp(ctx, hdr->where);
 	va_start(ap, fmt);
 	b = VRT_String(hp->ws, hdr->what + 1, fmt, ap);
@@ -234,7 +234,7 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	header_init_re(priv, s);
-	
+
 	hp = VRT_selecthttp(ctx, hdr->where);
 	u = header_http_findhdr(ctx, hp, hdr->what, priv->priv);
 	if (u == 0)
@@ -251,7 +251,7 @@ vmod_copy(VRT_CTX, VCL_HEADER src, VCL_HEADER dst)
 	struct http *src_hp;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	
+
 	src_hp = VRT_selecthttp(ctx, src->where);
 	header_http_cphdr(ctx, src_hp, src->what, dst);
 }
@@ -263,8 +263,7 @@ vmod_remove(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	header_init_re(priv, s);
-	
+
 	hp = VRT_selecthttp(ctx, hdr->where);
 	header_http_Unset(ctx, hp, hdr->what, priv->priv);
 }
-
