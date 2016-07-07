@@ -100,7 +100,6 @@ Corresponds to the use of ``beresp.saintmode`` in Varnish 3.0. Only available
 in vcl_backend_response.
 
 Example::
-::
 
     sub vcl_backend_response {
         if (beresp.http.broken-app) {
@@ -144,5 +143,4 @@ Example::
     sub vcl_backend_fetch {
         set bereq.backend = sm.backend();
     }
-
 
