@@ -130,7 +130,7 @@ xkey_ptrcmp(const struct xkey_ptrkey *k1, const struct xkey_ptrkey *k2)
 }
 
 static struct xkey_hashhead *
-xkey_hashhead_new()
+xkey_hashhead_new(void)
 {
 	struct xkey_hashhead *head;
 
@@ -166,7 +166,7 @@ xkey_hashhead_delete(struct xkey_hashhead **phead)
 }
 
 static struct xkey_ochead *
-xkey_ochead_new()
+xkey_ochead_new(void)
 {
 	struct xkey_ochead *head;
 
@@ -201,7 +201,7 @@ xkey_ochead_delete(struct xkey_ochead **phead)
 }
 
 static struct xkey_oc *
-xkey_oc_new()
+xkey_oc_new(void)
 {
 	struct xkey_oc *oc;
 
@@ -352,7 +352,7 @@ xkey_remove(struct xkey_ochead **pochead)
 }
 
 static void
-xkey_cleanup()
+xkey_cleanup(void)
 {
 	struct xkey_hashkey *hashkey;
 	struct xkey_hashhead *hashhead;
