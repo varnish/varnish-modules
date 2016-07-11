@@ -31,6 +31,8 @@ Example::
 
 	sub vcl_init {
 		# Instantiate sm1, sm2 for backends tile1, tile2
+		# with 10 blacklisted objects as the threshold for marking the
+		# whole backend sick.
 		new sm1 = saintmode.saintmode(tile1, 10);
 		new sm2 = saintmode.saintmode(tile2, 10);
 
@@ -41,6 +43,7 @@ Example::
 	}
 
 	sub vcl_backend_fetch {
+		# Get a backend from the director
 		set bereq.backend = imagedirector.backend();
 	}
 
@@ -49,6 +52,7 @@ Example::
 			# This marks the backend as sick for this specific
 			# object for the next 20s.
 			saintmode.blacklist(20s);
+			# Retry the request.
 			return (retry);
 		}
 	}
@@ -83,15 +87,3 @@ Example::
     sub vcl_init {
         new sm = saintmode.saintmode(b, 10);
     }
-
-
-$Method BACKEND .backend()
-
-Used for assigning the backend from the saintmode object.
-
-Example::
-
-    sub vcl_backend_fetch {
-        set bereq.backend = sm.backend();
-    }
-
