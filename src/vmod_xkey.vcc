@@ -23,6 +23,33 @@ Preferably the secondary hash keys are set from the backend
 application, but can also be set from VCL in ``vcl_backend_response``
 as in the above example.
 
+.. vcl-start
+VCL example::
+
+    vcl 4.0;
+    import xkey;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    acl purgers {
+        "203.0.113.0"/24;
+    }
+
+    sub vcl_recv {
+        if (req.method == "PURGE") {
+            if (client.ip !~ purgers) {
+                return (synth(403, "Forbidden"));
+            }
+            set req.http.n-gone = xkey.purge(req.http.key);
+            # or: set req.http.n-gone = xkey.softpurge(req.http.key)
+
+            return (synth(200, "Invalidated "+req.http.n-gone+" objects"));
+        }
+    }
+
+.. vcl-end
+
+
 Example
 -------
 

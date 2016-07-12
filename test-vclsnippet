@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Script that picks out a VCL section from a .vcc file and runs
+# varnishd -C on it to check syntax.
+#
+# Author: Lasse Karstensen <lasse.karstensen@gmail.com>
+#
+TMPFILE=$(mktemp)
+
+cleanup() {
+        rm -f "$TMPFILE"
+	test -d "$VDIR" && rmdir "$VDIR"
+}
+trap cleanup EXIT
+
+if [ ! -f "$1" ]; then
+	echo "ERROR: Can't read $1"
+	exit 1
+fi
+
+if [ -z "`grep ".. vcl-start" $1`" ]; then
+	echo "ERROR: No VCL marker in $1"
+	exit 2
+fi
+
+sed -e '1,/^.. vcl-start/d' \
+	-e '/.. vcl-end/,$d' \
+	-e '/^[^ ]/d'  $1 > $TMPFILE
+
+#cat $TMPFILE
+
+VDIR=/tmp/varnishd$RANDOM$RANDOM
+#RES=$(/usr/sbin/varnishd -C -f $TMPFILE -n $VDIR -p vmod_dir=/usr/lib/x86_64-linux-gnu/varnish/vmods/ 2>&1)
+RES=$(/usr/sbin/varnishd -C -f $TMPFILE -n $VDIR 2>&1)
+RCODE=$?
+if [ $RCODE != 0 ]; then
+	printf "$RES"
+else
+	echo "OK"
+fi
+cleanup
+exit $RCODE

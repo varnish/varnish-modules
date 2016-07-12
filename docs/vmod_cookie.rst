@@ -40,6 +40,8 @@ The state loaded with cookie.parse() has a lifetime of the current request
 or backend request context. To pass variables to the backend request, store
 the contents as fake bereq headers.
 
+.. vcl-start
+
 Filtering example::
 
     vcl 4.0;
@@ -66,6 +68,7 @@ Filtering example::
         }
     }
 
+.. vcl-end
 
 CONTENTS
 ========
