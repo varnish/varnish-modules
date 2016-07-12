@@ -16,6 +16,32 @@ The state loaded with cookie.parse() has a lifetime of the current request
 or backend request context. To pass variables to the backend request, store
 the contents as fake bereq headers.
 
+Filtering example::
+
+    vcl 4.0;
+
+    import cookie;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    sub vcl_recv {
+        if (req.http.cookie) {
+            cookie.parse(req.http.cookie);
+            # Either delete the ones you want to get rid of:
+            cookie.delete("cookie2");
+            # or filter everything but a few:
+            cookie.filter_except("SESSIONID,PHPSESSID");
+
+            # Store it back into req so it will be passed to the backend.
+            set req.http.cookie = cookie.get_string();
+
+            # If empty, unset so the builtin VCL can consider it for caching.
+            if (req.http.cookie == "") {
+                unset req.http.cookie;
+            }
+        }
+    }
+
 
 $Function VOID clean(PRIV_TASK)
 
