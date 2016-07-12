@@ -21,9 +21,42 @@ Memory usage is around 100 bytes per key tracked.
 
 .. _token-bucket algorithm: http://en.wikipedia.org/wiki/Token_bucket
 
+
+.. vcl-start
+
+Example::
+
+    vcl 4.0;
+    import vsthrottle;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    sub vcl_recv {
+        # Varnish will set client.identity for you based on client IP.
+
+        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
+            # Client has exceeded 15 reqs per 10s
+            return (synth(429, "Too Many Requests"));
+        }
+
+        # There is a quota per API key that must be fulfilled.
+        if (vsthrottle.is_denied("apikey:" + req.http.Key, 30, 60s)) {
+                return (synth(429, "Too Many Requests"));
+        }
+
+        # Only allow a few POST/PUTs per client.
+        if (req.method == "POST" || req.method == "PUT") {
+            if (vsthrottle.is_denied("rw" + client.identity, 2, 10s)) {
+                return (synth(429, "Too Many Requests"));
+            }
+        }
+    }
+
+.. vcl-end
+
 $Event event_function
 
-$Function BOOL is_denied(STRING jey, INT limit, DURATION period)
+$Function BOOL is_denied(STRING key, INT limit, DURATION period)
 
 Arguments
     key: A unique identifier to define what is being throttled - more examples below
