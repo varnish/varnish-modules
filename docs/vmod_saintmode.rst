@@ -48,6 +48,8 @@ backends marked sick are skipped by the director, this provides a way
 to have fine grained health status on the backends, and making sure that
 retries get a different backend than the one which failed.
 
+.. vcl-start
+
 Example::
 
     vcl 4.0;
@@ -89,6 +91,8 @@ Example::
             return (retry);
         }
     }
+
+.. vcl-end
 
 
 CONTENTS

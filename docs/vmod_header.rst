@@ -26,8 +26,30 @@ import header [from "path"] ;
 DESCRIPTION
 ===========
 
-Varnish Module (vmod) for manipulation of duplicated HTTP headers, for instance
+Varnish Module for manipulation of duplicated HTTP headers, for instance
 multiple Set-Cookie headers.
+
+.. vcl-start
+
+Example::
+
+    vcl 4.0;
+    import header;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    sub vcl_backend_response {
+        if (beresp.http.Set-Cookie) {
+            # Add another line of Set-Cookie in the response.
+            header.append(beresp.http.Set-Cookie, "VSESS=abbabeef");
+
+            # CMS always set this, but doesn't really need it.
+            header.remove(beresp.http.Set-Cookie, "JSESSIONID=");
+        }
+    }
+
+.. vcl-end
+
 
 CONTENTS
 ========
@@ -48,9 +70,8 @@ Prototype
 Description
         Append an extra occurrence to an existing header.
 Example
-	::
-
-		header.append(beresp.http.Set-Cookie, "foo=bar")
+    ::
+    header.append(beresp.http.Set-Cookie, "foo=bar")
 
 .. _func_copy:
 
@@ -63,9 +84,8 @@ Prototype
 Description
         Copy all source headers to a new header.
 Example
-	::
-
-		header.copy(beresp.http.set-cookie, beresp.http.x-old-cookie);
+    ::
+    header.copy(beresp.http.set-cookie, beresp.http.x-old-cookie);
 
 .. _func_get:
 
@@ -79,9 +99,8 @@ Description
         Fetches the value of the first `header` that matches the given
         regular expression `regex`.
 Example
-	::
-
-		set beresp.http.xusr = header.get(beresp.http.set-cookie,"user=");
+    ::
+    set beresp.http.xusr = header.get(beresp.http.set-cookie,"user=");
 
 .. _func_remove:
 
@@ -94,9 +113,8 @@ Prototype
 Description
         Remove all occurences of `header` that matches `regex`.
 Example
-	::
-
-	        header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
+    ::
+    header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
 
 
 
