@@ -19,8 +19,8 @@ if [ ! -f "$1" ]; then
 fi
 
 if [ -z "`grep ".. vcl-start" $1`" ]; then
-	echo "ERROR: No VCL marker in $1"
-	exit 2
+	echo "SKIP: No VCL marker in $1"
+	exit 0
 fi
 
 sed -e '1,/^.. vcl-start/d' \
