@@ -24,6 +24,7 @@ application, but can also be set from VCL in ``vcl_backend_response``
 as in the above example.
 
 .. vcl-start
+
 VCL example::
 
     vcl 4.0;

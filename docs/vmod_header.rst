@@ -44,6 +44,7 @@ VOID append(HEADER, STRING_LIST)
 
 Prototype
 	VOID append(HEADER, STRING_LIST)
+
 Description
         Append an extra occurrence to an existing header.
 Example

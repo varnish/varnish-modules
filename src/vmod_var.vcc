@@ -12,6 +12,7 @@ The remaining functions have PRIV_TASK lifespan and are local to a single
 request or backend request.
 
 .. vcl-start
+
 Example::
 
     vcl 4.0;

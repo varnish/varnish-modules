@@ -7,6 +7,7 @@ multiple Set-Cookie headers.
 
 $Event event_function
 $Function VOID append(HEADER, STRING_LIST)
+
 Description
         Append an extra occurrence to an existing header.
 Example
