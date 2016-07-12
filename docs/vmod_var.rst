@@ -75,7 +75,7 @@ Example::
         }
 
         if (var.global_get("open") != "yes") {
-            return (synth(200, "We currently closed, sorry!"));
+            return (synth(200, "We are currently closed, sorry!"));
         }
     }
 

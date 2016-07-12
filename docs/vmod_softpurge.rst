@@ -32,6 +32,42 @@ keeps the grace value of a resource.
 This makes it possible to serve stale content to users if the backend
 is unavailable and fresh content can not be fetched.
 
+.. vcl-start
+
+Example::
+
+    vcl 4.0;
+    import softpurge;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    sub vcl_recv {
+        # Return early to avoid return(pass) by builtin VCL.
+        if (req.method == "PURGE") {
+            return (hash);
+        }
+    }
+
+    sub vcl_backend_response {
+        # Set object grace so we keep them around after TTL has expired.
+        set beresp.grace = 10m;
+    }
+
+    sub vcl_hit {
+        if (req.method == "PURGE") {
+            softpurge.softpurge();
+            return (synth(200, "Successful softpurge"));
+        }
+    }
+
+    sub vcl_miss {
+        if (req.method == "PURGE") {
+            softpurge.softpurge();
+            return (synth(200, "Successful softpurge"));
+        }
+    }
+
+.. vcl-end
 
 CONTENTS
 ========
@@ -56,33 +92,3 @@ Example::
         }
     }
 
-
-USAGE
-=====
-In your VCL you could then use this vmod along the following lines::
-
-    import softpurge;
-
-    sub vcl_recv {
-        if (req.method == "PURGE") {
-            return (hash);
-        }
-    }
-
-    sub vcl_backend_response {
-        set beresp.grace = 10m;
-    }
-
-    sub vcl_hit {
-        if (req.method == "PURGE") {
-            softpurge.softpurge();
-            return (synth(200, "Successful softpurge"));
-        }
-    }
-
-    sub vcl_miss {
-        if (req.method == "PURGE") {
-            softpurge.softpurge();
-            return (synth(200, "Successful softpurge"));
-        }
-    }
