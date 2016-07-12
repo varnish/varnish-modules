@@ -43,6 +43,11 @@ saintmode object and give it a backend as an argument. The resulting object can
 then be used in place of the backend, with the effect that it also has added
 saintmode capabilities.
 
+Any director will then be able to use the saintmode backends, and as
+backends marked sick are skipped by the director, this provides a way
+to have fine grained health status on the backends, and making sure that
+retries get a different backend than the one which failed.
+
 Example::
 
 	vcl 4.0;
@@ -55,16 +60,22 @@ Example::
 
 	sub vcl_init {
 		# Instantiate sm1, sm2 for backends tile1, tile2
+		# with 10 blacklisted objects as the threshold for marking the
+		# whole backend sick.
 		new sm1 = saintmode.saintmode(tile1, 10);
 		new sm2 = saintmode.saintmode(tile2, 10);
 
 		# Add both to a director. Use sm0, sm1 in place of tile1, tile2.
+		# Other director types can be used in place of random.
 		new imagedirector = directors.random();
 		imagedirector.add_backend(sm1.backend(), 1);
 		imagedirector.add_backend(sm2.backend(), 1);
 	}
 
 	sub vcl_backend_fetch {
+		# Get a backend from the director.
+		# When returning a backend, the director will only return backends
+		# saintmode says are healthy.
 		set bereq.backend = imagedirector.backend();
 	}
 
@@ -73,6 +84,8 @@ Example::
 			# This marks the backend as sick for this specific
 			# object for the next 20s.
 			saintmode.blacklist(20s);
+			# Retry the request. This will result in a different backend
+			# being used.
 			return (retry);
 		}
 	}
