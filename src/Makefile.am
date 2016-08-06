@@ -77,5 +77,4 @@ EXTRA_DIST = foreign \
 	vtree.h
 
 CLEANFILES = $(builddir)/vcc*if.c $(builddir)/vcc*if.h \
-	$(builddir)/../docs/vmod_*.man.rst \
-	$(builddir)/../docs/vmod_*.rst
+	$(builddir)/../docs/vmod_*.man.rst
