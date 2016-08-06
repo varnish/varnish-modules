@@ -77,5 +77,6 @@ AC_PATH_PROG([VARNISHD], [varnishd], [],
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	docs/Makefile
 ])
 AC_OUTPUT
