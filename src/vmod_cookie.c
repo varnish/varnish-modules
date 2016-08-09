@@ -27,6 +27,7 @@
  * Cookie VMOD that simplifies handling of the Cookie request header.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
