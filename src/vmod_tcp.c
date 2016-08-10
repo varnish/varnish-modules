@@ -38,6 +38,10 @@
 #include <netinet/tcp.h>
 #include <netinet/in.h>
 
+#ifndef TCP_CONGESTION
+#define TCP_CONGESTION	13
+#endif
+
 #define TCP_CA_NAME_MAX 16
 
 /*
