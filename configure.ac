@@ -18,6 +18,12 @@ if test "x$ac_cv_prog_cc_c99" = xno; then
 fi
 AC_PROG_CPP
 
+AX_PTHREAD(,[AC_MSG_ERROR([Could not configure pthreads support])])
+
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
