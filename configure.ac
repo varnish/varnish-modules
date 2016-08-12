@@ -52,6 +52,7 @@ AS_VAR_IF([$1], [""], [$5], [$4])dnl
 ])
 
 PKG_CHECK_MODULES([libvarnishapi], [varnishapi])
+PKG_CHECK_VAR([LIBVARNISHAPI_PREFIX], [varnishapi], [prefix])
 PKG_CHECK_VAR([LIBVARNISHAPI_DATAROOTDIR], [varnishapi], [datarootdir])
 PKG_CHECK_VAR([LIBVARNISHAPI_BINDIR], [varnishapi], [bindir])
 PKG_CHECK_VAR([LIBVARNISHAPI_SBINDIR], [varnishapi], [sbindir])
@@ -68,6 +69,9 @@ PKG_CHECK_VAR([VARNISH_PLUS], [varnishapi], [varnish_plus],
 VARNISH_VMOD_INCLUDES
 VARNISH_VMOD_DIR
 VARNISH_VMODTOOL
+# inherit the prefix from Varnish.
+# acessing ac_ variable because AC_PREFIX_DEFAULT acts too early
+ac_default_prefix=$LIBVARNISHAPI_PREFIX
 
 AC_PATH_PROG([VARNISHTEST], [varnishtest], [],
     [$LIBVARNISHAPI_BINDIR:$LIBVARNISHAPI_SBINDIR:$PATH])
