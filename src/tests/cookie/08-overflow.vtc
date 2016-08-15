@@ -8,11 +8,9 @@ server s1 {
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+varnish v1 -cliok "param.set workspace_client 64k" -vcl+backend {
 	import cookie from "${vmod_builddir}/.libs/libvmod_cookie.so";
 
-	sub vcl_recv {
-	}
 	sub vcl_deliver {
 		cookie.parse(req.http.cookie);
 		set resp.http.cookiestring = cookie.get_string();
