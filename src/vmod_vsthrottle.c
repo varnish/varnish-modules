@@ -37,6 +37,7 @@
 #include "vcl.h"
 #include "vrt.h"
 #include "vas.h"
+#include "vtim.h"
 #include "miniobj.h"
 #include "vsha256.h"
 
@@ -137,14 +138,6 @@ calc_tokens(struct tbucket *b, double now)
 	/* VSL(SLT_VCL_Log, 0, "tokens: %ld", b->tokens); */
 }
 
-static double
-get_ts_mono(void)
-{
-	struct timespec ts;
-	AZ(clock_gettime(CLOCK_MONOTONIC, &ts));
-	return (ts.tv_sec + 1e-9 * ts.tv_nsec);
-}
-
 VCL_BOOL
 vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 {
@@ -170,7 +163,7 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 	part = digest[0] & N_PART_MASK;
 	v = &vsthrottle[part];
 	AZ(pthread_mutex_lock(&v->mtx));
-	now = get_ts_mono();
+	now = VTIM_mono();
 	b = get_bucket(digest, limit, period, now);
 	calc_tokens(b, now);
 	if (b->tokens > 0) {
