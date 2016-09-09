@@ -9,10 +9,10 @@ varnish-modules 0.10.0 (unreleased)
 * Various improvements in the build system
 * [vmod-cookie] Fix test case overflow issue for 32 bit systems (#35)
 * [vmod-vsthrottle] Fix OS X build issue (#37)
-* [vmod-saintmode] Add new log record for when vmod-saintmode marks a
-  backend as unhealthy
+* [vmod-saintmode] Add new log records for when vmod-saintmode marks a
+  backend as unhealthy (#43)
 * [vmod-saintmode] Added saintmode.status() which outputs a JSON
-  status string for use in vcl_synth
+  status string for use in vcl_synth (#43)
 
 varnish-modules 0.9.1 (2016-07-07)
 ----------------------------------
