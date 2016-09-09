@@ -120,8 +120,8 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	VTAILQ_INSERT_HEAD(&sm->troublelist, tp, list);
 	sm->n_trouble++;
 
-	VSLb(ctx->vsl, SLT_Debug, "Object put on blacklist for backend %s",
-		sm->be->vcl_name);
+	VSLb(ctx->vsl, SLT_Debug, "Object put on blacklist for backend %s "
+	    "for %.2f seconds", sm->be->vcl_name, expires);
 
 	pthread_mutex_unlock(&sm->mtx);
 
