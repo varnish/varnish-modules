@@ -120,8 +120,8 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	VTAILQ_INSERT_HEAD(&sm->troublelist, tp, list);
 	sm->n_trouble++;
 
-	VSLb(ctx->vsl, SLT_Debug, "Object put on blacklist for backend %s "
-	    "for %.2f seconds", sm->be->vcl_name, expires);
+	VSLb(ctx->vsl, SLT_Debug, "saintmode: object put on blacklist "
+	    "for backend %s for %.2f seconds", sm->be->vcl_name, expires);
 
 	pthread_mutex_unlock(&sm->mtx);
 
@@ -189,7 +189,7 @@ unsigned __match_proto__(vdi_healthy_f)
 healthy(const struct director *dir, const struct busyobj *bo, double *changed) {
 	struct trouble *tr;
 	struct trouble *tr2;
-	unsigned retval;
+	unsigned retval, bl;
 	struct vmod_saintmode_saintmode *sm;
 	VTAILQ_HEAD(, trouble)  troublelist;
 	double now;
@@ -197,6 +197,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed) {
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->be, DIRECTOR_MAGIC);
+	CHECK_OBJ_ORNULL(bo, BUSYOBJ_MAGIC);
 
 	/* If we don't have a bo with a digest to look at, we can't
 	 * know if we are on the trouble list or not. Fall back to the
@@ -227,9 +228,20 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed) {
 			break;
 		}
 	}
+
+	bl = !retval;
 	if (sm->threshold <= sm->n_trouble)
 		retval = 0;
 	pthread_mutex_unlock(&sm->mtx);
+
+	if (bl)
+		VSLb(((struct busyobj *)bo)->vsl, SLT_VCL_Log,
+		    "saintmode: unhealthy: object blacklisted for backend %s",
+			sm->be->vcl_name);
+	else if (retval == 0)
+		VSLb(((struct busyobj *)bo)->vsl, SLT_VCL_Log,
+		    "saintmode: unhealthy: hit threshold for backend %s",
+		    sm->be->vcl_name);
 
 	VTAILQ_FOREACH_SAFE(tr, &troublelist, list, tr2)
 		FREE_OBJ(tr);
