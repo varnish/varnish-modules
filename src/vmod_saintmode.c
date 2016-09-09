@@ -127,6 +127,19 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 
 }
 
+VCL_INT
+vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
+{
+	unsigned c = 0;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
+	pthread_mutex_lock(&sm->mtx);
+	c = sm->n_trouble;
+	pthread_mutex_unlock(&sm->mtx);
+	return (c);
+}
+
 unsigned healthy(const struct director *, const struct busyobj *, double *);
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */

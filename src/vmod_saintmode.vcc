@@ -112,3 +112,16 @@ Example::
         set bereq.backend = sm.backend();
     }
 
+
+$Method INT .blacklist_count()
+
+Returns the number of objects currently blacklisted for a saintmode
+director object.
+
+Example:
+
+::
+
+   sub vcl_deliver {
+       set resp.http.troublecount = sm.blacklist_count();
+   }

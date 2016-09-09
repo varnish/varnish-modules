@@ -101,6 +101,7 @@ CONTENTS
 * :ref:`func_blacklist`
 * :ref:`obj_saintmode`
 * :ref:`func_saintmode.backend`
+* :ref:`func_saintmode.blacklist_count`
 
 .. _func_blacklist:
 
@@ -159,3 +160,22 @@ Example::
         set bereq.backend = sm.backend();
     }
 
+
+.. _func_saintmode.blacklist_count:
+
+INT saintmode.blacklist_count()
+-------------------------------
+
+Prototype
+	INT saintmode.blacklist_count()
+
+Returns the number of objects currently blacklisted for a saintmode
+director object.
+
+Example:
+
+::
+
+   sub vcl_deliver {
+       set resp.http.troublecount = sm.blacklist_count();
+   }
