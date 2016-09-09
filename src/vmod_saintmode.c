@@ -94,8 +94,6 @@ VCL_VOID __match_proto__(td_saintmode_blacklist)
 vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct trouble *tp;
 	struct saintmode_objs *sm_objs;
-	// struct vbc *vbc;
-	//struct backend *be;
 	struct vmod_saintmode_saintmode *sm;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
