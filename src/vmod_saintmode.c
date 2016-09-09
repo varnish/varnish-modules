@@ -127,6 +127,48 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 
 }
 
+VCL_STRING
+vmod_status(VRT_CTX, struct vmod_priv *priv)
+{
+	struct saintmode_objs *sm_objs;
+	struct vmod_saintmode_saintmode *sm;
+	struct vsb *vsb;
+	void *p;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CAST_OBJ_NOTNULL(sm_objs, priv->priv, SAINTMODE_OBJS_MAGIC);
+
+	vsb = VSB_new_auto();
+	AN(vsb);
+	VSB_cat(vsb, "{\n\t\"saintmode\": [\n");
+
+	VTAILQ_FOREACH(sm, &sm_objs->sm_list, list) {
+		CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
+		CHECK_OBJ_NOTNULL(sm->be, DIRECTOR_MAGIC);
+		pthread_mutex_lock(&sm->mtx);
+		VSB_cat(vsb, "\t\t{ ");
+		VSB_printf(vsb, "\"name\": \"%s\", ", sm->sdir->vcl_name);
+		VSB_printf(vsb, "\"backend\": \"%s\", ", sm->be->vcl_name);
+		VSB_printf(vsb, "\"count\": \"%u\", ", sm->n_trouble);
+		VSB_printf(vsb, "\"threshold\": \"%u\" ", sm->threshold);
+		VSB_cat(vsb, "}");
+		if (VTAILQ_NEXT(sm, list) != NULL)
+			VSB_cat(vsb, ",");
+		pthread_mutex_unlock(&sm->mtx);
+		VSB_cat(vsb, "\n");
+	}
+
+	VSB_cat(vsb, "\t]\n}\n");
+	VSB_finish(vsb);
+
+	p = WS_Copy(ctx->ws, VSB_data(vsb), -1);
+	if (p == NULL)
+		VSLb(ctx->vsl, SLT_VCL_Log,
+		    "saintmode.vmod_status: workspace overflow");
+	VSB_delete(vsb);
+	return (p);
+}
+
 VCL_INT
 vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 {

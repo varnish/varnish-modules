@@ -102,6 +102,7 @@ CONTENTS
 * :ref:`obj_saintmode`
 * :ref:`func_saintmode.backend`
 * :ref:`func_saintmode.blacklist_count`
+* :ref:`func_status`
 
 .. _func_blacklist:
 
@@ -124,6 +125,42 @@ Example::
         }
     }
 
+
+.. _func_status:
+
+STRING status(PRIV_VCL)
+-----------------------
+
+Prototype
+	STRING status(PRIV_VCL)
+
+Returns a JSON formatted status string suitable for use in vcl_synth.
+
+::
+
+   sub vcl_recv {
+       if (req.url ~ "/saintmode-status") {
+           return (synth(700, "OK"));
+       }
+   }
+
+   sub vcl_synth {
+       if (resp.status == 700) {
+           synthetic(saintmode.status());
+           return (deliver);
+       }
+   }
+
+Example JSON output:
+
+   ::
+
+      {
+	"saintmode" : [
+            { "name": "sm1", "backend": "foo", "count": "3", "threshold": "10" },
+            { "name": "sm2", "backend": "bar", "count": "2", "threshold": "5" }
+	]
+      }
 
 
 .. _obj_saintmode:

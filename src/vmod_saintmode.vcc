@@ -87,6 +87,36 @@ Example::
     }
 
 
+$Function STRING status(PRIV_VCL)
+
+Returns a JSON formatted status string suitable for use in vcl_synth.
+
+::
+
+   sub vcl_recv {
+       if (req.url ~ "/saintmode-status") {
+           return (synth(700, "OK"));
+       }
+   }
+
+   sub vcl_synth {
+       if (resp.status == 700) {
+           synthetic(saintmode.status());
+           return (deliver);
+       }
+   }
+
+Example JSON output:
+
+   ::
+
+      {
+	"saintmode" : [
+            { "name": "sm1", "backend": "foo", "count": "3", "threshold": "10" },
+            { "name": "sm2", "backend": "bar", "count": "2", "threshold": "5" }
+	]
+      }
+
 
 $Object saintmode(PRIV_VCL, BACKEND backend, INT threshold)
 
