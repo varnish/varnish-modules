@@ -13,13 +13,13 @@ The request rate is specified as the number of requests permitted over
 a period. To keep things simple, this is passed as two separate
 parameters, 'limit' and 'period'.
 
-This VMOD implements a `token-bucket algorithm`_. State associated
+This VMOD implements a `token bucket algorithm`_. State associated
 with the token bucket for each key is stored in-memory using BSD's
 red-black tree implementation.
 
 Memory usage is around 100 bytes per key tracked.
 
-.. _token-bucket algorithm: http://en.wikipedia.org/wiki/Token_bucket
+.. _token bucket algorithm: http://en.wikipedia.org/wiki/Token_bucket
 
 
 .. vcl-start
