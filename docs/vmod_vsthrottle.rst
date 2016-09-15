@@ -82,6 +82,7 @@ CONTENTS
 ========
 
 * :ref:`func_is_denied`
+* :ref:`func_remaining`
 
 .. _func_is_denied:
 
@@ -91,17 +92,18 @@ BOOL is_denied(STRING, INT, DURATION)
 Prototype
 	BOOL is_denied(STRING key, INT limit, DURATION period)
 
-Arguments
-    key: A unique identifier to define what is being throttled - more examples below
-    limit: How many requests in the specified period
-    period: The time period
+Arguments:
+
+  - key: A unique identifier to define what is being throttled - more examples below
+  - limit: How many requests in the specified period
+  - period: The time period
 
 Description
-	Can be used to rate limit the traffic for a specific key to a
-	maximum of 'limit' requests per 'period' time. A token bucket
-	is uniquely identified by the triplet of its key, limit and
-	period, so using the same key multiple places with different
-	rules will create multiple token buckets.
+  Can be used to rate limit the traffic for a specific key to a
+  maximum of 'limit' requests per 'period' time. A token bucket
+  is uniquely identified by the triplet of its key, limit and
+  period, so using the same key multiple places with different
+  rules will create multiple token buckets.
 
 Example
         ::
@@ -115,3 +117,30 @@ Example
 			# ...
 		}
 
+
+.. _func_remaining:
+
+INT remaining(STRING, INT, DURATION)
+------------------------------------
+
+Prototype
+	INT remaining(STRING key, INT limit, DURATION period)
+
+Arguments:
+  - key: A unique identifier to define what is being throttled
+  - limit: How many requests in the specified period
+  - period: The time period
+
+Description
+
+  Get the current number of tokens for a given token bucket. This can
+  be used to create a response header to inform clients of their
+  current quota.
+
+
+Example
+  ::
+
+     sub vcl_deliver {
+	set resp.http.X-RateLimit-Remaining = vsthrottle.remaining(client.identity, 15, 10s);
+     }

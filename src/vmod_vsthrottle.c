@@ -138,13 +138,25 @@ calc_tokens(struct tbucket *b, double now)
 	/* VSL(SLT_VCL_Log, 0, "tokens: %ld", b->tokens); */
 }
 
+static
+void do_digest(unsigned char *out, const char *s, VCL_INT l, VCL_DURATION p)
+{
+	SHA256_CTX sctx;
+
+	SHA256_Init(&sctx);
+	SHA256_Update(&sctx, s, strlen(s));
+	SHA256_Update(&sctx, &l, sizeof (l));
+	SHA256_Update(&sctx, &p, sizeof (p));
+	SHA256_Final(out, &sctx);
+}
+
 VCL_BOOL
 vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 {
 	unsigned ret = 1;
 	struct tbucket *b;
 	double now;
-	SHA256_CTX sctx;
+
 	struct vsthrottle *v;
 	unsigned char digest[SHA256_LEN];
 	unsigned part;
@@ -153,12 +165,7 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 
 	if (!key)
 		return (1);
-
-	SHA256_Init(&sctx);
-	SHA256_Update(&sctx, key, strlen(key));
-	SHA256_Update(&sctx, &limit, sizeof (limit));
-	SHA256_Update(&sctx, &period, sizeof (period));
-	SHA256_Final(digest, &sctx);
+	do_digest(digest, key, limit, period);
 
 	part = digest[0] & N_PART_MASK;
 	v = &vsthrottle[part];
@@ -197,6 +204,32 @@ run_gc(double now, unsigned part)
 			free(x);
 		}
 	}
+}
+
+VCL_INT
+vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
+{
+	unsigned ret;
+	struct tbucket *b;
+	double now;
+	struct vsthrottle *v;
+	unsigned char digest[SHA256_LEN];
+	unsigned part;
+
+	(void)ctx;
+
+	if (!key)
+		return (-1);
+	do_digest(digest, key, limit, period);
+	part = digest[0] & N_PART_MASK;
+	v = &vsthrottle[part];
+	AZ(pthread_mutex_lock(&v->mtx));
+	now = VTIM_mono();
+	b = get_bucket(digest, limit, period, now);
+	calc_tokens(b, now);
+	ret = b->tokens;
+	AZ(pthread_mutex_unlock(&v->mtx));
+	return (ret);
 }
 
 static void
