@@ -13,6 +13,8 @@ varnish-modules 0.10.0 (unreleased)
   backend as unhealthy (#43)
 * [vmod-saintmode] Added saintmode.status() which outputs a JSON
   status string for use in vcl_synth (#43)
+* [vmod-vsthrottle] Added vsthrottle.remaining() which returns the
+  current number of tokens for a given bucket.
 
 varnish-modules 0.9.1 (2016-07-07)
 ----------------------------------
