@@ -69,10 +69,11 @@ CONTENTS
 
 .. _func_congestion_algorithm:
 
-INT congestion_algorithm(STRING)
---------------------------------
+congestion_algorithm
+--------------------
 
-Prototype
+::
+
 	INT congestion_algorithm(STRING algorithm)
 
 Set the client socket congestion control algorithm to S. Returns 0 on success, and -1 on error.
@@ -86,10 +87,11 @@ Example::
 
 .. _func_dump_info:
 
-VOID dump_info()
-----------------
+dump_info
+---------
 
-Prototype
+::
+
 	VOID dump_info()
 
 Write the contents of the TCP_INFO data structure into varnishlog.
@@ -110,10 +112,11 @@ Example varnishlog output::
 
 .. _func_get_estimated_rtt:
 
-REAL get_estimated_rtt()
-------------------------
+get_estimated_rtt
+-----------------
 
-Prototype
+::
+
 	REAL get_estimated_rtt()
 
 Get the estimated round-trip-time for the client socket. Unit: milliseconds.
@@ -127,10 +130,11 @@ Example::
 
 .. _func_set_socket_pace:
 
-VOID set_socket_pace(INT)
--------------------------
+set_socket_pace
+---------------
 
-Prototype
+::
+
 	VOID set_socket_pace(INT)
 
 Set socket pacing on client-side TCP connection to PACE KB/s. Network interface
@@ -139,4 +143,5 @@ used must be using a supported scheduler. (fq)
 Example::
 
     tcp.set_socket_pace(1000);
+
 

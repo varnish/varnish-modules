@@ -85,10 +85,11 @@ CONTENTS
 
 .. _func_clean:
 
-VOID clean(PRIV_TASK)
----------------------
+clean
+-----
 
-Prototype
+::
+
 	VOID clean(PRIV_TASK)
 
 Description
@@ -103,10 +104,11 @@ Example
 
 .. _func_delete:
 
-VOID delete(PRIV_TASK, STRING)
-------------------------------
+delete
+------
 
-Prototype
+::
+
 	VOID delete(PRIV_TASK, STRING cookiename)
 
 Description
@@ -123,10 +125,11 @@ Example
 
 .. _func_filter_except:
 
-VOID filter_except(PRIV_TASK, STRING)
--------------------------------------
+filter_except
+-------------
 
-Prototype
+::
+
 	VOID filter_except(PRIV_TASK, STRING filterstring)
 
 Description
@@ -144,10 +147,11 @@ Example
 
 .. _func_format_rfc1123:
 
-STRING format_rfc1123(TIME, DURATION)
--------------------------------------
+format_rfc1123
+--------------
 
-Prototype
+::
+
 	STRING format_rfc1123(TIME now, DURATION timedelta)
 
 Description
@@ -166,10 +170,11 @@ Example
 
 .. _func_get:
 
-STRING get(PRIV_TASK, STRING)
------------------------------
+get
+---
 
-Prototype
+::
+
 	STRING get(PRIV_TASK, STRING cookiename)
 
 Description
@@ -185,10 +190,11 @@ Example
 
 .. _func_get_string:
 
-STRING get_string(PRIV_TASK)
-----------------------------
+get_string
+----------
 
-Prototype
+::
+
 	STRING get_string(PRIV_TASK)
 
 Description
@@ -205,10 +211,11 @@ Example
 
 .. _func_isset:
 
-BOOL isset(PRIV_TASK, STRING)
------------------------------
+isset
+-----
 
-Prototype
+::
+
 	BOOL isset(PRIV_TASK, STRING cookiename)
 
 Description
@@ -227,10 +234,11 @@ Example
 
 .. _func_parse:
 
-VOID parse(PRIV_TASK, STRING)
------------------------------
+parse
+-----
 
-Prototype
+::
+
 	VOID parse(PRIV_TASK, STRING cookieheader)
 
 Description
@@ -246,10 +254,11 @@ Example
 
 .. _func_set:
 
-VOID set(PRIV_TASK, STRING, STRING)
------------------------------------
+set
+---
 
-Prototype
+::
+
 	VOID set(PRIV_TASK, STRING cookiename, STRING value)
 
 Description
@@ -262,4 +271,5 @@ Example
                         cookie.set("cookie1", "value1");
                         std.log("cookie1 value is: " + cookie.get("cookie1"));
                 }
+
 

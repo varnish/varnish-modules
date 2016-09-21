@@ -106,10 +106,11 @@ CONTENTS
 
 .. _func_blacklist:
 
-VOID blacklist(PRIV_VCL, DURATION)
-----------------------------------
+blacklist
+---------
 
-Prototype
+::
+
 	VOID blacklist(PRIV_VCL, DURATION expires)
 
 Marks the backend as sick for a specific object. Used in vcl_backend_response.
@@ -128,10 +129,11 @@ Example::
 
 .. _func_status:
 
-STRING status(PRIV_VCL)
------------------------
+status
+------
 
-Prototype
+::
+
 	STRING status(PRIV_VCL)
 
 Returns a JSON formatted status string suitable for use in vcl_synth.
@@ -165,9 +167,12 @@ Example JSON output:
 
 .. _obj_saintmode:
 
-Object saintmode
-================
+saintmode
+---------
 
+::
+
+	new OBJ = saintmode(PRIV_VCL, BACKEND backend, INT threshold)
 
 Constructs a saintmode director object. The ``threshold`` argument sets
 the saintmode threshold, which is the maximum number of items that can be
@@ -183,10 +188,11 @@ Example::
 
 .. _func_saintmode.backend:
 
-BACKEND saintmode.backend()
----------------------------
+saintmode.backend
+-----------------
 
-Prototype
+::
+
 	BACKEND saintmode.backend()
 
 Used for assigning the backend from the saintmode object.
@@ -200,10 +206,11 @@ Example::
 
 .. _func_saintmode.blacklist_count:
 
-INT saintmode.blacklist_count()
--------------------------------
+saintmode.blacklist_count
+-------------------------
 
-Prototype
+::
+
 	INT saintmode.blacklist_count()
 
 Returns the number of objects currently blacklisted for a saintmode
@@ -216,3 +223,4 @@ Example:
    sub vcl_deliver {
        set resp.http.troublecount = sm.blacklist_count();
    }
+

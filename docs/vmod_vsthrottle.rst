@@ -86,10 +86,11 @@ CONTENTS
 
 .. _func_is_denied:
 
-BOOL is_denied(STRING, INT, DURATION)
--------------------------------------
+is_denied
+---------
 
-Prototype
+::
+
 	BOOL is_denied(STRING key, INT limit, DURATION period)
 
 Arguments:
@@ -120,10 +121,11 @@ Example
 
 .. _func_remaining:
 
-INT remaining(STRING, INT, DURATION)
-------------------------------------
+remaining
+---------
 
-Prototype
+::
+
 	INT remaining(STRING key, INT limit, DURATION period)
 
 Arguments:
@@ -144,3 +146,4 @@ Example
      sub vcl_deliver {
 	set resp.http.X-RateLimit-Remaining = vsthrottle.remaining(client.identity, 15, 10s);
      }
+

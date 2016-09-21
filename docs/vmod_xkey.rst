@@ -120,10 +120,11 @@ CONTENTS
 
 .. _func_purge:
 
-INT purge(STRING)
------------------
+purge
+-----
 
-Prototype
+::
+
 	INT purge(STRING key)
 
 Description
@@ -133,10 +134,11 @@ Description
 
 .. _func_softpurge:
 
-INT softpurge(STRING)
----------------------
+softpurge
+---------
 
-Prototype
+::
+
 	INT softpurge(STRING key)
 
 Description
@@ -146,4 +148,5 @@ Description
 	A softpurge differs from a regular purge in that it resets an
 	object's TTL but keeps it available for grace mode and conditional
 	requests for the remainder of its configured grace and keep time.
+
 

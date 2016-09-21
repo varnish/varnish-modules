@@ -103,146 +103,162 @@ CONTENTS
 
 .. _func_set:
 
-VOID set(PRIV_TASK, STRING, STRING)
------------------------------------
+set
+---
 
-Prototype
+::
+
 	VOID set(PRIV_TASK, STRING key, STRING value)
 
 Set `key` to `value`.
 
 .. _func_get:
 
-STRING get(PRIV_TASK, STRING)
------------------------------
+get
+---
 
-Prototype
+::
+
 	STRING get(PRIV_TASK, STRING)
 
 Get `key` with data type STRING. If stored `key` is not a STRING an empty string is returned.
 
 .. _func_global_set:
 
-VOID global_set(STRING, STRING)
--------------------------------
+global_set
+----------
 
-Prototype
+::
+
 	VOID global_set(STRING, STRING)
 
 .. _func_global_get:
 
-STRING global_get(STRING)
--------------------------
+global_get
+----------
 
-Prototype
+::
+
 	STRING global_get(STRING)
 
 .. _func_set_int:
 
-VOID set_int(PRIV_TASK, STRING, INT)
-------------------------------------
+set_int
+-------
 
-Prototype
+::
+
 	VOID set_int(PRIV_TASK, STRING key, INT value)
 
 Set `key` to `value`.
 
 .. _func_get_int:
 
-INT get_int(PRIV_TASK, STRING)
-------------------------------
+get_int
+-------
 
-Prototype
+::
+
 	INT get_int(PRIV_TASK, STRING key)
 
 Get `key` with data type INT. If stored `key` is not an INT zero will be returned.
 
 .. _func_set_string:
 
-VOID set_string(PRIV_TASK, STRING, STRING)
-------------------------------------------
+set_string
+----------
 
-Prototype
+::
+
 	VOID set_string(PRIV_TASK, STRING key, STRING value)
 
 Identical to set().
 
 .. _func_get_string:
 
-STRING get_string(PRIV_TASK, STRING)
-------------------------------------
+get_string
+----------
 
-Prototype
+::
+
 	STRING get_string(PRIV_TASK, STRING key)
 
 Identical to get().
 
 .. _func_set_real:
 
-VOID set_real(PRIV_TASK, STRING, REAL)
---------------------------------------
+set_real
+--------
 
-Prototype
+::
+
 	VOID set_real(PRIV_TASK, STRING key, REAL value)
 
 Set `key` to `value`.
 
 .. _func_get_real:
 
-REAL get_real(PRIV_TASK, STRING)
---------------------------------
+get_real
+--------
 
-Prototype
+::
+
 	REAL get_real(PRIV_TASK, STRING key)
 
 Get `key` with data type REAL. If stored `key` is not a REAL zero will be returned.
 
 .. _func_set_duration:
 
-VOID set_duration(PRIV_TASK, STRING, DURATION)
-----------------------------------------------
+set_duration
+------------
 
-Prototype
+::
+
 	VOID set_duration(PRIV_TASK, STRING key, DURATION value)
 
 Set `key` to `value`.
 
 .. _func_get_duration:
 
-DURATION get_duration(PRIV_TASK, STRING)
-----------------------------------------
+get_duration
+------------
 
-Prototype
+::
+
 	DURATION get_duration(PRIV_TASK, STRING key)
 
 Get `key` with data type DURATION. If stored `key` is not a DURATION zero will be returned.
 
 .. _func_set_ip:
 
-VOID set_ip(PRIV_TASK, STRING, IP)
-----------------------------------
+set_ip
+------
 
-Prototype
+::
+
 	VOID set_ip(PRIV_TASK, STRING key, IP value)
 
 Set `key` to `value`.
 
 .. _func_get_ip:
 
-IP get_ip(PRIV_TASK, STRING)
-----------------------------
+get_ip
+------
 
-Prototype
+::
+
 	IP get_ip(PRIV_TASK, STRING key)
 
 Get `key` with data type IP. If stored `key` is not an IP null will be returned.
 
 .. _func_clear:
 
-VOID clear(PRIV_TASK)
----------------------
+clear
+-----
 
-Prototype
+::
+
 	VOID clear(PRIV_TASK)
 
 Clear all non-global variables.
+

@@ -76,10 +76,11 @@ CONTENTS
 
 .. _func_softpurge:
 
-VOID softpurge()
-----------------
+softpurge
+---------
 
-Prototype
+::
+
 	VOID softpurge()
 
 Performs a soft purge. Valid in vcl_hit and vcl_miss.
@@ -91,4 +92,5 @@ Example::
             softpurge.softpurge();
         }
     }
+
 

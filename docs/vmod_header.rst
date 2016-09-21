@@ -61,11 +61,12 @@ CONTENTS
 
 .. _func_append:
 
-VOID append(HEADER, STRING_LIST)
---------------------------------
+append
+------
 
-Prototype
-	VOID append(HEADER, STRING_LIST)
+::
+
+	VOID append(HEADER, STRING)
 
 Description
         Append an extra occurrence to an existing header.
@@ -75,10 +76,11 @@ Example
 
 .. _func_copy:
 
-VOID copy(HEADER, HEADER)
--------------------------
+copy
+----
 
-Prototype
+::
+
 	VOID copy(HEADER, HEADER)
 
 Description
@@ -89,10 +91,11 @@ Example
 
 .. _func_get:
 
-STRING get(PRIV_CALL, HEADER, STRING)
--------------------------------------
+get
+---
 
-Prototype
+::
+
 	STRING get(PRIV_CALL, HEADER header, STRING regex)
 
 Description
@@ -104,10 +107,11 @@ Example
 
 .. _func_remove:
 
-VOID remove(PRIV_CALL, HEADER, STRING)
---------------------------------------
+remove
+------
 
-Prototype
+::
+
 	VOID remove(PRIV_CALL, HEADER header, STRING regex)
 
 Description
@@ -131,3 +135,4 @@ BUGS
 
 You can't use dynamic regular expressions, which also holds true for normal
 regular expressions in regsub().
+
