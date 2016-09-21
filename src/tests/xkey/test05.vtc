@@ -36,7 +36,7 @@ client c1 {
 	txreq -hdr "xkey-purge: fdsa"
 	rxresp
 	expect resp.status == 200
-	expect resp.msg == "Purged"
+	expect resp.reason == "Purged"
 } -run
 
 delay 1

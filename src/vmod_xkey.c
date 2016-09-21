@@ -451,6 +451,7 @@ xkey_cb_remove(struct worker *wrk, struct objcore *objcore, void *priv)
 	AZ(pthread_mutex_unlock(&mtx));
 }
 
+#ifdef VARNISH_PLUS
 static void __match_proto__(exp_callback_f)
 xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
@@ -473,6 +474,28 @@ xkey_cb(struct worker *wrk, struct objcore *objcore,
 		WRONG("enum exp_event_e");
 	}
 }
+#else
+static void __match_proto__(obj_event_f)
+xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
+{
+
+	CHECK_OBJ_NOTNULL(wrk, WORKER_MAGIC);
+	CHECK_OBJ_NOTNULL(oc, OBJCORE_MAGIC);
+	AZ(priv);
+	AN(ev);
+
+	switch (ev) {
+	case OEV_INSERT:
+		xkey_cb_insert(wrk, oc, priv);
+		break;
+	case OEV_EXPIRE:
+		xkey_cb_remove(wrk, oc, priv);
+		break;
+	default:
+		WRONG("Unexpected event");
+	}
+}
+#endif
 
 /**************************/
 
@@ -508,7 +531,7 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		if (oc->objcore->flags & OC_F_BUSY)
 			continue;
 		if (do_soft &&
-		    oc->objcore->exp.ttl <= (ctx->now - oc->objcore->exp.t_origin))
+		    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
 			continue;
 #ifdef VARNISH_PLUS
 		/* Varnish Plus interface for EXP_Rearm() is different. */
@@ -520,11 +543,10 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 			    0, 0);
 #else
 		if (do_soft)
-			EXP_Rearm(oc->objcore, ctx->now, 0,
-			    oc->objcore->exp.grace, oc->objcore->exp.keep);
+			EXP_Rearm(oc->objcore, ctx->now, 0, oc->objcore->grace,
+			    oc->objcore->keep);
 		else
-			EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin, 0,
-			    0, 0);
+			EXP_Rearm(oc->objcore, oc->objcore->t_origin, 0, 0, 0);
 #endif
 
 		i++;
@@ -555,8 +577,13 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
 		if (n_init == 0) {
+#ifdef VARNISH_PLUS
 			xkey_cb_handle =
 			    EXP_Register_Callback(xkey_cb, NULL);
+#else
+			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
+			    OEV_INSERT|OEV_EXPIRE);
+#endif
 			AN(xkey_cb_handle);
 		}
 		n_init++;
@@ -569,7 +596,11 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		if (n_init == 0) {
 			/* Do cleanup */
 			AN(xkey_cb_handle);
+#ifdef VARNISH_PLUS
 			EXP_Deregister_Callback(&xkey_cb_handle);
+#else
+			ObjUnsubscribeEvents(&xkey_cb_handle);
+#endif
 			AZ(xkey_cb_handle);
 			xkey_cleanup();
 		}
