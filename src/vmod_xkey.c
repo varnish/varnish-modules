@@ -396,15 +396,13 @@ xkey_cleanup(void)
 /**************************/
 
 static void
-xkey_cb_insert(struct worker *wrk, struct objcore *objcore, void *priv)
+xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 {
 	SHA256_CTX sha_ctx;
 	unsigned char digest[DIGEST_LEN];
 	const char hdr_xkey[] = "xkey:";
 	const char hdr_h2[] = "X-HashTwo:";
 	const char *ep, *sp;
-
-	(void)priv;
 
 	CHECK_OBJ_NOTNULL(objcore, OBJCORE_MAGIC);
 
@@ -435,12 +433,9 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore, void *priv)
 }
 
 static void
-xkey_cb_remove(struct worker *wrk, struct objcore *objcore, void *priv)
+xkey_cb_remove(struct objcore *objcore)
 {
 	struct xkey_ochead *ochead;
-
-	(void)wrk;
-	(void)priv;
 
 	CHECK_OBJ_NOTNULL(objcore, OBJCORE_MAGIC);
 
@@ -457,18 +452,17 @@ xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
 {
 
-	(void)wrk;
-	(void)objcore;
-	(void)event;
-	(void)priv;
+	CHECK_OBJ_NOTNULL(wrk, WORKER_MAGIC);
+	CHECK_OBJ_NOTNULL(objcore, OBJCORE_MAGIC);
+	AZ(priv);
 
 	switch (event) {
 	case EXP_INSERT:
 	case EXP_INJECT:
-		xkey_cb_insert(wrk, objcore, priv);
+		xkey_cb_insert(wrk, objcore);
 		break;
 	case EXP_REMOVE:
-		xkey_cb_remove(wrk, objcore, priv);
+		xkey_cb_remove(objcore);
 		break;
 	default:
 		WRONG("enum exp_event_e");
@@ -486,10 +480,10 @@ xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 
 	switch (ev) {
 	case OEV_INSERT:
-		xkey_cb_insert(wrk, oc, priv);
+		xkey_cb_insert(wrk, oc);
 		break;
 	case OEV_EXPIRE:
-		xkey_cb_remove(wrk, oc, priv);
+		xkey_cb_remove(oc);
 		break;
 	default:
 		WRONG("Unexpected event");
@@ -576,7 +570,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	switch (e) {
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
-		if (n_init == 0) {
+		if (n_init == 0)
 #ifdef VARNISH_PLUS
 			xkey_cb_handle =
 			    EXP_Register_Callback(xkey_cb, NULL);
@@ -584,8 +578,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
 			    OEV_INSERT|OEV_EXPIRE);
 #endif
-			AN(xkey_cb_handle);
-		}
+		AN(xkey_cb_handle);
 		n_init++;
 		AZ(pthread_mutex_unlock(&mtx));
 		break;
@@ -593,9 +586,9 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		AZ(pthread_mutex_lock(&mtx));
 		assert(n_init > 0);
 		n_init--;
+		AN(xkey_cb_handle);
 		if (n_init == 0) {
 			/* Do cleanup */
-			AN(xkey_cb_handle);
 #ifdef VARNISH_PLUS
 			EXP_Deregister_Callback(&xkey_cb_handle);
 #else
