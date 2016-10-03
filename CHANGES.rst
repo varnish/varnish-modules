@@ -15,6 +15,7 @@ varnish-modules 0.10.0 (unreleased)
   status string for use in vcl_synth (#43)
 * [vmod-vsthrottle] Added vsthrottle.remaining() which returns the
   current number of tokens for a given bucket.
+* Correct build with 4.1.4-beta1, 5.0.0 and master at rev dfcf44c6.
 
 varnish-modules 0.9.1 (2016-07-07)
 ----------------------------------

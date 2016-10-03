@@ -80,10 +80,6 @@ Porting
 
 We encourage porting of the module package to other versions of Varnish Cache.
 
-Nils Goroll has a git tree adopted to Varnish git master, which can be found
-on: https://github.com/nigoroll/varnish-modules/
-
-
 
 Administrativa
 --------------
