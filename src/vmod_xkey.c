@@ -446,7 +446,7 @@ xkey_cb_remove(struct objcore *objcore)
 	AZ(pthread_mutex_unlock(&mtx));
 }
 
-#ifdef VARNISH_PLUS
+#if defined VARNISH_PLUS || !defined OEV_INSERT
 static void __match_proto__(exp_callback_f)
 xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
@@ -524,23 +524,36 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		CHECK_OBJ_NOTNULL(oc->objcore, OBJCORE_MAGIC);
 		if (oc->objcore->flags & OC_F_BUSY)
 			continue;
+#if defined HAVE_OBJCORE_EXP
+		if (do_soft && oc->objcore->exp.ttl <=
+		    (ctx->now - oc->objcore->exp.t_origin))
+			continue;
+#else
 		if (do_soft &&
 		    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
 			continue;
+#endif
 #ifdef VARNISH_PLUS
-		/* Varnish Plus interface for EXP_Rearm() is different. */
 		if (do_soft)
 			EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
 			    oc->objcore->exp.grace, oc->objcore->exp.keep);
 		else
-			EXP_Rearm(ctx->req->wrk, oc->objcore, oc->objcore->exp.t_origin, 0,
-			    0, 0);
+			EXP_Rearm(ctx->req->wrk, oc->objcore,
+			    oc->objcore->exp.t_origin, 0, 0, 0);
+#elif defined HAVE_OBJCORE_EXP
+		if (do_soft)
+			EXP_Rearm(oc->objcore, ctx->now, 0,
+			    oc->objcore->exp.grace, oc->objcore->exp.keep);
+		else
+			EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin,
+			    0, 0, 0);
 #else
 		if (do_soft)
-			EXP_Rearm(oc->objcore, ctx->now, 0, oc->objcore->grace,
-			    oc->objcore->keep);
+			EXP_Rearm(oc->objcore, ctx->now, 0,
+			    oc->objcore->grace, oc->objcore->keep);
 		else
-			EXP_Rearm(oc->objcore, oc->objcore->t_origin, 0, 0, 0);
+			EXP_Rearm(oc->objcore, oc->objcore->t_origin,
+			    0, 0, 0);
 #endif
 
 		i++;
@@ -571,7 +584,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
 		if (n_init == 0)
-#ifdef VARNISH_PLUS
+#if defined VARNISH_PLUS || !defined OEV_INSERT
 			xkey_cb_handle =
 			    EXP_Register_Callback(xkey_cb, NULL);
 #else
@@ -589,7 +602,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		AN(xkey_cb_handle);
 		if (n_init == 0) {
 			/* Do cleanup */
-#ifdef VARNISH_PLUS
+#if defined VARNISH_PLUS || !defined OEV_INSERT
 			EXP_Deregister_Callback(&xkey_cb_handle);
 #else
 			ObjUnsubscribeEvents(&xkey_cb_handle);

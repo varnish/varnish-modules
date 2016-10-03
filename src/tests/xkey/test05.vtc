@@ -23,6 +23,10 @@ varnish v1 -vcl+backend {
 		set beresp.grace = 0s;
 		set beresp.keep = 0s;
 	}
+
+	sub vcl_synth {
+		set resp.http.reason = resp.reason;
+	}
 } -start
 
 client c1 {
@@ -36,7 +40,7 @@ client c1 {
 	txreq -hdr "xkey-purge: fdsa"
 	rxresp
 	expect resp.status == 200
-	expect resp.reason == "Purged"
+	expect resp.http.reason == "Purged"
 } -run
 
 delay 1

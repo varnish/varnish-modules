@@ -60,7 +60,7 @@ vmod_softpurge(VRT_CTX)
 	now = ctx->req->t_prev;
 	Lck_Lock(&oh->mtx);
 	assert(oh->refcnt > 0);
-#ifdef VARNISH_PLUS
+#if defined VARNISH_PLUS || defined OC_EF_DYING
 	VTAILQ_FOREACH(oc, &oh->objcs, list) {
 		CHECK_OBJ_NOTNULL(oc, OBJCORE_MAGIC);
 		assert(oc->objhead == oh);
@@ -92,9 +92,10 @@ vmod_softpurge(VRT_CTX)
 	for (n = 0; n < nobj; n++) {
 		oc = ocp[n];
 		CHECK_OBJ_NOTNULL(oc, OBJCORE_MAGIC);
-#ifdef VARNISH_PLUS
-		/* Varnish Plus interface for EXP_Rearm() is different. */
+#if defined VARNISH_PLUS
 		EXP_Rearm(ctx->req->wrk, oc, now, 0, oc->exp.grace, oc->exp.keep);
+#elif defined HAVE_OBJCORE_EXP
+		EXP_Rearm(oc, now, 0, oc->exp.grace, oc->exp.keep);
 #else
 		EXP_Rearm(oc, now, 0, oc->grace, oc->keep);
 #endif

@@ -81,6 +81,14 @@ VARNISH_VMODTOOL
 # acessing ac_ variable because AC_PREFIX_DEFAULT acts too early
 ac_default_prefix=$LIBVARNISHAPI_PREFIX
 
+save_CFLAGS="$CFLAGS"
+CFLAGS="$VMOD_INCLUDES"
+AC_CHECK_MEMBERS(struct objcore.exp,
+  [AC_DEFINE([HAVE_OBJCORE_EXP], [1],
+    [Define if exp is present in the objcore struct])],
+  [], [#include <cache/cache.h>])
+CFLAGS="$save_CFLAGS"
+
 AC_PATH_PROG([VARNISHTEST], [varnishtest], [],
     [$LIBVARNISHAPI_BINDIR:$LIBVARNISHAPI_SBINDIR:$PATH])
 AC_PATH_PROG([VARNISHD], [varnishd], [],
