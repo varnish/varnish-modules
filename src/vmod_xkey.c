@@ -414,10 +414,10 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 		AN(sp);
 		sp++;
 		while (*sp != '\0') {
-			while (*sp == ' ')
+			while (isspace(*sp))
 				sp++;
 			ep = sp;
-			while (*ep != '\0' && *ep != ' ')
+			while (*ep != '\0' && !isspace(*ep))
 				ep++;
 			if (sp == ep)
 				break;
@@ -500,8 +500,8 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	unsigned char digest[DIGEST_LEN];
 	struct xkey_hashhead *hashhead;
 	struct xkey_oc *oc;
-	int i = 0;
 	const char *ep, *sp;
+	int i = 0;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
@@ -511,10 +511,10 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		return (0);
 	sp = key;
 	while (*sp != '\0') {
-		while (*sp == ' ')
+		while (isspace(*sp))
 			sp++;
 		ep = sp;
-		while (*ep != '\0' && *ep != ' ')
+		while (*ep != '\0' && !isspace(*ep))
 			ep++;
 		if (sp == ep)
 			break;
@@ -525,48 +525,46 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 
                 AZ(pthread_mutex_lock(&mtx));
                 hashhead = xkey_hashtree_lookup(digest, sizeof(digest));
-                if (hashhead == NULL) {
-                        AZ(pthread_mutex_unlock(&mtx));
-                        continue;
-                }
-                VTAILQ_FOREACH(oc, &hashhead->ocs, list_hashhead) {
-                        CHECK_OBJ_NOTNULL(oc->objcore, OBJCORE_MAGIC);
-                        if (oc->objcore->flags & OC_F_BUSY)
-                                continue;
+                if (hashhead != NULL) {
+                        VTAILQ_FOREACH(oc, &hashhead->ocs, list_hashhead) {
+                                CHECK_OBJ_NOTNULL(oc->objcore, OBJCORE_MAGIC);
+                                if (oc->objcore->flags & OC_F_BUSY)
+                                        continue;
 #if defined HAVE_OBJCORE_EXP
-			if (do_soft && oc->objcore->exp.ttl <=
-			    (ctx->now - oc->objcore->exp.t_origin))
-				continue;
+				if (do_soft && oc->objcore->exp.ttl <=
+				    (ctx->now - oc->objcore->exp.t_origin))
+					continue;
 #else
-			if (do_soft &&
-			    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
-				continue;
+				if (do_soft &&
+				    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
+					continue;
 #endif
 #ifdef VARNISH_PLUS
-			if (do_soft)
-				EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
-				    oc->objcore->exp.grace, oc->objcore->exp.keep);
-			else
-				EXP_Rearm(ctx->req->wrk, oc->objcore,
-				    oc->objcore->exp.t_origin, 0, 0, 0);
+				if (do_soft)
+					EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
+					    oc->objcore->exp.grace, oc->objcore->exp.keep);
+				else
+					EXP_Rearm(ctx->req->wrk, oc->objcore,
+					    oc->objcore->exp.t_origin, 0, 0, 0);
 #elif defined HAVE_OBJCORE_EXP
-			if (do_soft)
-				EXP_Rearm(oc->objcore, ctx->now, 0,
-				    oc->objcore->exp.grace, oc->objcore->exp.keep);
-			else
-				EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin,
-				    0, 0, 0);
+				if (do_soft)
+					EXP_Rearm(oc->objcore, ctx->now, 0,
+					    oc->objcore->exp.grace, oc->objcore->exp.keep);
+				else
+					EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin,
+					    0, 0, 0);
 #else
-			if (do_soft)
-				EXP_Rearm(oc->objcore, ctx->now, 0,
-				    oc->objcore->grace, oc->objcore->keep);
-			else
-				EXP_Rearm(oc->objcore, oc->objcore->t_origin,
-				    0, 0, 0);
+				if (do_soft)
+					EXP_Rearm(oc->objcore, ctx->now, 0,
+					    oc->objcore->grace, oc->objcore->keep);
+				else
+					EXP_Rearm(oc->objcore, oc->objcore->t_origin,
+					    0, 0, 0);
 #endif
 
-			i++;
-		}
+				i++;
+			}
+                }
 		AZ(pthread_mutex_unlock(&mtx));
 		sp = ep;
 	}
