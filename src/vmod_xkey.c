@@ -414,10 +414,10 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 		AN(sp);
 		sp++;
 		while (*sp != '\0') {
-			while (isspace(*sp))
+			while (isblank(*sp))
 				sp++;
 			ep = sp;
-			while (*ep != '\0' && !isspace(*ep))
+			while (*ep != '\0' && !isblank(*ep))
 				ep++;
 			if (sp == ep)
 				break;
@@ -511,10 +511,10 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		return (0);
 	sp = key;
 	while (*sp != '\0') {
-		while (isspace(*sp))
+		while (isblank(*sp))
 			sp++;
 		ep = sp;
-		while (*ep != '\0' && !isspace(*ep))
+		while (*ep != '\0' && !isblank(*ep))
 			ep++;
 		if (sp == ep)
 			break;
