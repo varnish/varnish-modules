@@ -568,7 +568,6 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		AZ(pthread_mutex_unlock(&mtx));
 		sp = ep;
 	}
-
 	return (i);
 }
 
