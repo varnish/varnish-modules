@@ -1,6 +1,6 @@
 varnishtest "Test cookie parser"
 
-server s1 -repeat 5 {
+server s1 -repeat 6 {
        rxreq
        txresp
 } -start
@@ -44,4 +44,11 @@ client c5 {
 	txreq -hdr "Cookie: cookie1=foobarbaz"
 	rxresp
 	expect resp.http.X-foo == "cookie1=foobarbaz;"
+} -run
+
+# Don't overflow the buffer with an edge case
+client c6 {
+	txreq -hdr "Cookie: csrftoken=0e0c3616e41a6bd561b72b7f5fc1128a;=" -hdr "X-Not-Cookie: sessionid=a707505310ddf259bb290d3ca63fc561"
+	rxresp
+	expect resp.http.X-foo == "csrftoken=0e0c3616e41a6bd561b72b7f5fc1128a;"
 } -run
