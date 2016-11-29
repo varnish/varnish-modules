@@ -118,13 +118,14 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 			break;
 		}
 		value = strndup(p, pdiff(p, sep));
-		if (sep != '\0')
-			p = sep + 1;
 
 		vmod_set(ctx, priv, name, value);
 		free(name);
 		free(value);
 		i++;
+		if (*sep == '\0')
+			break;
+		p = sep + 1;
 	}
 	VSLb(ctx->vsl, SLT_VCL_Log, "cookie: parsed %i cookies.", i);
 }
