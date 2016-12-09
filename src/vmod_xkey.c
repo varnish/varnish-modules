@@ -419,7 +419,7 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 			ep = sp;
 			while (*ep != '\0' && !isblank(*ep))
 				ep++;
-			if (sp == ep)
+			if (*sp == '\0')
 				break;
 			SHA256_Init(&sha_ctx);
 			SHA256_Update(&sha_ctx, sp, ep - sp);
@@ -516,7 +516,7 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 		ep = sp;
 		while (*ep != '\0' && !isblank(*ep))
 			ep++;
-		if (sp == ep)
+		if (*sp == '\0')
 			break;
 
                 SHA256_Init(&sha_ctx);
