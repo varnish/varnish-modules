@@ -9,7 +9,6 @@ AM_CONFIG_HEADER(config.h)
 
 AM_INIT_AUTOMAKE([1.11 foreign])
 AM_SILENT_RULES([yes])
-AM_EXTRA_RECURSIVE_TARGETS([docs])
 
 LT_INIT([dlopen disable-static])
 LT_PREREQ([2.2.6])
