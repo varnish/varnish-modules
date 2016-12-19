@@ -51,7 +51,7 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 @BUILD_VMOD_VSTHROTTLE@
 @BUILD_VMOD_XKEY@
 
-docs: $(generated_docs)
+rst-docs: $(generated_docs)
 	cp $(generated_docs) $(top_srcdir)/docs/
 
 doctest:
