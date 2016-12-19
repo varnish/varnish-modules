@@ -1,16 +1,13 @@
-**.o
-**.in
-**.in~
-**.sw[op]
 .deps/
 .libs/
 *.o
-*.lo
 *.la
+*.lo
 *~
 *.[1-9]
+*.gz
 Makefile
-/stamp-h1
+Makefile.in
 /aclocal.m4
 /config.log
 /config.status
@@ -18,7 +15,6 @@ Makefile
 /configure
 /autom4te.cache
 /build-aux/
-Makefile.in
 /config.h.in
 /configure
 /libtool
@@ -27,6 +23,23 @@ Makefile.in
 /m4/ltsugar.m4
 /m4/ltversion.m4
 /m4/lt~obsolete.m4
-#
-/src/vcc*if.[ch]
-/docs/vmod_*.man.rst
+ar-lib
+stamp-h1
+
+# vmodtool
+vcc_*_if.[ch]
+vmod_*.rst
+
+# docs
+! /docs/vmod_*.rst
+
+# test suite
+*.log
+*.trs
+test-driver
+
+# ax_code_coverage
+*.gcno
+*.gcda
+*.info
+lcov/
