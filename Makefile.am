@@ -9,11 +9,6 @@ EXTRA_DIST = \
 	docs \
 	CHANGES.rst
 
-.PHONY: docs
-
-docs:
-	$(MAKE) -C src/ docs
-
 # lcov support
 CODE_COVERAGE_OUTPUT_DIRECTORY = lcov
 CODE_COVERAGE_IGNORE_PATTERN = "/usr/*"
