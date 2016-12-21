@@ -395,6 +395,27 @@ xkey_cleanup(void)
 
 /**************************/
 
+static unsigned
+xkey_tok(const char **b, const char **e)
+{
+	const char *t;
+
+	AN(b);
+	AN(e);
+
+	t = *b;
+	AN(t);
+
+	while (isblank(*t))
+		t++;
+	*b = t;
+
+	while (*t != '\0' && !isblank(*t))
+		t++;
+	*e = t;
+	return (*b < *e);
+}
+
 static void
 xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 {
@@ -413,14 +434,7 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 		sp = strchr(sp, ':');
 		AN(sp);
 		sp++;
-		while (*sp != '\0') {
-			while (*sp == ' ')
-				sp++;
-			ep = sp;
-			while (*ep != '\0' && *ep != ' ')
-				ep++;
-			if (sp == ep)
-				break;
+		while (xkey_tok(&sp, &ep)) {
 			SHA256_Init(&sha_ctx);
 			SHA256_Update(&sha_ctx, sp, ep - sp);
 			SHA256_Final(digest, &sha_ctx);
