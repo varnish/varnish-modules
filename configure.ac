@@ -53,6 +53,16 @@ AC_CHECK_MEMBER(struct objcore.exp,
 	[], [#include <cache/cache.h>])
 CFLAGS="$save_CFLAGS"
 
+AC_CHECK_TYPE(struct tcp_info,
+	[AC_DEFINE([HAVE_TCP_INFO], [1],
+		[Define if struct tcp_info is present])],
+	[], [[
+		#include <sys/types.h>
+		#include <sys/socket.h>
+		#include <netinet/tcp.h>
+		#include <netinet/in.h>
+	]])
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile

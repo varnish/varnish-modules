@@ -33,6 +33,8 @@
 
 #include "vcc_tcp_if.h"
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
@@ -53,6 +55,7 @@ void vmod_dump_info(const struct vrt_ctx *ctx) {
 	if (ctx->req == NULL) {
 	    return;
 	}
+#ifdef HAVE_TCP_INFO
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req->sp, SESS_MAGIC);
 	AN(ctx->req->sp->fd);
@@ -74,7 +77,7 @@ void vmod_dump_info(const struct vrt_ctx *ctx) {
 	    "tcpi2: pmtu=%i rtt=%i rttvar=%i snd_cwnd=%i advmss=%i reordering=%i",
 	    tcpinfo.tcpi_pmtu, tcpinfo.tcpi_rtt, tcpinfo.tcpi_rttvar,
 	    tcpinfo.tcpi_snd_cwnd, tcpinfo.tcpi_advmss, tcpinfo.tcpi_reordering);
-
+#endif
 }
 
 /* TODO: Use a vmod object for these getters. */
@@ -83,6 +86,7 @@ VCL_REAL vmod_get_estimated_rtt(const struct vrt_ctx *ctx) {
 	if (ctx->req == NULL) {
 	    return(0.0);
 	}
+#ifdef HAVE_TCP_INFO
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req->sp, SESS_MAGIC);
 	AN(ctx->req->sp->fd);
@@ -100,6 +104,9 @@ VCL_REAL vmod_get_estimated_rtt(const struct vrt_ctx *ctx) {
 	 * the VCL constraints.
 	*/
 	return (tcpinfo.tcpi_rtt / 1000);
+#else
+	return (-1.);
+#endif
 }
 
 
@@ -107,12 +114,15 @@ VCL_REAL vmod_get_estimated_rtt(const struct vrt_ctx *ctx) {
 // https://fasterdata.es.net/host-tuning/linux/
 
 VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
+#ifdef HAVE_TCP_INFO
 	char strategy[TCP_CA_NAME_MAX + 1];
+#endif
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	if (ctx->req == NULL) {
 	    return(-1);
 	}
+#ifdef HAVE_TCP_INFO
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req->sp, SESS_MAGIC);
 	AN(ctx->req->sp->fd);
@@ -126,7 +136,7 @@ VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
 		return(-1);
 	}
 
-#ifndef NDEBUG
+#  ifndef NDEBUG
 	l = TCP_CA_NAME_MAX;
 	if (getsockopt(ctx->req->sp->fd, IPPROTO_TCP, TCP_CONGESTION,
 	    strategy, &l) < 0) {
@@ -134,8 +144,12 @@ VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
 	} else {
 		VSLb(ctx->vsl, SLT_VCL_Log, "getsockopt() returned: %s", strategy);
 	}
-#endif
+#  endif
 	return(0);
+#else
+	(void)new;
+	return (-1);
+#endif /* ifdef HAVE_TCP_INFO */
 }
 
 /*
@@ -152,8 +166,9 @@ vmod_set_socket_pace(const struct vrt_ctx *ctx, const long rate)
 #define SO_MAX_PACING_RATE 47
 #endif
 
-        int pacerate = rate * 1024;
         CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+#ifdef HAVE_TCP_INFO
+        int pacerate = rate * 1024;
 
         if (setsockopt(ctx->req->sp->fd, SOL_SOCKET, SO_MAX_PACING_RATE, &pacerate,
             sizeof(pacerate)) != 0)
@@ -161,13 +176,15 @@ vmod_set_socket_pace(const struct vrt_ctx *ctx, const long rate)
 	else
                 VSLb(ctx->vsl, SLT_VCL_Log, "vmod-tcp: Socket paced to %lu KB/s.", rate);
 
-#ifndef NDEBUG
+#  ifndef NDEBUG
         int retval;
         unsigned int current_rate = 0;
         socklen_t f = sizeof(current_rate);
         retval = getsockopt(ctx->req->sp->fd, SOL_SOCKET, SO_MAX_PACING_RATE,
                 &current_rate, &f);
         VSLb(ctx->vsl, SLT_VCL_Log, "getsockopt() %i %i", retval, current_rate);
-#endif
-
+#  endif
+#else
+	(void)rate;
+#endif /* ifdef HAVE_TCP_INFO */
 }
