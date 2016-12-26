@@ -47,10 +47,10 @@ VARNISH_VMODS([
 
 save_CFLAGS="$CFLAGS"
 CFLAGS="$VARNISHAPI_CFLAGS"
-AC_CHECK_MEMBERS(struct objcore.exp,
-  [AC_DEFINE([HAVE_OBJCORE_EXP], [1],
-    [Define if exp is present in the objcore struct])],
-  [], [#include <cache/cache.h>])
+AC_CHECK_MEMBER(struct objcore.exp,
+	[AC_DEFINE([HAVE_OBJCORE_EXP], [1],
+		[Define if exp is present in the objcore struct])],
+	[], [#include <cache/cache.h>])
 CFLAGS="$save_CFLAGS"
 
 AC_CONFIG_FILES([
