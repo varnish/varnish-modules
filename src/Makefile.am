@@ -1,6 +1,6 @@
 AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign
 AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS) -Wall -Werror -Wunused-parameter -Wmissing-prototypes -Werror=strict-prototypes
-AM_LDFLAGS = $(VARNISHAPI_LIBS) $(CODE_COVERAGE_LDFLAGS)
+AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
 vmod_LTLIBRARIES = \
 	libvmod_cookie.la \
