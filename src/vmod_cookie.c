@@ -131,6 +131,17 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 	VSLb(ctx->vsl, SLT_VCL_Log, "cookie: parsed %i cookies.", i);
 }
 
+static struct cookie *
+find_cookie(struct vmod_cookie *vcp, VCL_STRING name)
+{
+	struct cookie *cookie;
+	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
+		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
+		if (!strcmp(cookie->name, name))
+			break;
+	}
+	return(cookie);
+}
 
 VCL_VOID
 vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
@@ -144,12 +155,8 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 		return;
 
 	char *p;
-	struct cookie *cookie;
-	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
-		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (strcmp(cookie->name, name))
-			continue;
-
+	struct cookie *cookie = find_cookie(vcp, name);
+	if (cookie != NULL) {
 		p = WS_Printf(ctx->ws, "%s", value);
 		if (p == NULL) {
 			VSLb(ctx->vsl, SLT_VCL_Log,
@@ -182,14 +189,9 @@ vmod_isset(VRT_CTX, struct vmod_priv *priv, const char *name) {
 	if (name == NULL || strlen(name) == 0)
 		return(0);
 
-	struct cookie *cookie;
-	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
-		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (strcmp(cookie->name, name) == 0) {
-			return 1;
-		}
-	}
-	return 0;
+	struct cookie *cookie = find_cookie(vcp, name);
+
+	return (cookie ? 1 : 0);
 }
 
 VCL_STRING
@@ -201,14 +203,9 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	if (name == NULL || strlen(name) == 0)
 		return(NULL);
 
-	struct cookie *cookie;
-	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
-		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (strcmp(cookie->name, name) == 0) {
-			return (cookie->value);
-		}
-	}
-	return (NULL);
+	struct cookie *cookie = find_cookie(vcp, name);
+
+	return (cookie ? cookie->value : NULL);
 }
 
 
@@ -221,15 +218,10 @@ vmod_delete(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	if (name == NULL || strlen(name) == 0)
 		return;
 
-	struct cookie *cookie;
-	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
-		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (strcmp(cookie->name, name) == 0) {
-			VTAILQ_REMOVE(&vcp->cookielist, cookie, list);
-			/* No way to clean up storage, let ws reclaim do it. */
-			break;
-		}
-	}
+	struct cookie *cookie = find_cookie(vcp, name);
+
+	if (cookie != NULL)
+		VTAILQ_REMOVE(&vcp->cookielist, cookie, list);
 }
 
 VCL_VOID
