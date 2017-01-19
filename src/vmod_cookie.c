@@ -147,16 +147,17 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 	struct cookie *cookie;
 	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
 		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (strcmp(cookie->name, name) == 0) {
-			p = WS_Printf(ctx->ws, "%s", value);
-			if (p == NULL) {
-				VSLb(ctx->vsl, SLT_VCL_Log,
-				    "cookie: Workspace overflow in set()");
-			} else
-				cookie->value = p;
+		if (strcmp(cookie->name, name))
+			continue;
 
-			return;
-		}
+		p = WS_Printf(ctx->ws, "%s", value);
+		if (p == NULL) {
+			VSLb(ctx->vsl, SLT_VCL_Log,
+					"cookie: Workspace overflow in set()");
+		} else
+			cookie->value = p;
+
+		return;
 	}
 
 	struct cookie *newcookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
