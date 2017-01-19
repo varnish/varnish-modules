@@ -86,7 +86,6 @@ cobj_get(struct vmod_priv *priv) {
 VCL_VOID
 vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 
 	char *name, *value;
 	const char *p, *sep;
@@ -146,7 +145,6 @@ find_cookie(struct vmod_cookie *vcp, VCL_STRING name)
 VCL_VOID
 vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 
 	/* Empty cookies should be ignored. */
 	if (name == NULL || strlen(name) == 0)
@@ -187,7 +185,6 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 VCL_BOOL
 vmod_isset(VRT_CTX, struct vmod_priv *priv, const char *name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 	(void)ctx;
 
 	if (name == NULL || strlen(name) == 0)
@@ -201,7 +198,6 @@ vmod_isset(VRT_CTX, struct vmod_priv *priv, const char *name) {
 VCL_STRING
 vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 	(void)ctx;
 
 	if (name == NULL || strlen(name) == 0)
@@ -216,7 +212,6 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 VCL_VOID
 vmod_delete(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 	(void)ctx;
 
 	if (name == NULL || strlen(name) == 0)
@@ -231,7 +226,6 @@ vmod_delete(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 VCL_VOID
 vmod_clean(VRT_CTX, struct vmod_priv *priv) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 	(void)ctx;
 
 	AN(&vcp->cookielist);
@@ -251,7 +245,6 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 
 	VTAILQ_HEAD(, whitelist) whitelist_head;
 	VTAILQ_INIT(&whitelist_head);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 	AN(whitelist_s);
 
 	/* Parse the supplied whitelist. */
@@ -316,7 +309,6 @@ vmod_get_string(VRT_CTX, struct vmod_priv *priv) {
 	struct vsb *output;
 	void *u;
 	struct vmod_cookie *vcp = cobj_get(priv);
-	CHECK_OBJ_NOTNULL(vcp, VMOD_COOKIE_MAGIC);
 
 	output = VSB_new_auto();
 	AN(output);
