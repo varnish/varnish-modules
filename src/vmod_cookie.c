@@ -169,7 +169,6 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 	newcookie->value = WS_Printf(ctx->ws, "%s", value);
 	if (newcookie->name == NULL || newcookie->value == NULL) {
 		WS_MarkOverflow(ctx->ws);
-		WS_Release(ctx->ws, sizeof(struct cookie));
 		return;
 	}
 	VTAILQ_INSERT_TAIL(&vcp->cookielist, newcookie, list);
