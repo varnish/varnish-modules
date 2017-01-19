@@ -150,7 +150,6 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 		if (strcmp(cookie->name, name) == 0) {
 			p = WS_Printf(ctx->ws, "%s", value);
 			if (p == NULL) {
-				WS_MarkOverflow(ctx->ws); // Remove when WS_Printf() does it.
 				VSLb(ctx->vsl, SLT_VCL_Log,
 				    "cookie: Workspace overflow in set()");
 			} else
@@ -168,10 +167,8 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 	newcookie->magic = VMOD_COOKIE_ENTRY_MAGIC;
 	newcookie->name = WS_Printf(ctx->ws, "%s", name);
 	newcookie->value = WS_Printf(ctx->ws, "%s", value);
-	if (newcookie->name == NULL || newcookie->value == NULL) {
-		WS_MarkOverflow(ctx->ws);
+	if (newcookie->name == NULL || newcookie->value == NULL)
 		return;
-	}
 	VTAILQ_INSERT_TAIL(&vcp->cookielist, newcookie, list);
 }
 
