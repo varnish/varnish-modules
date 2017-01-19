@@ -165,21 +165,21 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 		return;
 	}
 
-	struct cookie *newcookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
-	if (newcookie == NULL) {
+	cookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
+	if (cookie == NULL) {
 		VSLb(ctx->vsl, SLT_VCL_Log,
 				"cookie: unable to get storage for cookie");
 		return;
 	}
-	newcookie->magic = VMOD_COOKIE_ENTRY_MAGIC;
-	newcookie->name = WS_Printf(ctx->ws, "%s", name);
-	newcookie->value = WS_Printf(ctx->ws, "%s", value);
-	if (newcookie->name == NULL || newcookie->value == NULL) {
+	cookie->magic = VMOD_COOKIE_ENTRY_MAGIC;
+	cookie->name = WS_Printf(ctx->ws, "%s", name);
+	cookie->value = WS_Printf(ctx->ws, "%s", value);
+	if (cookie->name == NULL || cookie->value == NULL) {
 		VSLb(ctx->vsl, SLT_VCL_Log,
 				"cookie: unable to get storage for cookie");
 		return;
 	}
-	VTAILQ_INSERT_TAIL(&vcp->cookielist, newcookie, list);
+	VTAILQ_INSERT_TAIL(&vcp->cookielist, cookie, list);
 }
 
 VCL_BOOL
