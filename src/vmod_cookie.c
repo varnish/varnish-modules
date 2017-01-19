@@ -245,10 +245,9 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 
 	VTAILQ_HEAD(, whitelist) whitelist_head;
 	VTAILQ_INIT(&whitelist_head);
-	AN(whitelist_s);
 
 	/* Parse the supplied whitelist. */
-	while (*p != '\0') {
+	while (p && *p != '\0') {
 		while (*p != '\0' && isspace(*p)) p++;
 		if (p == '\0')
 			break;

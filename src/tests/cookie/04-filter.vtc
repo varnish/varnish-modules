@@ -20,6 +20,9 @@ varnish v1 -vcl+backend {
 		cookie.parse("bredela=eggwhites; empire=jellytots;");
 		cookie.filter_except(",,,,bredela,    ,empire,baz,");
 		set resp.http.X-bar = cookie.get_string();
+
+		cookie.filter_except(req.http.none);
+		set resp.http.X-baz = cookie.get_string();
 	}
 } -start
 
@@ -28,5 +31,6 @@ client c1 {
 	rxresp
 	expect resp.http.X-foo == "bredela=eggwhites; empire=jellytots;"
 	expect resp.http.X-bar == "bredela=eggwhites; empire=jellytots;"
+	expect resp.http.X-baz == ""
 }
 client c1 -run
