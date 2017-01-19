@@ -294,6 +294,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 
 	if (!priv->priv) {
 		ALLOC_OBJ(sm_objs, SAINTMODE_OBJS_MAGIC);
+		AN(sm_objs);
 		VTAILQ_INIT(&sm_objs->sm_list);
 		priv->priv = sm_objs;
 		priv->free = free;

@@ -73,6 +73,7 @@ cobj_get(struct vmod_priv *priv) {
 
 	if (priv->priv == NULL) {
 		ALLOC_OBJ(vcp, VMOD_COOKIE_MAGIC);
+		AN(vcp);
 		VTAILQ_INIT(&vcp->cookielist);
 		priv->priv = vcp;
 		priv->free = cobj_free;
