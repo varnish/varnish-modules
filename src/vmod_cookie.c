@@ -159,8 +159,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 		}
 	}
 
-	struct cookie *newcookie = (struct cookie *)WS_Alloc(ctx->ws,
-	    sizeof(struct cookie));
+	struct cookie *newcookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
 	if (newcookie == NULL) {
 		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: unable to get storage for cookie");
 		return;
