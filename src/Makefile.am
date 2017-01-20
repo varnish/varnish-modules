@@ -1,5 +1,26 @@
-AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign
-AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS) -Wall -Werror -Wunused-parameter -Wmissing-prototypes -Werror=strict-prototypes
+AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign \
+	-Wall \
+	-Werror \
+	-Werror \
+	-Wall \
+	-Wno-format-y2k \
+	-W \
+	-Wstrict-prototypes \
+	-Wmissing-prototypes \
+	-Werror=missing-field-initializers \
+	-Wpointer-arith \
+	-Wreturn-type \
+	-Wwrite-strings \
+	-Wswitch \
+	-Wshadow \
+	-Wunused-parameter \
+	-Wcast-align \
+	-Wchar-subscripts \
+	-Wnested-externs \
+	-Wextra \
+	-Wno-sign-compare
+
+AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS)
 AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
 vmod_LTLIBRARIES = \
