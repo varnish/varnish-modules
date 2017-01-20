@@ -11,6 +11,7 @@ AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/for
 	-Wpointer-arith \
 	-Wreturn-type \
 	-Wwrite-strings \
+	-Wcast-qual \
 	-Wswitch \
 	-Wshadow \
 	-Wunused-parameter \

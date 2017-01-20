@@ -234,11 +234,11 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	pthread_mutex_unlock(&sm->mtx);
 
 	if (bl)
-		VSLb(((struct busyobj *)bo)->vsl, SLT_VCL_Log,
+		VSLb(((struct busyobj *)TRUST_ME(bo))->vsl, SLT_VCL_Log,
 		    "saintmode: unhealthy: object blacklisted for backend %s",
 			sm->be->vcl_name);
 	else if (retval == 0)
-		VSLb(((struct busyobj *)bo)->vsl, SLT_VCL_Log,
+		VSLb(((struct busyobj *)TRUST_ME(bo))->vsl, SLT_VCL_Log,
 		    "saintmode: unhealthy: hit threshold for backend %s",
 		    sm->be->vcl_name);
 
