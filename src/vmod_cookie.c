@@ -91,7 +91,7 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 	const char *p, *sep;
 	int i = 0;
 
-	if (!cookieheader || strlen(cookieheader) == 0) {
+	if (!cookieheader || *cookieheader == '\0') {
 		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: nothing to parse");
 		return;
 	}
@@ -147,9 +147,9 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 
 	/* Empty cookies should be ignored. */
-	if (name == NULL || strlen(name) == 0)
+	if (name == NULL || *name == '\0')
 		return;
-	if (value == NULL || strlen(value) == 0)
+	if (value == NULL || *value == '\0')
 		return;
 
 	char *p;
@@ -187,7 +187,7 @@ vmod_isset(VRT_CTX, struct vmod_priv *priv, const char *name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
 
-	if (name == NULL || strlen(name) == 0)
+	if (name == NULL || *name == '\0')
 		return(0);
 
 	struct cookie *cookie = find_cookie(vcp, name);
@@ -200,7 +200,7 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
 
-	if (name == NULL || strlen(name) == 0)
+	if (name == NULL || *name == '\0')
 		return(NULL);
 
 	struct cookie *cookie = find_cookie(vcp, name);
@@ -214,7 +214,7 @@ vmod_delete(VRT_CTX, struct vmod_priv *priv, VCL_STRING name) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
 
-	if (name == NULL || strlen(name) == 0)
+	if (name == NULL || *name == '\0')
 		return;
 
 	struct cookie *cookie = find_cookie(vcp, name);
