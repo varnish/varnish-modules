@@ -283,8 +283,7 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 		CHECK_OBJ_NOTNULL(cookieptr, VMOD_COOKIE_ENTRY_MAGIC);
 		whitelisted = 0;
 		VTAILQ_FOREACH(whentry, &whitelist_head, list) {
-			if (strlen(cookieptr->name) == strlen(whentry->name) &&
-			    strcmp(cookieptr->name, whentry->name) == 0) {
+			if (strcmp(cookieptr->name, whentry->name) == 0) {
 				whitelisted = 1;
 				break;
 			}
