@@ -111,10 +111,11 @@ static struct tbucket *
 get_bucket(const unsigned char *digest, long limit, double period, double now)
 {
 	struct tbucket *b;
-	struct tbucket k = { 0 };
+	struct tbucket k;
 	unsigned part = digest[0] & N_PART_MASK;
 	struct vsthrottle *v = &vsthrottle[part];
 
+	INIT_OBJ(&k, TBUCKET_MAGIC);
 	memcpy(&k.digest, digest, sizeof k.digest);
 	b = VRB_FIND(tbtree, &v->buckets, &k);
 	if (b) {
