@@ -182,11 +182,10 @@ vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 	return (c);
 }
 
-unsigned healthy(const struct director *, const struct busyobj *, double *);
-
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-unsigned __match_proto__(vdi_healthy_f)
-healthy(const struct director *dir, const struct busyobj *bo, double *changed) {
+static unsigned __match_proto__(vdi_healthy_f)
+healthy(const struct director *dir, const struct busyobj *bo, double *changed)
+{
 	struct trouble *tr;
 	struct trouble *tr2;
 	unsigned retval, bl;
