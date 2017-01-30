@@ -259,7 +259,7 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 
 		whentry = malloc(sizeof(struct whitelist));
 		AN(whentry);
-		whentry->name = strndup(p, q-p);
+		whentry->name = strndup(p, q - p);
 		AN(whentry->name);
 
 		VTAILQ_INSERT_TAIL(&whitelist_head, whentry, list);
