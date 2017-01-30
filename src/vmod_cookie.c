@@ -233,8 +233,7 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 	struct cookie *cookieptr, *safeptr;
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct whitelist *whentry, *whsafe;
-	char const *p = whitelist_s;
-	char *q;
+	char const *p = whitelist_s, *q;
 	int whitelisted = 0;
 
 	(void)ctx;
