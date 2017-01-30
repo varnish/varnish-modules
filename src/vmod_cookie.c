@@ -249,19 +249,14 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 		if (*p == '\0')
 			break;
 
-		q = strchr(p, ',');
-		if (q == NULL) {
-			q = strchr(p, '\0');
-		}
-		AN(q);
+		q = p;
+		while (*q != '\0' && *q != ',')
+			q++;
 
 		if (q == p) {
 			p++;
 			continue;
 		}
-
-		assert(q > p);
-		assert(q-p > 0);
 
 		whentry = malloc(sizeof(struct whitelist));
 		AN(whentry);
