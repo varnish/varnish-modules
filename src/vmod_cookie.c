@@ -246,7 +246,7 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 	while (p && *p != '\0') {
 		while (isspace(*p))
 			p++;
-		if (p == '\0')
+		if (*p == '\0')
 			break;
 
 		q = strchr(p, ',');
