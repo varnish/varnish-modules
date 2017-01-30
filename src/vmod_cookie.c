@@ -109,14 +109,10 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader) {
 			break;
 		name = strndup(p, pdiff(p, sep));
 		p = sep + 1;
-		sep = strchr(p, ';');
-		if (sep == NULL)
-			sep = strchr(p, '\0');
 
-		if (sep == NULL) {
-			free(name);
-			break;
-		}
+		sep = p;
+		while (*sep != '\0' && *sep != ';')
+			sep++;
 		value = strndup(p, pdiff(p, sep));
 
 		vmod_set(ctx, priv, name, value);
@@ -248,7 +244,8 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 
 	/* Parse the supplied whitelist. */
 	while (p && *p != '\0') {
-		while (*p != '\0' && isspace(*p)) p++;
+		while (isspace(*p))
+			p++;
 		if (p == '\0')
 			break;
 
