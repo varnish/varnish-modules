@@ -16,6 +16,8 @@ varnish-modules 0.10.0 (unreleased)
 * [vmod-vsthrottle] Added vsthrottle.remaining() which returns the
   current number of tokens for a given bucket.
 * Correct build with 4.1.4-beta1, 5.0.0 and master at rev dfcf44c6.
+* [vmod-xkey] Add support for purging multiple keys in a single invocation
+* [vmod-cookie] Fix a bug where we would crash on malicious input
 
 varnish-modules 0.9.1 (2016-07-07)
 ----------------------------------
