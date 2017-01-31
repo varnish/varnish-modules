@@ -1,6 +1,6 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.10.1 (2017-01-31)
+varnish-modules 0.10.2 (2017-01-31)
 -----------------------------------
 
 * Improved documentation and examples for vmod-saintmode, vmod-cookie,
