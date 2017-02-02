@@ -47,9 +47,10 @@ struct cookie {
 	VTAILQ_ENTRY(cookie) list;
 };
 
-struct whitelist {
+/* A structure to represent both whitelists and blacklists */
+struct greylist {
 	char *name;
-	VTAILQ_ENTRY(whitelist) list;
+	VTAILQ_ENTRY(greylist) list;
 };
 
 struct vmod_cookie {
@@ -228,20 +229,18 @@ vmod_clean(VRT_CTX, struct vmod_priv *priv) {
 	VTAILQ_INIT(&vcp->cookielist);
 }
 
-VCL_VOID
-vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
+static void
+filter_cookies(struct vmod_priv *priv, VCL_STRING list_s, VCL_INT is_whitelist) {
 	struct cookie *cookieptr, *safeptr;
 	struct vmod_cookie *vcp = cobj_get(priv);
-	struct whitelist *whentry, *whsafe;
-	char const *p = whitelist_s, *q;
-	int whitelisted = 0;
+	struct greylist *glentry, *glsafe;
+	char const *p = list_s, *q;
+	int greylisted = 0;
 
-	(void)ctx;
+	VTAILQ_HEAD(, greylist) greylist_head;
+	VTAILQ_INIT(&greylist_head);
 
-	VTAILQ_HEAD(, whitelist) whitelist_head;
-	VTAILQ_INIT(&whitelist_head);
-
-	/* Parse the supplied whitelist. */
+	/* Parse the supplied list. */
 	while (p && *p != '\0') {
 		while (isspace(*p))
 			p++;
@@ -257,38 +256,52 @@ vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 			continue;
 		}
 
-		whentry = malloc(sizeof(struct whitelist));
-		AN(whentry);
-		whentry->name = strndup(p, q - p);
-		AN(whentry->name);
+		glentry = malloc(sizeof(struct greylist));
+		AN(glentry);
+		glentry->name = strndup(p, q - p);
+		AN(glentry->name);
 
-		VTAILQ_INSERT_TAIL(&whitelist_head, whentry, list);
+		VTAILQ_INSERT_TAIL(&greylist_head, glentry, list);
 
 		p = q;
 		if (*p != '\0')
 			p++;
 	}
 
-	/* Filter existing cookies that isn't in the whitelist. */
+	/* Filter existing cookies that either aren't in the whitelist or are in the blacklist (depending on the is_whitelist flag) */
 	VTAILQ_FOREACH_SAFE(cookieptr, &vcp->cookielist, list, safeptr) {
 		CHECK_OBJ_NOTNULL(cookieptr, VMOD_COOKIE_ENTRY_MAGIC);
-		whitelisted = 0;
-		VTAILQ_FOREACH(whentry, &whitelist_head, list) {
-			if (strcmp(cookieptr->name, whentry->name) == 0) {
-				whitelisted = 1;
+		greylisted = 0;
+
+		VTAILQ_FOREACH(glentry, &greylist_head, list) {
+			if (strcmp(cookieptr->name, glentry->name) == 0) {
+				greylisted = 1;
 				break;
 			}
 		}
-		if (!whitelisted) {
+		if ((is_whitelist && !greylisted) || (!is_whitelist && greylisted)) {
 			VTAILQ_REMOVE(&vcp->cookielist, cookieptr, list);
 		}
 	}
 
-	VTAILQ_FOREACH_SAFE(whentry, &whitelist_head, list, whsafe) {
-		VTAILQ_REMOVE(&whitelist_head, whentry, list);
-		free(whentry->name);
-		free(whentry);
+	VTAILQ_FOREACH_SAFE(glentry, &greylist_head, list, glsafe) {
+		VTAILQ_REMOVE(&greylist_head, glentry, list);
+		free(glentry->name);
+		free(glentry);
 	}
+}
+
+
+VCL_VOID
+vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
+	(void)ctx;
+	filter_cookies(priv, whitelist_s, 1);
+}
+
+VCL_VOID
+vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s) {
+	(void)ctx;
+	filter_cookies(priv, blacklist_s, 0);
 }
 
 
