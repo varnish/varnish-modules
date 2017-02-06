@@ -1,5 +1,12 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.10.3 (unreleased)
+-----------------------------------
+
+* [vmod-saintmode] Fix a bug where saintmode.blacklist() would cause a
+  crash if saintmode was not configured. (#54)
+
+
 varnish-modules 0.10.2 (2017-01-31)
 -----------------------------------
 

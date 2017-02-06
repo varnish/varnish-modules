@@ -96,6 +96,12 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct saintmode_objs *sm_objs;
 	struct vmod_saintmode_saintmode *sm;
 
+	if (priv->priv == NULL) {
+		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.blacklist(): "
+		    "Saintmode is not configured");
+		return;
+	}
+
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	if (ctx->method != VCL_MET_BACKEND_RESPONSE) {
 		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.blacklist() called"

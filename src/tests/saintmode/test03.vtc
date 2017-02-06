@@ -1,0 +1,36 @@
+varnishtest "varnish-modules issue #54"
+
+server s1 {
+       rxreq
+       txresp
+
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
+	import directors;
+
+	sub vcl_recv {
+		return (pass);
+	}
+
+	sub vcl_backend_response {
+		# this should be a no-op when saintmode is not configured
+		saintmode.blacklist(0.5s);
+	}
+
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.status == 200
+
+	txreq
+	rxresp
+	expect resp.status == 200
+}
+
+client c1 -run
