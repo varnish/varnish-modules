@@ -76,7 +76,7 @@ Example
 $Function VOID filter(PRIV_TASK, STRING filterstring)
 
 Description
-        Delete all cookies from internal vmod storage that is in the
+        Delete all cookies from internal vmod storage that are in the
         comma-separated argument cookienames.
 
 Example
