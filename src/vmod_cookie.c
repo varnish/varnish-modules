@@ -282,9 +282,8 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s, VCL_BOOL filter_action
 				break;
 			}
 		}
-		if ((filter_action == FILTER_ACTION_WHITELIST && !matched) || (filter_action == FILTER_ACTION_BLACKLIST && matched)) {
+		if (matched != filter_action)
 			VTAILQ_REMOVE(&vcp->cookielist, cookieptr, list);
-		}
 	}
 
 	VTAILQ_FOREACH_SAFE(mlentry, &matchlist_head, list, mlsafe) {
