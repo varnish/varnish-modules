@@ -53,9 +53,6 @@ struct matchlist {
 	VTAILQ_ENTRY(matchlist) list;
 };
 
-#define FILTER_ACTION_BLACKLIST 0
-#define FILTER_ACTION_WHITELIST 1
-
 struct vmod_cookie {
 	unsigned magic;
 #define VMOD_COOKIE_MAGIC 0x4EE5FB2E
@@ -232,8 +229,13 @@ vmod_clean(VRT_CTX, struct vmod_priv *priv) {
 	VTAILQ_INIT(&vcp->cookielist);
 }
 
+#define FILTER_ACTION_BLACKLIST 0
+#define FILTER_ACTION_WHITELIST 1
+
 static void
-filter_cookies(struct vmod_priv *priv, VCL_STRING list_s, VCL_BOOL filter_action) {
+filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
+		VCL_BOOL filter_action)
+{
 	struct cookie *cookieptr, *safeptr;
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct matchlist *mlentry, *mlsafe;
@@ -271,7 +273,8 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s, VCL_BOOL filter_action
 			p++;
 	}
 
-	/* Filter existing cookies that either aren't in the whitelist or are in the blacklist (depending on the filter_action) */
+	/* Filter existing cookies that either aren't in the whitelist or
+	 * are in the blacklist (depending on the filter_action) */
 	VTAILQ_FOREACH_SAFE(cookieptr, &vcp->cookielist, list, safeptr) {
 		CHECK_OBJ_NOTNULL(cookieptr, VMOD_COOKIE_ENTRY_MAGIC);
 		matched = 0;
@@ -293,7 +296,6 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s, VCL_BOOL filter_action
 	}
 }
 
-
 VCL_VOID
 vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s) {
 	(void)ctx;
@@ -305,7 +307,6 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s) {
 	(void)ctx;
 	filter_cookies(priv, blacklist_s, FILTER_ACTION_BLACKLIST);
 }
-
 
 VCL_STRING
 vmod_get_string(VRT_CTX, struct vmod_priv *priv) {
