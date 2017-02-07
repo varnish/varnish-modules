@@ -1,10 +1,11 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.10.3 (unreleased)
+varnish-modules 0.10.3 (2017-02-07)
 -----------------------------------
 
 * [vmod-saintmode] Fix a bug where saintmode.blacklist() would cause a
   crash if saintmode was not configured. (#54)
+* [vmod-cookie] New cookie.filter() function to blacklist cookies.
 
 
 varnish-modules 0.10.2 (2017-01-31)
