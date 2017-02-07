@@ -1,10 +1,8 @@
 AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign \
 	-Wall \
 	-Werror \
-	-Werror \
 	-Wall \
 	-Wno-format-y2k \
-	-W \
 	-Wstrict-prototypes \
 	-Wmissing-prototypes \
 	-Werror=missing-field-initializers \
