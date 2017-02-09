@@ -28,14 +28,15 @@
  */
 
 #define _GNU_SOURCE
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
+#include "cache/cache.h"
 #include "vrt.h"
 #include "vqueue.h"
-#include "cache/cache.h"
 
 #include "vcc_cookie_if.h"
 

@@ -25,15 +25,14 @@
  * SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "vrt.h"
 #include "cache/cache.h"
+#include "vrt.h"
 
 #include "vcc_tcp_if.h"
-
-#include "config.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>

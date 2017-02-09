@@ -26,15 +26,15 @@
  * SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <stdlib.h>
 #include <pthread.h>
 
 #include "vcl.h"
-#include "vrt.h"
 #include "cache/cache.h"
+#include "vrt.h"
 
 #include "vcc_header_if.h"
-#include "config.h"
 
 /*
  * This mutex is used to avoid having two threads that initializes the same
