@@ -25,11 +25,11 @@
  * SUCH DAMAGE.
  */
 
+#include "config.h"
+#include "cache/cache.h"
 #include "vrt.h"
 #include "vcl.h"
-#include "cache/cache.h"
 #include "hash/hash_slinger.h"
-#include "config.h"
 
 #include "vcc_softpurge_if.h"
 

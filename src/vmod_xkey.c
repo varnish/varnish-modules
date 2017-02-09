@@ -26,15 +26,15 @@
  * SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
 #include "vcl.h"
-#include "vrt.h"
 #include "cache/cache.h"
+#include "vrt.h"
 #include "vsha256.h"
-#include "config.h"
 
 #include "vtree.h"
 
