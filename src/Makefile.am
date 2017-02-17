@@ -32,6 +32,7 @@ vmod_LTLIBRARIES = \
 	libvmod_vsthrottle.la \
 	libvmod_xkey.la
 
+if HAVE_RST2MAN
 dist_man_MANS = \
 	vmod_cookie.3 \
 	vmod_header.3 \
@@ -41,6 +42,9 @@ dist_man_MANS = \
 	vmod_var.3 \
 	vmod_vsthrottle.3 \
 	vmod_xkey.3
+else
+dist_man_MANS =
+endif
 
 generated_docs = $(dist_man_MANS:.3=.rst)
 
