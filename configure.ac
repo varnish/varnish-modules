@@ -21,8 +21,8 @@ AX_CODE_COVERAGE
 AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
 if test "x$RST2MAN" = "xno"; then
 	AC_MSG_WARN([rst2man not found - not building man pages])
+	RST2MAN=: # no-op
 fi
-AM_CONDITIONAL(HAVE_RST2MAN, [test "x$RST2MAN" != "xno"])
 
 # Test suite
 VMOD_TESTS="$(cd $srcdir/src && echo tests/*/*.vtc)"
