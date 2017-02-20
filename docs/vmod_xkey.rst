@@ -125,11 +125,13 @@ purge
 
 ::
 
-	INT purge(STRING key)
+	INT purge(STRING keys)
 
 Description
-    Purges all objects hashed on `key`. Returns the number of objects that were
-    purged.
+        Purges all objects hashed on any key found in the ``keys`` argument.
+        Returns the number of objects that were purged.
+
+        The ``keys`` may contain a list of space-separated ids.
 
 
 .. _func_softpurge:
@@ -139,14 +141,14 @@ softpurge
 
 ::
 
-	INT softpurge(STRING key)
+	INT softpurge(STRING keys)
 
 Description
-	Performs a "soft purge" for all objects hashed on `key`.
-	Returns the number of objects that were purged.
+        Performs a "soft purge" for all objects hashed on any key found in the
+        ``keys`` argument.  Returns the number of objects that were purged.
 
-	A softpurge differs from a regular purge in that it resets an
-	object's TTL but keeps it available for grace mode and conditional
-	requests for the remainder of its configured grace and keep time.
+        A softpurge differs from a regular purge in that it resets an
+        object's TTL but keeps it available for grace mode and conditional
+        requests for the remainder of its configured grace and keep time.
 
 

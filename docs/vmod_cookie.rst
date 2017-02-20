@@ -30,7 +30,8 @@ Handle HTTP cookies easier in Varnish VCL. (without regex)
 
 Parses a cookie header into an internal data store, where per-cookie
 get/set/delete functions are available. A filter_except() method removes all
-but a set comma-separated list of cookies.
+but a set comma-separated list of cookies. A filter() method removes a comma-
+separated list of cookies.
 
 A convenience function for formatting the Set-Cookie Expires date field
 is also included. If there are multiple Set-Cookie headers vmod-header
@@ -75,6 +76,7 @@ CONTENTS
 
 * :ref:`func_clean`
 * :ref:`func_delete`
+* :ref:`func_filter`
 * :ref:`func_filter_except`
 * :ref:`func_format_rfc1123`
 * :ref:`func_get`
@@ -122,6 +124,29 @@ Example
 		    cookie.delete("cookie2");
 		    // get_string() will now yield "cookie1: value1";
 		}
+
+.. _func_filter:
+
+filter
+------
+
+::
+
+	VOID filter(PRIV_TASK, STRING filterstring)
+
+Description
+        Delete all cookies from internal vmod storage that are in the
+        comma-separated argument cookienames.
+
+Example
+        ::
+
+                sub vcl_recv {
+                        cookie.parse("cookie1: value1; cookie2: value2; cookie3: value3");
+                        cookie.filter("cookie1,cookie2");
+                        // get_string() will now yield
+                        // "cookie3: value3";
+                }
 
 .. _func_filter_except:
 
