@@ -1,6 +1,6 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.10.3 (2017-02-07)
+varnish-modules 0.11.0 (2017-02-07)
 -----------------------------------
 
 * [vmod-saintmode] Fix a bug where saintmode.blacklist() would cause a
