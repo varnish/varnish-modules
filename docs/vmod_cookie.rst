@@ -34,8 +34,8 @@ but a set comma-separated list of cookies. A filter() method removes a comma-
 separated list of cookies.
 
 A convenience function for formatting the Set-Cookie Expires date field
-is also included. If there are multiple Set-Cookie headers vmod-header
-should be used.
+is also included. To actually manipulate the Set-Cookie response headers,
+vmod-header should be used instead though.
 
 The state loaded with cookie.parse() has a lifetime of the current request
 or backend request context. To pass variables to the backend request, store
