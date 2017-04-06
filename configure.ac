@@ -35,6 +35,7 @@ AC_SUBST([VARNISH_LIBRARY_PATH],
 
 VARNISH_PREREQ([4.1.4])
 VARNISH_VMODS([
+	bodyaccess
 	cookie
 	header
 	saintmode

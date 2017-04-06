@@ -1,0 +1,51 @@
+varnishtest "Test len of req body"
+
+server s1 {
+	rxreq
+	txresp
+	rxreq
+	txresp
+	rxreq
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import std;
+
+	sub vcl_recv {
+		std.cache_req_body(110B);
+		set req.http.x-len = bodyaccess.len_req_body();
+	}
+
+	sub vcl_deliver {
+		set resp.http.x-len = req.http.x-len;
+	}
+} -start
+
+client c1 {
+	txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
+	chunked {BLAS}
+	delay .2
+	chunkedlen 110
+	expect_close
+} -run
+
+client c1 {
+	txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
+	chunked {BLAS}
+	delay .2
+	chunkedlen 90
+	delay .2
+	chunked {FOO}
+	delay .2
+	chunkedlen 0
+	rxresp
+	expect resp.http.x-len == 97
+} -run
+
+client c2 {
+	txreq -req POST -body "BANANE"
+	rxresp
+	expect resp.http.x-len == 6
+} -run
