@@ -33,11 +33,20 @@ Installation requires an installed version of Varnish Cache, including the
 development files. Requirements can be found in the `Varnish documentation`_.
 
 .. _`Varnish documentation`: https://www.varnish-cache.org/docs/4.1/installation/install.html#compiling-varnish-from-source
+.. _`Varnish Project packages`: https://www.varnish-cache.org/releases/index.html
 
 
-Source code is built with autotools::
+Source code is built with autotools, you need to install the correct development packages first.
+If you are using the official `Varnish Project packages`_::
+
+    sudo apt-get install varnish-dev || sudo yum install varnish-devel
+
+If you are using the distro provided packages::
 
     sudo apt-get install libvarnishapi-dev || sudo yum install varnish-libs-devel
+
+Then proceed to the configure and build::
+
     ./bootstrap   # If running from git.
     ./configure
     make
