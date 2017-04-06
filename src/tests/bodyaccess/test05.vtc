@@ -1,0 +1,33 @@
+varnishtest "Test logging POST body"
+
+server s1 {
+	rxreq
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+        import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import std;
+
+	sub vcl_recv {
+		std.cache_req_body(10KB);
+		bodyaccess.log_req_body("PREFIX:", 3);
+	}
+} -start
+
+logexpect l1 -v v1 {
+	expect * * Debug "^PREFIX:123$"
+	expect 1 = Debug "^PREFIX:456$"
+	expect 1 = Debug "^PREFIX:789$"
+	expect 1 = Debug "^PREFIX:0AB$"
+	expect 1 = Debug "^PREFIX:CDE$"
+	expect 1 = Debug "^PREFIX:F$"
+} -start
+
+client c1 {
+	txreq -req POST -body "1234567890ABCDEF"
+	rxresp
+	expect resp.status == 200
+} -run
+
+logexpect l1 -wait

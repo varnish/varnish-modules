@@ -23,6 +23,7 @@ AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS)
 AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
 vmod_LTLIBRARIES = \
+	libvmod_bodyaccess.la \
 	libvmod_cookie.la \
 	libvmod_header.la \
 	libvmod_saintmode.la \
@@ -33,6 +34,7 @@ vmod_LTLIBRARIES = \
 	libvmod_xkey.la
 
 dist_man_MANS = \
+	vmod_bodyaccess.3 \
 	vmod_cookie.3 \
 	vmod_header.3 \
 	vmod_saintmode.3 \
@@ -44,6 +46,7 @@ dist_man_MANS = \
 
 generated_docs = $(dist_man_MANS:.3=.rst)
 
+libvmod_bodyaccess_la_SOURCES = vmod_bodyaccess.c
 libvmod_cookie_la_SOURCES = vmod_cookie.c
 libvmod_header_la_SOURCES = vmod_header.c
 libvmod_vsthrottle_la_SOURCES = vmod_vsthrottle.c
@@ -53,6 +56,7 @@ libvmod_tcp_la_SOURCES = vmod_tcp.c
 libvmod_var_la_SOURCES = vmod_var.c
 libvmod_xkey_la_SOURCES = vmod_xkey.c
 
+nodist_libvmod_bodyaccess_la_SOURCES = vcc_bodyaccess_if.c vcc_bodyaccess_if.h
 nodist_libvmod_cookie_la_SOURCES = vcc_cookie_if.c vcc_cookie_if.h
 nodist_libvmod_header_la_SOURCES = vcc_header_if.c vcc_header_if.h
 nodist_libvmod_vsthrottle_la_SOURCES = vcc_vsthrottle_if.c vcc_vsthrottle_if.h
@@ -62,6 +66,7 @@ nodist_libvmod_tcp_la_SOURCES = vcc_tcp_if.c vcc_tcp_if.h
 nodist_libvmod_var_la_SOURCES = vcc_var_if.c vcc_var_if.h
 nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 
+@BUILD_VMOD_BODYACCESS@
 @BUILD_VMOD_COOKIE@
 @BUILD_VMOD_HEADER@
 @BUILD_VMOD_SAINTMODE@
@@ -95,6 +100,7 @@ EXTRA_DIST = \
 	foreign \
 	vtree.h \
 	$(VMOD_TESTS) \
+	vmod_bodyaccess.vcc \
 	vmod_cookie.vcc \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \

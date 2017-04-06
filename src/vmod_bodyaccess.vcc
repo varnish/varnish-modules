@@ -1,0 +1,113 @@
+$Module bodyaccess 3 Varnish Module for request body access
+DESCRIPTION
+===========
+Varnish module that lets you access the request body.
+
+.. vcl-start
+
+VCL example::
+
+	vcl 4.0;
+	import std;
+	import bodyaccess;
+
+	backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+	sub vcl_recv {
+	        if (req.method == "POST") {
+        	        set req.http.x-method = req.method;
+        	        if (std.cache_req_body(110KB)) {
+                	        set req.http.x-len = bodyaccess.len_req_body();
+                	        set req.http.x-re = bodyaccess.rematch_req_body("Regex");
+                		bodyaccess.log_req_body("PREFIX:", 3);
+			}
+        	}
+        return(hash);
+	}
+
+	sub vcl_hash {
+        	bodyaccess.hash_req_body();
+        	return (lookup);
+	}
+
+	sub vcl_backend_fetch {
+        	set bereq.method = bereq.http.x-method;
+	}
+
+	sub vcl_deliver {
+        	set resp.http.x-len = req.http.x-len;
+        	set resp.http.x-re = req.http.x-re;
+	}
+
+.. vcl-end
+
+
+N.B. The request body must be retrieved before doing any operations on it.
+It can be buffered using the cache_req_body() function from libvmod_std.
+
+These functions applies only to standard REST methods.
+Caching is *not* allowed on PUT requests.
+
+
+
+
+$Function INT rematch_req_body(PRIV_CALL, STRING re)
+
+Description
+        Returns -1 if an error occurrs.
+        Returns 0 if the request body doesn't contain the string *re*.
+        Returns 1 if the request body contains the string *re*.
+
+        Note that the comparison is case sensitive and the
+        request body must be buffered.
+Example
+	::
+
+                | std.cache_req_body(1KB);
+                |
+                | if (bodyaccess.rematch_req_body("FOO") == 1) {
+                |    std.log("is true");
+                | }
+
+$Function VOID hash_req_body()
+
+Description
+        Adds available request body bytes to the lookup hash key.
+        Note that this function can only be used in vcl_hash and
+        the request body must be buffered.
+Example
+        ::
+
+                | sub vcl_recv {
+                |     std.cache_req_body(1KB);
+                | }
+                |
+                | sub vcl_hash{
+                |     bodyaccess.hash_req_body();
+                | }
+
+$Function INT len_req_body()
+
+Description
+        Returns the request body length or -1 if an error occurs.
+
+        Note that the request body must be buffered.	
+Example
+        ::
+
+                | std.cache_req_body(1KB);
+                | set req.http.x-len = bodyaccess.len_req_body();
+
+$Function VOID log_req_body(STRING prefix = "", INT length = 200)
+
+Description
+	Log the request body to the VSL, making it available for
+	other components.
+	When logging, it takes an optional prefix and a max line length,
+	so the body could be split up across multiple lines as there
+	is a limit to how large a single line can be.
+Example
+        ::
+
+                | std.cache_req_body(1KB);
+	        | bodyaccess.log_req_body("PREFIX:", 3);
