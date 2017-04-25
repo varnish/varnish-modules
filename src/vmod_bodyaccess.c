@@ -52,6 +52,7 @@ void HSH_AddBytes(const struct req *req, VRT_CTX,
 	const void *buf, size_t len);
 void VRB_Blob(VRT_CTX, struct vmod_priv *vmod);
 
+#if defined(HAVE_REQ_BODY_ITER_F)
 static int __match_proto__(req_body_iter_f)
 IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t l)
 {
@@ -107,6 +108,11 @@ IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
 
         return (0);
 }
+#elif defined(HAVE_OBJITERATE_F)
+	/* TODO: insert 5.0 variant */
+#else
+#  error Unsupported VRB API
+#endif
 
 void
 HSH_AddBytes(const struct req *req, VRT_CTX,
@@ -129,7 +135,13 @@ VRB_Blob(VRT_CTX, struct vmod_priv *vmod)
         CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
         vsb = VSB_new_auto();
+#if defined(HAVE_REQ_BODY_ITER_F)
         l = VRB_Iterate(ctx->req, IterCopyReqBody, (void*)vsb);
+#elif defined(HAVE_OBJITERATE_F)
+	/* TODO: insert 5.0 variant */
+#else
+#  error Unsupported VRB API
+#endif
         VSB_finish(vsb);
         if (l < 0) {
                 VSLb(ctx->vsl, SLT_VCL_Error,
@@ -260,7 +272,13 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 		return;
 	}
 
+#if defined(HAVE_REQ_BODY_ITER_F)
 	ret = VRB_Iterate(ctx->req, IterLogReqBody, &lrb);
+#elif defined(HAVE_OBJITERATE_F)
+	/* TODO: insert 5.0 variant */
+#else
+#  error Unsupported VRB API
+#endif
 
 	if (ret < 0) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
