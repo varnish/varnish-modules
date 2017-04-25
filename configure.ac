@@ -52,6 +52,9 @@ AC_CHECK_MEMBER(struct objcore.exp,
 	[AC_DEFINE([HAVE_OBJCORE_EXP], [1],
 		[Define if exp is present in the objcore struct])],
 	[], [#include <cache/cache.h>])
+
+AC_CHECK_TYPES([req_body_iter_f, objiterate_f],
+	[], [], [#include <cache/cache.h>])
 CFLAGS="$save_CFLAGS"
 
 AC_CHECK_TYPE(struct tcp_info,
