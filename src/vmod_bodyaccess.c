@@ -39,6 +39,7 @@
 #include "vcc_bodyaccess_if.h"
 
 struct log_req_body {
+	struct vsl_log *vsl;
         const char *prefix;
         size_t len;
 };
@@ -52,27 +53,13 @@ void HSH_AddBytes(const struct req *req, VRT_CTX,
 	const void *buf, size_t len);
 void VRB_Blob(VRT_CTX, struct vsb *vsb);
 
-#if defined(HAVE_REQ_BODY_ITER_F)
-static int __match_proto__(req_body_iter_f)
-IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t l)
+static int
+iter_log_req_body(struct log_req_body *lrb, void *ptr, size_t len)
 {
-        struct vsb *iter_vsb = priv;
-        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-
-        return (VSB_bcat(iter_vsb, ptr, l));
-}
-
-static int __match_proto__(req_body_iter_f)
-IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
-{
-        struct log_req_body *lrb;
         txt txtbody;
         char *str, *buf;
         size_t size, prefix_len;
 
-        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-
-        lrb = priv;
         str = ptr;
 
         if (lrb->len > 0)
@@ -97,7 +84,7 @@ IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
                 txtbody.b = buf;
                 txtbody.e = buf + prefix_len + size;
 
-                VSLbt(req->vsl, SLT_Debug, txtbody);
+                VSLbt(lrb->vsl, SLT_Debug, txtbody);
 
                 len -= size;
                 str += size;
@@ -106,6 +93,28 @@ IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
         free(buf);
 
         return (0);
+}
+
+#if defined(HAVE_REQ_BODY_ITER_F)
+static int __match_proto__(req_body_iter_f)
+IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t len)
+{
+        struct vsb *iter_vsb = priv;
+
+        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+
+        return (VSB_bcat(iter_vsb, ptr, len));
+}
+
+static int __match_proto__(req_body_iter_f)
+IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
+{
+        struct log_req_body *lrb;
+
+        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+
+        lrb = priv;
+	return (iter_log_req_body(lrb, ptr, len));
 }
 #elif defined(HAVE_OBJITERATE_F)
 static int __match_proto__(objiterate_f)
@@ -261,10 +270,12 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
+	AN(ctx->vsl);
 
 	if (!prefix)
 		prefix = "";
 
+	lrb.vsl = ctx->vsl;
 	lrb.prefix = prefix;
 	lrb.len = length;
 
