@@ -44,11 +44,6 @@ struct log_req_body {
         size_t len;
 };
 
-struct vmod {
-        ssize_t len;
-        void *priv;
-};
-
 void HSH_AddBytes(const struct req *req, VRT_CTX,
 	const void *buf, size_t len);
 void VRB_Blob(VRT_CTX, struct vsb *vsb);
