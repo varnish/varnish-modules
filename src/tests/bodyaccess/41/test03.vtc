@@ -10,9 +10,9 @@ server s1 {
 # rematch_req_body is case sensitive.
 
 varnish v1 -vcl+backend {
-        import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
-	
+
 	sub vcl_recv {
 		std.cache_req_body(10KB);
 		set req.http.x-re1 = bodyaccess.rematch_req_body(".*");

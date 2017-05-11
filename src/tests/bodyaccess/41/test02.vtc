@@ -1,4 +1,5 @@
 varnishtest "Test hash on req body"
+
 server s1 {
 	rxreq
 	expect req.bodylen == 6
@@ -10,7 +11,7 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-        import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
 
 	sub vcl_recv {

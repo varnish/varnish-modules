@@ -39,77 +39,76 @@
 #include "vcc_bodyaccess_if.h"
 
 struct log_req_body {
-	struct vsl_log *vsl;
-        const char *prefix;
-        size_t len;
+	struct vsl_log	*vsl;
+	const char	*prefix;
+	size_t		len;
 };
 
-void HSH_AddBytes(const struct req *req, VRT_CTX,
-	const void *buf, size_t len);
-void VRB_Blob(VRT_CTX, struct vsb *vsb);
+void HSH_AddBytes(const struct req *, VRT_CTX, const void *, size_t);
+void VRB_Blob(VRT_CTX, struct vsb *);
 
 static int
 iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
 {
-        txt txtbody;
-        const char *str;
-        char *buf;
-        size_t size, prefix_len;
+	txt txtbody;
+	const char *str;
+	char *buf;
+	size_t size, prefix_len;
 
-        str = ptr;
+	str = ptr;
 
-        if (lrb->len > 0)
-                size = lrb->len;
-        else
-                size = len;
-        prefix_len = strlen(lrb->prefix);
-        size += prefix_len;
+	if (lrb->len > 0)
+		size = lrb->len;
+	else
+		size = len;
+	prefix_len = strlen(lrb->prefix);
+	size += prefix_len;
 
-        buf = malloc(size);
-        AN(buf);
+	buf = malloc(size);
+	AN(buf);
 
-        while (len > 0) {
-                if (len > lrb->len && lrb->len > 0)
-                        size = lrb->len;
-                else
-                        size = len;
+	while (len > 0) {
+		if (len > lrb->len && lrb->len > 0)
+			size = lrb->len;
+		else
+			size = len;
 
-                memcpy(buf, lrb->prefix, prefix_len);
-                memcpy(buf + prefix_len, str, size);
+		memcpy(buf, lrb->prefix, prefix_len);
+		memcpy(buf + prefix_len, str, size);
 
-                txtbody.b = buf;
-                txtbody.e = buf + prefix_len + size;
+		txtbody.b = buf;
+		txtbody.e = buf + prefix_len + size;
 
-                VSLbt(lrb->vsl, SLT_Debug, txtbody);
+		VSLbt(lrb->vsl, SLT_Debug, txtbody);
 
-                len -= size;
-                str += size;
-        }
+		len -= size;
+		str += size;
+	}
 
-        free(buf);
+	free(buf);
 
-        return (0);
+	return (0);
 }
 
 #if defined(HAVE_REQ_BODY_ITER_F)
 static int __match_proto__(req_body_iter_f)
 IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t len)
 {
-        struct vsb *iter_vsb = priv;
+	struct vsb *iter_vsb = priv;
 
-        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
 
-        return (VSB_bcat(iter_vsb, ptr, len));
+	return (VSB_bcat(iter_vsb, ptr, len));
 }
 
 static int __match_proto__(req_body_iter_f)
 IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
 {
-        struct log_req_body *lrb;
+	struct log_req_body *lrb;
 
-        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
 
-        lrb = priv;
+	lrb = priv;
 	return (iter_log_req_body(lrb, ptr, len));
 }
 #elif defined(HAVE_OBJITERATE_F)
@@ -139,26 +138,26 @@ void
 HSH_AddBytes(const struct req *req, VRT_CTX,
     const void *buf, size_t len)
 {
-        CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-        AN(ctx);
+	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+	AN(ctx);
 
-        if (buf != NULL)
-                SHA256_Update(ctx->specific, buf, len);
+	if (buf != NULL)
+		SHA256_Update(ctx->specific, buf, len);
 }
 
 void
 VRB_Blob(VRT_CTX, struct vsb *vsb)
 {
-        int l;
+	int l;
 
-        CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-        CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
-        l = VRB_Iterate(ctx->req, IterCopyReqBody, vsb);
-        AZ(VSB_finish(vsb));
-        if (l < 0)
-                VSLb(ctx->vsl, SLT_VCL_Error,
-                    "Iteration on req.body didn't succeed.");
+	l = VRB_Iterate(ctx->req, IterCopyReqBody, vsb);
+	AZ(VSB_finish(vsb));
+	if (l < 0)
+		VSLb(ctx->vsl, SLT_VCL_Error,
+		    "Iteration on req.body didn't succeed.");
 }
 
 VCL_VOID
@@ -243,7 +242,6 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 		}
 		priv_call->priv = t;
 		priv_call->free = free;
-
 	}
 
 	vsb = VSB_new_auto();
@@ -263,7 +261,7 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 		return (0);
 
 	VSLb(ctx->vsl, SLT_VCL_Error, "Regexp matching returned %d", i);
-		return (-1);
+	return (-1);
 
 }
 

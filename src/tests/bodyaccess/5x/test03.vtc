@@ -12,7 +12,7 @@ server s1 {
 varnish v1 -vcl+backend {
 	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
-	
+
 	sub vcl_recv {
 		std.cache_req_body(10KB);
 		set req.http.x-re1 = bodyaccess.rematch_req_body(".*");

@@ -1,17 +1,18 @@
 varnishtest "cache post request"
+
 server s1 {
-        rxreq
-        expect req.body == "BANANE"
-        txresp -hdr "OK: yes"
-        rxreq
-        txresp -hdr "OK: yes"
-        rxreq
-        txresp -hdr "OK: yes"
+	rxreq
+	expect req.body == "BANANE"
+	txresp -hdr "OK: yes"
+	rxreq
+	txresp -hdr "OK: yes"
+	rxreq
+	txresp -hdr "OK: yes"
 } -start
 
 varnish v1 -vcl+backend {
 	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
-        import std;
+	import std;
 
 	# On cache things that look like model api calls
 	sub vcl_recv {
@@ -57,26 +58,26 @@ varnish v1 -vcl+backend {
 
 
 client c1 {
-        txreq -req POST -body "BANANE"
-        rxresp
-        expect resp.http.ok == "yes"
+	txreq -req POST -body "BANANE"
+	rxresp
+	expect resp.http.ok == "yes"
 	expect resp.http.X-Cache == "MISS"
 
-        txreq
-        rxresp
-        expect resp.http.ok == "yes"
+	txreq
+	rxresp
+	expect resp.http.ok == "yes"
 	expect resp.http.X-Cache == "MISS"
 } -run
 
 client c2 {
-        txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
-        chunked {BANA}
-        delay .2
-        chunked {NE}
-        delay .2
-        chunkedlen 0
-        rxresp
-        expect resp.http.ok == "yes"
-        expect resp.http.X-Cache == "HIT"
+	txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
+	chunked {BANA}
+	delay .2
+	chunked {NE}
+	delay .2
+	chunkedlen 0
+	rxresp
+	expect resp.http.ok == "yes"
+	expect resp.http.X-Cache == "HIT"
 } -run
 

@@ -1,4 +1,5 @@
 varnishtest "Test hash on req body"
+
 server s1 {
 	rxreq
 	expect req.bodylen == 6
