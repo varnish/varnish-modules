@@ -44,8 +44,6 @@ struct bodyaccess_log_ctx {
 	size_t		len;
 };
 
-void bodyaccess_bcat(VRT_CTX, struct vsb *);
-
 static int
 bodyaccess_log(struct bodyaccess_log_ctx *ctx, const void *ptr, size_t len)
 {
@@ -133,7 +131,7 @@ bodyaccess_log_cb(void *priv, int flush, const void *ptr, ssize_t len)
 #  error Unsupported VRB API
 #endif
 
-void
+static void
 bodyaccess_bcat(VRT_CTX, struct vsb *vsb)
 {
 	int l;
