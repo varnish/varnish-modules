@@ -67,8 +67,7 @@ IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
 {
         struct log_req_body *lrb;
         txt txtbody;
-        static char *str;
-        char *buf;
+        char *str, *buf;
         size_t size, prefix_len;
 
         CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
