@@ -38,16 +38,16 @@
 #include "vsha256.h"
 #include "vcc_bodyaccess_if.h"
 
-struct log_req_body {
+struct bodyaccess_log_ctx {
 	struct vsl_log	*vsl;
-	const char	*prefix;
+	const char	*pfx;
 	size_t		len;
 };
 
-void VRB_Blob(VRT_CTX, struct vsb *);
+void bodyaccess_bcat(VRT_CTX, struct vsb *);
 
 static int
-iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
+bodyaccess_log(struct bodyaccess_log_ctx *ctx, const void *ptr, size_t len)
 {
 	txt txtbody;
 	const char *str;
@@ -56,29 +56,29 @@ iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
 
 	str = ptr;
 
-	if (lrb->len > 0)
-		size = lrb->len;
+	if (ctx->len > 0)
+		size = ctx->len;
 	else
 		size = len;
-	prefix_len = strlen(lrb->prefix);
+	prefix_len = strlen(ctx->pfx);
 	size += prefix_len;
 
 	buf = malloc(size);
 	AN(buf);
 
 	while (len > 0) {
-		if (len > lrb->len && lrb->len > 0)
-			size = lrb->len;
+		if (len > ctx->len && ctx->len > 0)
+			size = ctx->len;
 		else
 			size = len;
 
-		memcpy(buf, lrb->prefix, prefix_len);
+		memcpy(buf, ctx->pfx, prefix_len);
 		memcpy(buf + prefix_len, str, size);
 
 		txtbody.b = buf;
 		txtbody.e = buf + prefix_len + size;
 
-		VSLbt(lrb->vsl, SLT_Debug, txtbody);
+		VSLbt(ctx->vsl, SLT_Debug, txtbody);
 
 		len -= size;
 		str += size;
@@ -91,7 +91,7 @@ iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
 
 #if defined(HAVE_REQ_BODY_ITER_F)
 static int __match_proto__(req_body_iter_f)
-IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t len)
+bodyaccess_bcat_cb(struct req *req, void *priv, void *ptr, size_t len)
 {
 
 	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
@@ -101,17 +101,17 @@ IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t len)
 }
 
 static int __match_proto__(req_body_iter_f)
-IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
+bodyaccess_log_cb(struct req *req, void *priv, void *ptr, size_t len)
 {
 
 	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
 	AN(priv);
 
-	return (iter_log_req_body(priv, ptr, len));
+	return (bodyaccess_log(priv, ptr, len));
 }
 #elif defined(HAVE_OBJITERATE_F)
 static int __match_proto__(objiterate_f)
-IterCopyReqBody(void *priv, int flush, const void *ptr, ssize_t len)
+bodyaccess_bcat_cb(void *priv, int flush, const void *ptr, ssize_t len)
 {
 
 	AN(priv);
@@ -121,27 +121,27 @@ IterCopyReqBody(void *priv, int flush, const void *ptr, ssize_t len)
 }
 
 static int __match_proto__(objiterate_f)
-IterLogReqBody(void *priv, int flush, const void *ptr, ssize_t len)
+bodyaccess_log_cb(void *priv, int flush, const void *ptr, ssize_t len)
 {
 
 	AN(priv);
 
 	(void)flush;
-	return (iter_log_req_body(priv, ptr, len));
+	return (bodyaccess_log(priv, ptr, len));
 }
 #else
 #  error Unsupported VRB API
 #endif
 
 void
-VRB_Blob(VRT_CTX, struct vsb *vsb)
+bodyaccess_bcat(VRT_CTX, struct vsb *vsb)
 {
 	int l;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
-	l = VRB_Iterate(ctx->req, IterCopyReqBody, vsb);
+	l = VRB_Iterate(ctx->req, bodyaccess_bcat_cb, vsb);
 	AZ(VSB_finish(vsb));
 	if (l < 0)
 		VSLb(ctx->vsl, SLT_VCL_Error,
@@ -170,7 +170,7 @@ vmod_hash_req_body(VRT_CTX)
 	vsb = VSB_new_auto();
 	AN(vsb);
 
-	VRB_Blob(ctx, vsb);
+	bodyaccess_bcat(ctx, vsb);
 	SHA256_Update(ctx->specific, VSB_data(vsb),  VSB_len(vsb));
 	VSB_delete(vsb);
 }
@@ -235,7 +235,7 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 	vsb = VSB_new_auto();
 	AN(vsb);
 
-	VRB_Blob(ctx, vsb);
+	bodyaccess_bcat(ctx, vsb);
 
 	i = VRE_exec(priv_call->priv, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
 	    0, NULL);
@@ -256,7 +256,7 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 VCL_VOID
 vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 {
-	struct log_req_body lrb;
+	struct bodyaccess_log_ctx log_ctx;
 	int ret;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
@@ -266,16 +266,16 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 	if (!prefix)
 		prefix = "";
 
-	lrb.vsl = ctx->vsl;
-	lrb.prefix = prefix;
-	lrb.len = length;
+	log_ctx.vsl = ctx->vsl;
+	log_ctx.pfx = prefix;
+	log_ctx.len = length;
 
 	if (ctx->req->req_body_status != REQ_BODY_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error, "Unbuffered req.body");
 		return;
 	}
 
-	ret = VRB_Iterate(ctx->req, IterLogReqBody, &lrb);
+	ret = VRB_Iterate(ctx->req, bodyaccess_log_cb, &log_ctx);
 
 	if (ret < 0) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
