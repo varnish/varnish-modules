@@ -93,41 +93,41 @@ iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
 static int __match_proto__(req_body_iter_f)
 IterCopyReqBody(struct req *req, void *priv, void *ptr, size_t len)
 {
-	struct vsb *iter_vsb = priv;
 
 	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+	AN(priv);
 
-	return (VSB_bcat(iter_vsb, ptr, len));
+	return (VSB_bcat(priv, ptr, len));
 }
 
 static int __match_proto__(req_body_iter_f)
 IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
 {
-	struct log_req_body *lrb;
 
 	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+	AN(priv);
 
-	lrb = priv;
-	return (iter_log_req_body(lrb, ptr, len));
+	return (iter_log_req_body(priv, ptr, len));
 }
 #elif defined(HAVE_OBJITERATE_F)
 static int __match_proto__(objiterate_f)
 IterCopyReqBody(void *priv, int flush, const void *ptr, ssize_t len)
 {
-	struct vsb *iter_vsb = priv;
+
+	AN(priv);
 
 	(void)flush;
-	return (VSB_bcat(iter_vsb, ptr, len));
+	return (VSB_bcat(priv, ptr, len));
 }
 
 static int __match_proto__(objiterate_f)
 IterLogReqBody(void *priv, int flush, const void *ptr, ssize_t len)
 {
-	struct log_req_body *lrb;
 
-	lrb = priv;
+	AN(priv);
+
 	(void)flush;
-	return (iter_log_req_body(lrb, ptr, len));
+	return (iter_log_req_body(priv, ptr, len));
 }
 #else
 #  error Unsupported VRB API
