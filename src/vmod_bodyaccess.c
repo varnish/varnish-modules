@@ -50,7 +50,7 @@ struct vmod {
 
 void HSH_AddBytes(const struct req *req, VRT_CTX,
 	const void *buf, size_t len);
-void VRB_Blob(VRT_CTX, struct vmod_priv *vmod);
+void VRB_Blob(VRT_CTX, struct vsb *vsb);
 
 #if defined(HAVE_REQ_BODY_ITER_F)
 static int __match_proto__(req_body_iter_f)
@@ -126,38 +126,26 @@ HSH_AddBytes(const struct req *req, VRT_CTX,
 }
 
 void
-VRB_Blob(VRT_CTX, struct vmod_priv *vmod)
+VRB_Blob(VRT_CTX, struct vsb *vsb)
 {
-        struct vsb *vsb;
         int l;
 
         CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
         CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
-        vsb = VSB_new_auto();
-#if defined(HAVE_REQ_BODY_ITER_F)
-        l = VRB_Iterate(ctx->req, IterCopyReqBody, (void*)vsb);
-#elif defined(HAVE_OBJITERATE_F)
-	/* TODO: insert 5.0 variant */
-#else
-#  error Unsupported VRB API
-#endif
+        l = VRB_Iterate(ctx->req, IterCopyReqBody, vsb);
         VSB_finish(vsb);
-        if (l < 0) {
+        if (l < 0)
                 VSLb(ctx->vsl, SLT_VCL_Error,
                     "Iteration on req.body didn't succeed.");
-                return;
-        }
-
-        vmod->priv = vsb;
-        vmod->len = VSB_len(vsb);
 }
 
 VCL_VOID
 vmod_hash_req_body(VRT_CTX)
 {
+	struct vsb *vsb;
+
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	struct vmod_priv priv_top = { 0 };
 
 	if (ctx->req->req_body_status != REQ_BODY_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
@@ -171,9 +159,12 @@ vmod_hash_req_body(VRT_CTX)
 		return;
 	}
 
-	VRB_Blob(ctx, &priv_top);
-	HSH_AddBytes(ctx->req, ctx, VSB_data(priv_top.priv),  priv_top.len);
-	VSB_delete(priv_top.priv);
+	vsb = VSB_new_auto();
+	AN(vsb);
+
+	VRB_Blob(ctx, vsb);
+	HSH_AddBytes(ctx->req, ctx, VSB_data(vsb),  VSB_len(vsb));
+	VSB_delete(vsb);
 }
 
 VCL_INT
@@ -200,7 +191,7 @@ vmod_len_req_body(VRT_CTX)
 VCL_INT
 vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 {
-	struct vmod_priv priv_top = { 0 };
+	struct vsb *vsb;
 	const char *error;
 	int erroroffset;
 	vre_t *t = NULL;
@@ -234,12 +225,15 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 
 	}
 
-	VRB_Blob(ctx, &priv_top);
+	vsb = VSB_new_auto();
+	AN(vsb);
 
-	i = VRE_exec(priv_call->priv, VSB_data(priv_top.priv), priv_top.len, 0, 0,
-	    NULL, 0, NULL);
+	VRB_Blob(ctx, vsb);
 
-	VSB_delete(priv_top.priv);
+	i = VRE_exec(priv_call->priv, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
+	    0, NULL);
+
+	VSB_delete(vsb);
 
 	if (i > 0)
 		return (1);
