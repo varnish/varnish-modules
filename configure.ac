@@ -24,10 +24,6 @@ if test "x$RST2MAN" = "xno"; then
 	RST2MAN=: # no-op
 fi
 
-# Test suite
-VMOD_TESTS="$(cd $srcdir/src && echo tests/*/*.vtc)"
-AC_SUBST(VMOD_TESTS)
-
 # Will be available after Varnish 5.0
 PKG_CHECK_VAR([VARNISHAPI_LIBDIR], [varnishapi], [libdir])
 AC_SUBST([VARNISH_LIBRARY_PATH],
@@ -66,6 +62,16 @@ AC_CHECK_TYPE(struct tcp_info,
 		#include <netinet/tcp.h>
 		#include <netinet/in.h>
 	]])
+
+# Test suite
+VMOD_TESTS=$(cd $srcdir/src && echo tests/*/*.vtc)
+AC_SUBST([VMOD_TESTS])
+
+if echo $VARNISH_VERSION | grep -q ^4; then
+	VMOD_TESTS="$VMOD_TESTS $(cd $srcdir/src && echo tests/*/41/*.vtc)"
+else
+	VMOD_TESTS="$VMOD_TESTS $(cd $srcdir/src && echo tests/*/5x/*.vtc)"
+fi
 
 AC_CONFIG_FILES([
 	Makefile

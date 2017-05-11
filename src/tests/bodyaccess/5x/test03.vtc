@@ -1,0 +1,64 @@
+varnishtest "test regex match on req body"
+
+server s1 {
+	rxreq
+	txresp
+	rxreq
+	txresp
+} -start
+
+# rematch_req_body is case sensitive.
+
+varnish v1 -vcl+backend {
+	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import std;
+	
+	sub vcl_recv {
+		std.cache_req_body(10KB);
+		set req.http.x-re1 = bodyaccess.rematch_req_body(".*");
+		set req.http.x-re2 = bodyaccess.rematch_req_body("aRNI");
+		set req.http.x-re3 = bodyaccess.rematch_req_body("a");
+		set req.http.x-re4 = bodyaccess.rematch_req_body("F");
+	}
+
+	sub vcl_deliver {
+		set resp.http.x-re1 = req.http.x-re1;
+		set resp.http.x-re2 = req.http.x-re2;
+		set resp.http.x-re3 = req.http.x-re3;
+		set resp.http.x-re4 = req.http.x-re4;
+	}
+}
+
+varnish v1 -cliok "param.set debug +syncvsl"
+varnish v1 -cliok "param.set fetch_chunksize 4k"
+varnish v1 -cliok "param.set pcre_match_limit 10000"
+varnish v1 -cliok "param.set pcre_match_limit_recursion 10000"
+varnish v1 -start
+
+client c1 {
+	txreq -req "POST" -body {VarNISH}
+	rxresp
+	expect resp.http.x-re1 == 1
+	expect resp.http.x-re2 == 0
+	expect resp.http.x-re3 == 1
+	expect resp.http.x-re4 == 0
+} -run
+
+client c2 {
+	txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
+	chunked {a5e2e2e1c2e2}
+	delay .2
+	chunkedlen 4090
+	delay .2
+	chunked {VARNISH}
+	delay .2
+	chunked { }
+	chunked {FOO}
+	delay .2
+	chunkedlen 0
+	rxresp
+	expect resp.http.x-re1 == 1
+	expect resp.http.x-re2 == 0
+	expect resp.http.x-re3 == 1
+	expect resp.http.x-re4 == 1
+} -run
