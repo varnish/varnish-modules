@@ -44,7 +44,6 @@ struct log_req_body {
 	size_t		len;
 };
 
-void HSH_AddBytes(const struct req *, VRT_CTX, const void *, size_t);
 void VRB_Blob(VRT_CTX, struct vsb *);
 
 static int
@@ -135,17 +134,6 @@ IterLogReqBody(void *priv, int flush, const void *ptr, ssize_t len)
 #endif
 
 void
-HSH_AddBytes(const struct req *req, VRT_CTX,
-    const void *buf, size_t len)
-{
-	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-	AN(ctx);
-
-	if (buf != NULL)
-		SHA256_Update(ctx->specific, buf, len);
-}
-
-void
 VRB_Blob(VRT_CTX, struct vsb *vsb)
 {
 	int l;
@@ -183,7 +171,7 @@ vmod_hash_req_body(VRT_CTX)
 	AN(vsb);
 
 	VRB_Blob(ctx, vsb);
-	HSH_AddBytes(ctx->req, ctx, VSB_data(vsb),  VSB_len(vsb));
+	SHA256_Update(ctx->specific, VSB_data(vsb),  VSB_len(vsb));
 	VSB_delete(vsb);
 }
 
