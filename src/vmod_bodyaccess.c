@@ -54,10 +54,11 @@ void HSH_AddBytes(const struct req *req, VRT_CTX,
 void VRB_Blob(VRT_CTX, struct vsb *vsb);
 
 static int
-iter_log_req_body(struct log_req_body *lrb, void *ptr, size_t len)
+iter_log_req_body(struct log_req_body *lrb, const void *ptr, size_t len)
 {
         txt txtbody;
-        char *str, *buf;
+        const char *str;
+        char *buf;
         size_t size, prefix_len;
 
         str = ptr;
@@ -124,6 +125,16 @@ IterCopyReqBody(void *priv, int flush, const void *ptr, ssize_t len)
 
 	(void)flush;
 	return (VSB_bcat(iter_vsb, ptr, len));
+}
+
+static int __match_proto__(objiterate_f)
+IterLogReqBody(void *priv, int flush, const void *ptr, ssize_t len)
+{
+	struct log_req_body *lrb;
+
+	lrb = priv;
+	(void)flush;
+	return (iter_log_req_body(lrb, ptr, len));
 }
 #else
 #  error Unsupported VRB API
@@ -261,7 +272,6 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 
 }
 
-#if defined(HAVE_REQ_BODY_ITER_F)
 VCL_VOID
 vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 {
@@ -292,8 +302,3 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 		return;
 	}
 }
-#elif defined(HAVE_OBJITERATE_F)
-#  error Missing implementation
-#else
-#  error Unsupported VRB API
-#endif
