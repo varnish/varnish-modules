@@ -141,7 +141,7 @@ VRB_Blob(VRT_CTX, struct vsb *vsb)
         CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
         l = VRB_Iterate(ctx->req, IterCopyReqBody, vsb);
-        VSB_finish(vsb);
+        AZ(VSB_finish(vsb));
         if (l < 0)
                 VSLb(ctx->vsl, SLT_VCL_Error,
                     "Iteration on req.body didn't succeed.");
