@@ -246,6 +246,7 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 
 }
 
+#if defined(HAVE_REQ_BODY_ITER_F)
 VCL_VOID
 vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 {
@@ -266,13 +267,7 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 		return;
 	}
 
-#if defined(HAVE_REQ_BODY_ITER_F)
 	ret = VRB_Iterate(ctx->req, IterLogReqBody, &lrb);
-#elif defined(HAVE_OBJITERATE_F)
-	/* TODO: insert 5.0 variant */
-#else
-#  error Unsupported VRB API
-#endif
 
 	if (ret < 0) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
@@ -280,3 +275,8 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 		return;
 	}
 }
+#elif defined(HAVE_OBJITERATE_F)
+#  error Missing implementation
+#else
+#  error Unsupported VRB API
+#endif
