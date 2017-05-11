@@ -1,0 +1,62 @@
+varnishtest "Test hash on req body"
+server s1 {
+	rxreq
+	expect req.bodylen == 6
+	txresp -hdr "OK: yes"
+	rxreq
+	txresp -hdr "OK: yes"
+	rxreq
+	txresp -hdr "OK: yes"
+} -start
+
+varnish v1 -vcl+backend {
+	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
+	import std;
+
+	sub vcl_recv {
+		if(req.method == "POST" && req.http.Pass =="yes") {
+			std.cache_req_body(110B);
+			return (pass);
+		}
+		return(hash);
+	}
+
+	sub vcl_hash {
+		bodyaccess.hash_req_body();
+		return (lookup);
+	}
+
+	sub vcl_hit {
+		set req.http.x-cache = "HIT";
+	}
+
+	sub vcl_miss {
+		set req.http.x-cache = "MISS";
+	}
+
+	sub vcl_deliver {
+		set resp.http.x-cache = req.http.x-cache;
+	}
+} -start
+
+client c1 {
+	txreq -req POST -hdr "Pass: yes" -body "BANANE"
+	rxresp
+	expect resp.http.ok == "yes"
+	txreq
+	rxresp
+	expect resp.http.ok == "yes"
+	expect resp.http.x-cache == "MISS"
+} -run
+
+client c2 {
+	txreq -req POST -nolen -hdr "Transfer-encoding: chunked"
+	chunked {BANA}
+	delay .2
+	chunked {NE}
+	delay .2
+	chunkedlen 0
+	rxresp
+	expect resp.http.ok == "yes"
+	expect resp.http.x-cache == "HIT"
+} -run
