@@ -109,7 +109,14 @@ IterLogReqBody(struct req *req, void *priv, void *ptr, size_t len)
         return (0);
 }
 #elif defined(HAVE_OBJITERATE_F)
-	/* TODO: insert 5.0 variant */
+static int __match_proto__(objiterate_f)
+IterCopyReqBody(void *priv, int flush, const void *ptr, ssize_t len)
+{
+	struct vsb *iter_vsb = priv;
+
+	(void)flush;
+	return (VSB_bcat(iter_vsb, ptr, len));
+}
 #else
 #  error Unsupported VRB API
 #endif
