@@ -29,7 +29,6 @@ varnish v1 -vcl+backend {
 		if (req.method == "POST") {
 			bodyaccess.hash_req_body();
 		}
-		return(lookup);
 	}
 
 	sub vcl_backend_fetch {
