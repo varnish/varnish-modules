@@ -15,9 +15,9 @@ varnish v1 -vcl+backend {
 
 	# On cache things that look like model api calls
 	sub vcl_recv {
+		# Set the method as a header so we can reuse it for the fetch
+		set req.http.x-meth = req.method;
 		if (req.method == "POST") {
-			# Set the method as a header so we can reuse it for the fetch
-			set req.http.x-meth = req.method;
 			# Buffer the request body
 			std.cache_req_body(10KB);
 			return (hash);
