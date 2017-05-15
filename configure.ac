@@ -67,12 +67,6 @@ AC_CHECK_TYPE(struct tcp_info,
 VMOD_TESTS=$(cd $srcdir/src && echo tests/*/*.vtc)
 AC_SUBST([VMOD_TESTS])
 
-if echo $VARNISH_VERSION | grep -q ^4; then
-	VMOD_TESTS="$VMOD_TESTS $(cd $srcdir/src && echo tests/*/41/*.vtc)"
-else
-	VMOD_TESTS="$VMOD_TESTS $(cd $srcdir/src && echo tests/*/5x/*.vtc)"
-fi
-
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
