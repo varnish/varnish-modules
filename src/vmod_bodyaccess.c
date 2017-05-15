@@ -150,6 +150,7 @@ VCL_VOID
 vmod_hash_req_body(VRT_CTX)
 {
 	struct vsb *vsb;
+	txt txtbody;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
@@ -169,7 +170,10 @@ vmod_hash_req_body(VRT_CTX)
 	AN(vsb);
 
 	bodyaccess_bcat(ctx, vsb);
-	SHA256_Update(ctx->specific, VSB_data(vsb),  VSB_len(vsb));
+	txtbody.b = VSB_data(vsb);
+	txtbody.e = txtbody.b + VSB_len(vsb);
+	SHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
+	VSLbt(ctx->vsl, SLT_Hash, txtbody);
 	VSB_delete(vsb);
 }
 
