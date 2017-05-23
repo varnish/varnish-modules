@@ -1,6 +1,6 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.12.0 (unreleased)
+varnish-modules 0.12.0 (2017-05-23)
 -----------------------------------
 
 * [vmod-bodyaccess] New vmod that enables simple matching and hashing
