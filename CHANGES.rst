@@ -1,5 +1,13 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.12.0 (unreleased)
+-----------------------------------
+
+* [vmod-bodyaccess] New vmod that enables simple matching and hashing
+  on the client request body.
+* [vmod-xkey] Some documentation improvements
+* Build system fixes
+
 varnish-modules 0.11.0 (2017-02-07)
 -----------------------------------
 
