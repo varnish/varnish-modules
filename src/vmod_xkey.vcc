@@ -41,10 +41,14 @@ VCL example::
             if (client.ip !~ purgers) {
                 return (synth(403, "Forbidden"));
             }
-            set req.http.n-gone = xkey.purge(req.http.key);
-            # or: set req.http.n-gone = xkey.softpurge(req.http.key)
+	    if (req.http.xkey) {
+		set req.http.n-gone = xkey.purge(req.http.key);
+		# or: set req.http.n-gone = xkey.softpurge(req.http.key)
 
-            return (synth(200, "Invalidated "+req.http.n-gone+" objects"));
+		return (synth(200, "Invalidated "+req.http.n-gone+" objects"));
+	    } else {
+		return (purge);
+	    }
         }
     }
 
