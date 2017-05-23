@@ -20,8 +20,8 @@ separator. Alternatively, they can be specified in multiple ``xkey``
 response headers.
 
 Preferably the secondary hash keys are set from the backend
-application, but can also be set from VCL in ``vcl_backend_response``
-as in the above example.
+application, but the header can also be set from VCL in
+``vcl_backend_response``.
 
 .. vcl-start
 
