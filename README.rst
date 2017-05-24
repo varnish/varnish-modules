@@ -12,9 +12,11 @@ Included:
 * Modify and change complex HTTP headers
 * 3.0-style saint mode,
 * Advanced cache invalidations, and more.
+* Client request body access
 
-This collection contains the following vmods (previously kept individually):
-cookie, vsthrottle, header, saintmode, softpurge, tcp, var, xkey
+This collection contains the following vmods (previously kept
+individually): cookie, vsthrottle, header, saintmode, softpurge, tcp,
+var, xkey, bodyaccess
 
 Supported Varnish version is described in the `CHANGES.rst` file. Normally this
 is the last public Varnish Cache release. See PORTING below for information on
