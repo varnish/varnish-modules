@@ -1,5 +1,10 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.12.1 (2017-05-24)
+-----------------------------------
+
+* Bump configure.ac version number
+
 varnish-modules 0.12.0 (2017-05-23)
 -----------------------------------
 
