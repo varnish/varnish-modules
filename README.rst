@@ -59,6 +59,10 @@ Then proceed to the configure and build::
 The resulting loadable modules (``libvmod_foo*.so`` files) will be installed to
 the Varnish module directory. (default `/usr/lib/varnish/vmods/`)
 
+If /tmp directory is mounted with ``noexec``, a safe TMPDIR needs to be passed:
+
+    mkdir -p tmp && TMPDIR=$(pwd)/tmp make check
+
 
 Usage
 -----
