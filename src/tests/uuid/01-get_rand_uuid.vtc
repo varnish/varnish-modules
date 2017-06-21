@@ -1,0 +1,25 @@
+varnishtest "Test uuid vmod"
+
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+        import uuid from "${vmod_builddir}/.libs/libvmod_uuid.so";
+
+	sub vcl_recv {
+	}
+	sub vcl_deliver {
+            set resp.http.X-uuid = uuid.get_rand_uuid();
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+        expect resp.http.X-uuid ~ "[-a-f0-9]{36,36}"
+}
+
+client c1 -run
