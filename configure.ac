@@ -40,6 +40,7 @@ VARNISH_VMODS([
 	var
 	vsthrottle
 	xkey
+	uuid
 ])
 
 save_CFLAGS="$CFLAGS"
@@ -61,6 +62,13 @@ AC_CHECK_TYPE(struct tcp_info,
 		#include <sys/socket.h>
 		#include <netinet/tcp.h>
 		#include <netinet/in.h>
+	]])
+
+AC_CHECK_TYPE(const uuid_t,
+	[AC_DEFINE([HAVE_UUID_UUID_H], [1],
+		[Define if const uuid_t is present])],
+	[AC_MSG_ERROR([uuid.h is missing, install uuid and uuid-dev])], [[
+		#include <uuid/uuid.h>
 	]])
 
 # Test suite

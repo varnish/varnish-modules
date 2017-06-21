@@ -1,0 +1,108 @@
+$Module uuid 3 Varnish UUID Module
+DESCRIPTION
+===========
+
+Allows on the fly generation of UUIDs (random)
+
+Useful for doing some on the fly random cookie value generation
+to enable cookie delivery and caching
+
+Typically used with both vmod_cookie, vmod_header and vmod_std
+
+.. vcl-start
+
+Cookie manipulation (end-to-end) example::
+
+    vcl 4.0;
+
+    import std;
+    import header;
+    import cookie;
+    import uuid;
+
+    backend default { .host = "192.0.2.11"; .port = "8080"; }
+
+    sub vcl_recv {
+        /* force all requests to carry one random guid cookie on req but write
+           this into an http.X-... header for retrieval in delivery phase
+           assumes "YOUR_COOKIE_NAME" is a random guid
+        */
+
+        if (req.http.cookie) {
+            cookie.parse(req.http.cookie);
+            if (cookie.isset("YOUR_COOKIE_NAME")) {
+                set.req.http.X-YOUR_COOKIE_NAME = cookie.get("YOUR_COOKIE_NAME");
+            }
+        }
+        else {
+            /* if you don't have cookies inbound, you can pseudo assign one here
+               so the varnish response, if cacheable just serve the cache and overwrite the
+               set-cookie header in vcl deliver
+            */
+            set req.http.X-YOUR_COOKIE_NAME = uuid.get_rand_uuid();
+        }
+
+        ## now on response you can retrieve cookie values in vcl_deliver
+        ## and make this response cacheable by unsetting the inbound cookie headers
+        unset req.http.cookie;
+    }
+
+    sub vcl_backend_fetch {
+        ## if your site handles CORS, make sure that a CORS OPTIONS
+        ## request gets to backend with proper method!
+        if (bereq.http.X-is-options) {
+            set bereq.method = "OPTIONS";
+        }
+        return (fetch);
+    }
+
+    sub vcl_backend_response {
+        var.set("cacheable","false");
+        ## when you get to responses that might be cacheable
+        ## e.g., fresh, cookieless reqs...
+        if (YOUR_CACHEABLE_CRITERIA) {
+            var.set("cacheable","true");
+            unset beresp.http.set-cookie;
+            set beresp.http.is-cacheable = 1;
+        }
+        else {
+            set beresp.uncacheable = true;
+        }
+        return (deliver);
+    }
+
+    sub vcl_deliver {
+        ## code illustrated here assumes only one valuable inbound request cookie existed
+        ## but this logic can apply to as many inbound request cookies came
+        ## that are just played back with fresher expirations
+        var.set("domain","; Domain=YOURDOMAIN");
+        var.set("path","; PATH=YOURPATH");
+
+        if (resp.http.is-cacheable) {
+            unset beresp.http.set-cookie;
+            if (req.http.X-YOUR_COOKIE_NAME "") {
+                var.set("expires","; Expires=" + cookie.format_rfc1123(now,1h));
+                var.set("max-age","; Max-Age=" + 60*60);
+                header.append(resp.http.Set-Cookie,"YOUR_COOKIE_NAME=" + req.http.X-YOUR_COOKIE_NAME + var.get("domain") + var.get("expires") + var.get("max-age") + var.get("path"));
+            }
+            ## set as many of these inbound request cookies that were rewritten into http.X-headers
+            ## as your heart desires
+        }
+
+        ## clean up X-headers that came with cached response that were just to help
+        ## varnish keep state
+        unset resp.http.is-cacheable;
+    }
+
+.. vcl-end
+
+$Function STRING get_rand_uuid()
+
+Description
+        Fetch a random uuid 
+Example
+        ::
+
+                sub vcl_deliver {
+                        set resp.http.X-uuid-cookie-val = uuid.get_rand_uuid();
+                }
