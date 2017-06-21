@@ -31,7 +31,8 @@ vmod_LTLIBRARIES = \
 	libvmod_tcp.la \
 	libvmod_var.la \
 	libvmod_vsthrottle.la \
-	libvmod_xkey.la
+	libvmod_xkey.la \
+	libvmod_uuid.la
 
 dist_man_MANS = \
 	vmod_bodyaccess.3 \
@@ -42,7 +43,8 @@ dist_man_MANS = \
 	vmod_tcp.3 \
 	vmod_var.3 \
 	vmod_vsthrottle.3 \
-	vmod_xkey.3
+	vmod_xkey.3 \
+	vmod_uuid.3
 
 generated_docs = $(dist_man_MANS:.3=.rst)
 
@@ -55,6 +57,8 @@ libvmod_softpurge_la_SOURCES = vmod_softpurge.c foreign/hash/hash_slinger.h
 libvmod_tcp_la_SOURCES = vmod_tcp.c
 libvmod_var_la_SOURCES = vmod_var.c
 libvmod_xkey_la_SOURCES = vmod_xkey.c
+libvmod_uuid_la_SOURCES = vmod_uuid.c
+libvmod_uuid_la_LIBADD = -luuid
 
 nodist_libvmod_bodyaccess_la_SOURCES = vcc_bodyaccess_if.c vcc_bodyaccess_if.h
 nodist_libvmod_cookie_la_SOURCES = vcc_cookie_if.c vcc_cookie_if.h
@@ -65,6 +69,7 @@ nodist_libvmod_softpurge_la_SOURCES = vcc_softpurge_if.c vcc_softpurge_if.h
 nodist_libvmod_tcp_la_SOURCES = vcc_tcp_if.c vcc_tcp_if.h
 nodist_libvmod_var_la_SOURCES = vcc_var_if.c vcc_var_if.h
 nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
+nodist_libvmod_uuid_la_SOURCES = vcc_uuid_if.c vcc_uuid_if.h
 
 @BUILD_VMOD_BODYACCESS@
 @BUILD_VMOD_COOKIE@
@@ -75,6 +80,7 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 @BUILD_VMOD_VAR@
 @BUILD_VMOD_VSTHROTTLE@
 @BUILD_VMOD_XKEY@
+@BUILD_VMOD_UUID@
 
 rst-docs: $(generated_docs)
 	cp $(generated_docs) $(top_srcdir)/docs/
@@ -108,4 +114,5 @@ EXTRA_DIST = \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \
-	vmod_xkey.vcc
+	vmod_xkey.vcc \
+	vmod_uuid.vcc
