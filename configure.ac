@@ -23,6 +23,7 @@ if test "x$RST2MAN" = "xno"; then
 	AC_MSG_WARN([rst2man not found - not building man pages])
 	RST2MAN=: # no-op
 fi
+AM_CONDITIONAL(HAVE_RST2MAN, [test "$RST2MAN" != no])
 
 # Will be available after Varnish 5.0
 PKG_CHECK_VAR([VARNISHAPI_LIBDIR], [varnishapi], [libdir])
