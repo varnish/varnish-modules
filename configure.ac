@@ -50,7 +50,12 @@ AC_CHECK_MEMBER(struct objcore.exp,
 		[Define if exp is present in the objcore struct])],
 	[], [#include <cache/cache.h>])
 
-AC_CHECK_TYPES([req_body_iter_f, objiterate_f],
+AC_CHECK_MEMBER(struct objcore.hsh_list,
+	[AC_DEFINE([HAVE_OBJCORE_HSH_LIST], [1],
+		[Define if hsh_list is present in the objcore struct])],
+	[], [#include <cache/cache.h>])
+
+AC_CHECK_TYPES([req_body_iter_f, objiterate_f, enum exp_event_e],
 	[], [], [#include <cache/cache.h>])
 CFLAGS="$save_CFLAGS"
 

@@ -460,7 +460,7 @@ xkey_cb_remove(struct objcore *objcore)
 	AZ(pthread_mutex_unlock(&mtx));
 }
 
-#if defined VARNISH_PLUS || !defined OEV_INSERT
+#if HAVE_ENUM_EXP_EVENT_E
 static void __match_proto__(exp_callback_f)
 xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
@@ -545,7 +545,7 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 				    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
 					continue;
 #endif
-#ifdef VARNISH_PLUS
+#if defined HAVE_OBJCORE_EXP && defined VARNISH_PLUS
 				if (do_soft)
 					EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
 					    oc->objcore->exp.grace, oc->objcore->exp.keep);
@@ -599,7 +599,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
 		if (n_init == 0)
-#if defined VARNISH_PLUS || !defined OEV_INSERT
+#ifdef HAVE_ENUM_EXP_EVENT_E
 			xkey_cb_handle =
 			    EXP_Register_Callback(xkey_cb, NULL);
 #else
@@ -617,7 +617,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		AN(xkey_cb_handle);
 		if (n_init == 0) {
 			/* Do cleanup */
-#if defined VARNISH_PLUS || !defined OEV_INSERT
+#ifdef HAVE_ENUM_EXP_EVENT_E
 			EXP_Deregister_Callback(&xkey_cb_handle);
 #else
 			ObjUnsubscribeEvents(&xkey_cb_handle);
