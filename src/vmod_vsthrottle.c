@@ -43,7 +43,6 @@
 #include "miniobj.h"
 #include "vsha256.h"
 
-
 #include "vtree.h"
 #include <sys/time.h>
 
@@ -57,6 +56,7 @@ struct tbucket {
 	unsigned char		digest[SHA256_LEN];
 	double			last_used;
 	double			period;
+	double			block;
 	long			tokens;
 	long			capacity;
 	VRB_ENTRY(tbucket)	tree;
@@ -103,6 +103,7 @@ tb_alloc(const unsigned char *digest, long limit, double period, double now)
 	tb->magic = TBUCKET_MAGIC;
 	tb->last_used = now;
 	tb->period = period;
+	tb->block = 0.;
 	tb->tokens = limit;
 	tb->capacity = limit;
 
@@ -142,7 +143,8 @@ calc_tokens(struct tbucket *b, double now)
 }
 
 static
-void do_digest(unsigned char *out, const char *s, VCL_INT l, VCL_DURATION p)
+void do_digest(unsigned char *out, const char *s, VCL_INT l, VCL_DURATION p,
+	       VCL_DURATION b)
 {
 	SHA256_CTX sctx;
 
@@ -150,11 +152,13 @@ void do_digest(unsigned char *out, const char *s, VCL_INT l, VCL_DURATION p)
 	SHA256_Update(&sctx, s, strlen(s));
 	SHA256_Update(&sctx, &l, sizeof (l));
 	SHA256_Update(&sctx, &p, sizeof (p));
+	SHA256_Update(&sctx, &b, sizeof (b));
 	SHA256_Final(out, &sctx);
 }
 
 VCL_BOOL
-vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
+vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
+               VCL_DURATION block)
 {
 	unsigned ret = 1;
 	struct tbucket *b;
@@ -168,19 +172,29 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 
 	if (!key)
 		return (1);
-	do_digest(digest, key, limit, period);
+	do_digest(digest, key, limit, period, block);
 
 	part = digest[0] & N_PART_MASK;
 	v = &vsthrottle[part];
 	AZ(pthread_mutex_lock(&v->mtx));
 	now = VTIM_mono();
 	b = get_bucket(digest, limit, period, now);
-	calc_tokens(b, now);
-	if (b->tokens > 0) {
-		b->tokens -= 1;
-		ret = 0;
-		b->last_used = now;
+	if (b->block > 0. && now < b->block) {
+		AZ(b->tokens);
+		ret = 1;
 	}
+	else {
+		calc_tokens(b, now);
+		if (b->tokens > 0) {
+			b->tokens -= 1;
+			ret = 0;
+			b->last_used = now;
+		} else if (block > 0.)
+			b->block = now + block;
+	}
+
+	if (block > 0. && !ret)
+		b->block = 0.;
 
 	v->gc_count++;
 	if (v->gc_count == GC_INTVL) {
@@ -210,7 +224,8 @@ run_gc(double now, unsigned part)
 }
 
 VCL_INT
-vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
+vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
+	       VCL_DURATION block)
 {
 	unsigned ret;
 	struct tbucket *b;
@@ -223,7 +238,7 @@ vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period)
 
 	if (!key)
 		return (-1);
-	do_digest(digest, key, limit, period);
+	do_digest(digest, key, limit, period, block);
 	part = digest[0] & N_PART_MASK;
 	v = &vsthrottle[part];
 	AZ(pthread_mutex_lock(&v->mtx));

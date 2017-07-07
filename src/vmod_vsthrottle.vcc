@@ -13,6 +13,12 @@ The request rate is specified as the number of requests permitted over
 a period. To keep things simple, this is passed as two separate
 parameters, 'limit' and 'period'.
 
+If an optional duration 'block' is specified, then access is denied
+altogether for that period of time after the rate limit is
+reached. This is a way to entirely turn away a particularly
+troublesome source of traffic for a while, rather than let them back
+in as soon as the rate slips back under the threshold.
+
 This VMOD implements a `token bucket algorithm`_. State associated
 with the token bucket for each key is stored in-memory using BSD's
 red-black tree implementation.
@@ -34,8 +40,9 @@ Example::
     sub vcl_recv {
         # Varnish will set client.identity for you based on client IP.
 
-        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
-            # Client has exceeded 15 reqs per 10s
+        if (vsthrottle.is_denied(client.identity, 15, 10s, 30s)) {
+            # Client has exceeded 15 reqs per 10s.
+            # When this happens, block altogether for the next 30s.
             return (synth(429, "Too Many Requests"));
         }
 
@@ -56,20 +63,24 @@ Example::
 
 $Event event_function
 
-$Function BOOL is_denied(STRING key, INT limit, DURATION period)
+$Function BOOL is_denied(STRING key, INT limit, DURATION period,
+                         DURATION block=0)
 
 Arguments:
 
   - key: A unique identifier to define what is being throttled - more examples below
   - limit: How many requests in the specified period
   - period: The time period
+  - block: a period to deny all access after meeting the threshold
 
 Description
   Can be used to rate limit the traffic for a specific key to a
-  maximum of 'limit' requests per 'period' time. A token bucket
-  is uniquely identified by the triplet of its key, limit and
-  period, so using the same key multiple places with different
-  rules will create multiple token buckets.
+  maximum of 'limit' requests per 'period' time. If 'block' is > 0s,
+  (0s by default), then always deny for 'key' for that length of time
+  after hitting the threshold. A token bucket is uniquely identified
+  by the 4-tuple of its key, limit, period and block, so using the
+  same key multiple places with different rules will create multiple
+  token buckets.
 
 Example
         ::
@@ -84,12 +95,14 @@ Example
 		}
 
 
-$Function INT remaining(STRING key, INT limit, DURATION period)
+$Function INT remaining(STRING key, INT limit, DURATION period,
+                        DURATION block=0)
 
 Arguments:
   - key: A unique identifier to define what is being throttled
   - limit: How many requests in the specified period
   - period: The time period
+  - block: duration to block, defaults to 0s
 
 Description
 
