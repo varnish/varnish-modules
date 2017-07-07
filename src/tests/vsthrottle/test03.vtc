@@ -9,7 +9,8 @@ varnish v1 -vcl {
         }
 
 	sub vcl_synth {
-                set resp.http.block-1 = vsthrottle.is_denied("quux", 2, 1s, 2s);
+                set resp.http.block = vsthrottle.is_denied("quux", 2, 1s, 2s);
+                set resp.http.blocked = vsthrottle.blocked("quux", 2, 1s, 2s);
                 return(deliver);
 	}
 } -start
@@ -17,25 +18,30 @@ varnish v1 -vcl {
 client c1 {
 	txreq
         rxresp
-        expect resp.http.block-1 == "false"
+        expect resp.http.block == "false"
+        expect resp.http.blocked ~ "^0[.]0+$"
 
 	txreq
 	rxresp
-        expect resp.http.block-1 == "false"
+        expect resp.http.block == "false"
+        expect resp.http.blocked ~ "^0[.]0+$"
 
 	txreq
 	rxresp
-        expect resp.http.block-1 == "true"
-
-        delay 1.1
-	txreq
-	rxresp
-        expect resp.http.block-1 == "true"
+        expect resp.http.block == "true"
+        expect resp.http.blocked ~ "^[12][.][0-9]+$"
 
         delay 1.1
 	txreq
 	rxresp
-        expect resp.http.block-1 == "false"
+        expect resp.http.block == "true"
+        expect resp.http.blocked ~ "^0[.][0-9]+$"
+
+        delay 1.1
+	txreq
+	rxresp
+        expect resp.http.block == "false"
+        expect resp.http.blocked ~ "^0[.]0+$"
 } -run
 
 # If block <= 0s, then is_denied() ignores it. So this is just the

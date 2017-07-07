@@ -250,6 +250,36 @@ vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	return (ret);
 }
 
+VCL_DURATION
+vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
+             VCL_DURATION block)
+{
+	VCL_DURATION ret;
+	struct tbucket *b;
+	double now;
+	struct vsthrottle *v;
+	unsigned char digest[SHA256_LEN];
+	unsigned part;
+
+	(void)ctx;
+
+	if (!key)
+		return (-1);
+	do_digest(digest, key, limit, period, block);
+	part = digest[0] & N_PART_MASK;
+	v = &vsthrottle[part];
+	AZ(pthread_mutex_lock(&v->mtx));
+	now = VTIM_mono();
+	b = get_bucket(digest, limit, period, now);
+	if (b->block == 0.)
+		ret = 0.;
+	else
+		ret = b->block - now;
+	AZ(pthread_mutex_unlock(&v->mtx));
+	assert(ret >= 0.);
+	return (ret);
+}
+
 static void
 fini(void *priv)
 {
