@@ -182,6 +182,7 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	if (b->block > 0. && now < b->block) {
 		AZ(b->tokens);
 		ret = 1;
+		b->last_used = now;
 	}
 	else {
 		calc_tokens(b, now);
