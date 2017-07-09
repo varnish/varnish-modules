@@ -160,7 +160,7 @@ VCL_BOOL
 vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
                VCL_DURATION block)
 {
-	unsigned ret = 1;
+	unsigned ret = 1, blocked = 0;
 	struct tbucket *b;
 	double now;
 
@@ -179,22 +179,21 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	AZ(pthread_mutex_lock(&v->mtx));
 	now = VTIM_mono();
 	b = get_bucket(digest, limit, period, now);
-	if (b->block > 0. && now < b->block) {
-		AZ(b->tokens);
-		ret = 1;
+	calc_tokens(b, now);
+	if (block > 0. && now < b->block) {
+		blocked = 1;
 		b->last_used = now;
 	}
-	else {
-		calc_tokens(b, now);
-		if (b->tokens > 0) {
-			b->tokens -= 1;
+	if (b->tokens > 0) {
+		b->tokens -= 1;
+		if (!blocked)
 			ret = 0;
-			b->last_used = now;
-		} else if (block > 0.)
-			b->block = now + block;
+		b->last_used = now;
 	}
+	else if (block > 0. && !blocked)
+		b->block = now + block;
 
-	if (block > 0. && !ret)
+	if (block > 0. && !ret && !blocked)
 		b->block = 0.;
 
 	v->gc_count++;
