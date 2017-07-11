@@ -272,9 +272,9 @@ vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	now = VTIM_mono();
 	b = get_bucket(digest, limit, period, now);
 	ret = b->block - now;
+	AZ(pthread_mutex_unlock(&v->mtx));
 	if (ret <= 0.)
 		ret = 0.;
-	AZ(pthread_mutex_unlock(&v->mtx));
 	return (ret);
 }
 
