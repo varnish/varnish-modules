@@ -57,18 +57,18 @@ varnish v1 -vcl {
 
 	sub vcl_synth {
 		set resp.http.foo-count0
-                    = vsthrottle.remaining("foo", 1, 1s, -1s);
-		if (!vsthrottle.is_denied("foo", 1, 1s, -1s)) {
+                    = vsthrottle.remaining("foo", 1, 1s, 0s);
+		if (!vsthrottle.is_denied("foo", 1, 1s, 0s)) {
 			set resp.http.f1 = "OK";
 		}
 		set resp.http.foo-count1
-                    = vsthrottle.remaining("foo", 1, 1s, -1s);
+                    = vsthrottle.remaining("foo", 1, 1s, 0s);
 
-		if (!vsthrottle.is_denied("foo", 1, 1s, -1s)) {
+		if (!vsthrottle.is_denied("foo", 1, 1s, 0s)) {
 			set resp.http.f2 = "OK";
 		}
 		set resp.http.foo-count2
-                    = vsthrottle.remaining("foo", 1, 1s, -1s);
+                    = vsthrottle.remaining("foo", 1, 1s, 0s);
 
 		set resp.http.bar-count0
                     = vsthrottle.remaining("bar", 1, 1s, 0s);
@@ -79,12 +79,12 @@ varnish v1 -vcl {
                     = vsthrottle.remaining("bar", 1, 1s, 0s);
 
 		set resp.http.f4-count0
-                    = vsthrottle.remaining(req.http.not-found, 1, 1s, -2s);
-		if (vsthrottle.is_denied(req.http.not-found, 10, 100s, -2s)) {
+                    = vsthrottle.remaining(req.http.not-found, 1, 1s, 0s);
+		if (vsthrottle.is_denied(req.http.not-found, 10, 100s, 0s)) {
 			set resp.http.f4 = "NULL";
 		}
 		set resp.http.f4-count1
-                    = vsthrottle.remaining(req.http.not-found, 1, 1s, -2s);
+                    = vsthrottle.remaining(req.http.not-found, 1, 1s, 0s);
 
                 return(deliver);
 	}
