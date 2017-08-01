@@ -179,6 +179,8 @@ the saintmode threshold, which is the maximum number of items that can be
 blacklisted before the whole backend is regarded as sick. Corresponds with the
 ``saintmode_threshold`` parameter of Varnish 3.0.
 
+Setting threshold to 0 disables saintmode, not the threshold.
+
 Example::
 
     sub vcl_init {
