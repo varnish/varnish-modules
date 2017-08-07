@@ -1,5 +1,7 @@
 varnishtest "Test enabling pacing"
 
+feature cmd "uname | grep Linux"
+
 server s1 {
        rxreq
        txresp
