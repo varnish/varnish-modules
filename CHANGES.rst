@@ -1,5 +1,15 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.13.0 (unreleased)
+-----------------------------------
+
+* [vmod-vsthrottle] Add an optional block parameter to
+  vsthrottle.is_denied, to permit blocking clients for a specified
+  duration when the request rate threshold is reached.
+* [vmod-vsthrottle] Add vsthrottle.blocked() for querying remaining
+  time for a pending block.
+
+
 varnish-modules 0.12.1 (2017-05-24)
 -----------------------------------
 
