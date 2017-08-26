@@ -42,8 +42,8 @@ VCL example::
                 return (synth(403, "Forbidden"));
             }
 	    if (req.http.xkey) {
-		set req.http.n-gone = xkey.purge(req.http.xkey-purge);
-		# or: set req.http.n-gone = xkey.softpurge(req.http.xkey-purge)
+		set req.http.n-gone = xkey.purge(req.http.xkey);
+		# or: set req.http.n-gone = xkey.softpurge(req.http.xkey)
 
 		return (synth(200, "Invalidated "+req.http.n-gone+" objects"));
 	    } else {
