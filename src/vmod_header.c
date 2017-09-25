@@ -212,7 +212,8 @@ vmod_append(VRT_CTX, VCL_HEADER hdr, const char *fmt, ...)
 	const char *b;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	assert(fmt != NULL);
+	if (fmt == NULL)
+		return;
 
 	hp = VRT_selecthttp(ctx, hdr->where);
 	va_start(ap, fmt);
