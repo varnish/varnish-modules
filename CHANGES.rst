@@ -8,6 +8,8 @@ varnish-modules 0.13.0 (unreleased)
   duration when the request rate threshold is reached.
 * [vmod-vsthrottle] Add vsthrottle.blocked() for querying remaining
   time for a pending block.
+* [vmod-header]: Fix a bug where we would crash if a non-existing
+  header would be passed as the final argument to header.append()
 
 
 varnish-modules 0.12.1 (2017-05-24)
