@@ -31,11 +31,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "vcl.h"
 #include "cache/cache.h"
 #include "vrt.h"
+#include "vcl.h"
+
 #include "cache/cache_director.h"
-#include "cache/cache_backend.h"
 
 #include "vcc_saintmode_if.h"
 

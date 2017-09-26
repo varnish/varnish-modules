@@ -30,9 +30,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "vcl.h"
 #include "cache/cache.h"
 #include "vrt.h"
+#include "vcl.h"
 
 #include "vcc_header_if.h"
 
