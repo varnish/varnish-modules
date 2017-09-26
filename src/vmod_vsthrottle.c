@@ -35,9 +35,14 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "vcl.h"
 #include "vdef.h"
+
+#define VCL_RET_MAX 1
+enum vcl_event_e;
 #include "vrt.h"
+#undef VCL_RET_MAX
+
+#include "vcl.h"
 #include "vas.h"
 #include "vtim.h"
 #include "miniobj.h"

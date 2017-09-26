@@ -28,9 +28,9 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 
 #include "vcc_tcp_if.h"
 
@@ -158,7 +158,7 @@ VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
  *
  * */
 
-VCL_VOID __match_proto__(td_std_set_socket_pace)
+VCL_VOID
 vmod_set_socket_pace(const struct vrt_ctx *ctx, const long rate)
 {
 #ifndef SO_MAX_PACING_RATE

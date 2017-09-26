@@ -29,9 +29,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <sys/socket.h>
+#include <string.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vsa.h"
 
 #include "vcc_var_if.h"
