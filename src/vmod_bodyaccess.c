@@ -29,10 +29,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 
 #include "cache/cache.h"
 #include "vre.h"
+#include "vsb.h"
 #include "vrt.h"
 #include "vcl.h"
 #include "vsha256.h"

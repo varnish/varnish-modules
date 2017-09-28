@@ -36,6 +36,7 @@
 
 #include "cache/cache.h"
 #include "vrt.h"
+#include "vsb.h"
 #include "vqueue.h"
 
 #include "vcc_cookie_if.h"

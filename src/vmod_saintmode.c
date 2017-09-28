@@ -29,10 +29,12 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 
 #include "cache/cache.h"
 #include "vrt.h"
+#include "vsb.h"
 #include "vcl.h"
 
 #include "cache/cache_director.h"
