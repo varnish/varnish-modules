@@ -8,7 +8,7 @@ All modules taken into this collection at creation time were copyright Varnish
 Software and are 2-clause BSD licensed.
 
 vmod-header was originally written by Kristian Lyngstøl.
-vmod-cookie, vmod-softpurge and vmod-tcp were written by Lasse Karstensen.
+vmod-cookie and vmod-tcp were written by Lasse Karstensen.
 vmod-vsthrottle and vmod-saintmode were written by Dag Haavi Finstad.
 vmod-xkey was originally written by Martin Blix Grydeland.
 

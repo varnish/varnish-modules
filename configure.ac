@@ -36,7 +36,6 @@ VARNISH_VMODS([
 	cookie
 	header
 	saintmode
-	softpurge
 	tcp
 	var
 	vsthrottle

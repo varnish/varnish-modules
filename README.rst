@@ -15,7 +15,7 @@ Included:
 * Client request body access
 
 This collection contains the following vmods (previously kept
-individually): cookie, vsthrottle, header, saintmode, softpurge, tcp,
+individually): cookie, vsthrottle, header, saintmode, tcp,
 var, xkey, bodyaccess
 
 Supported Varnish version is described in the `CHANGES.rst` file. Normally this
