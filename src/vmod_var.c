@@ -27,6 +27,7 @@
 
 #include "config.h"
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <sys/socket.h>
 #include <string.h>
