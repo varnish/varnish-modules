@@ -53,7 +53,7 @@
 struct tbucket {
 	unsigned		magic;
 #define TBUCKET_MAGIC		0x53345eb9
-	unsigned char		digest[SHA256_LEN];
+	unsigned char		digest[VSHA256_LEN];
 	double			last_used;
 	double			period;
 	double			block;
@@ -146,14 +146,14 @@ static
 void do_digest(unsigned char *out, const char *s, VCL_INT l, VCL_DURATION p,
 	       VCL_DURATION b)
 {
-	SHA256_CTX sctx;
+	VSHA256_CTX sctx;
 
-	SHA256_Init(&sctx);
-	SHA256_Update(&sctx, s, strlen(s));
-	SHA256_Update(&sctx, &l, sizeof (l));
-	SHA256_Update(&sctx, &p, sizeof (p));
-	SHA256_Update(&sctx, &b, sizeof (b));
-	SHA256_Final(out, &sctx);
+	VSHA256_Init(&sctx);
+	VSHA256_Update(&sctx, s, strlen(s));
+	VSHA256_Update(&sctx, &l, sizeof (l));
+	VSHA256_Update(&sctx, &p, sizeof (p));
+	VSHA256_Update(&sctx, &b, sizeof (b));
+	VSHA256_Final(out, &sctx);
 }
 
 VCL_BOOL
@@ -165,7 +165,7 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	double now;
 
 	struct vsthrottle *v;
-	unsigned char digest[SHA256_LEN];
+	unsigned char digest[VSHA256_LEN];
 	unsigned part;
 
 	(void)ctx;
@@ -231,7 +231,7 @@ vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	struct tbucket *b;
 	double now;
 	struct vsthrottle *v;
-	unsigned char digest[SHA256_LEN];
+	unsigned char digest[VSHA256_LEN];
 	unsigned part;
 
 	(void)ctx;
@@ -258,7 +258,7 @@ vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	struct tbucket *b;
 	double now;
 	struct vsthrottle *v;
-	unsigned char digest[SHA256_LEN];
+	unsigned char digest[VSHA256_LEN];
 	unsigned part;
 
 	(void)ctx;

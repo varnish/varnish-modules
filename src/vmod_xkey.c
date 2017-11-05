@@ -419,7 +419,7 @@ xkey_tok(const char **b, const char **e)
 static void
 xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 {
-	SHA256_CTX sha_ctx;
+	VSHA256_CTX sha_ctx;
 	unsigned char digest[DIGEST_LEN];
 	const char hdr_xkey[] = "xkey:";
 	const char hdr_h2[] = "X-HashTwo:";
@@ -435,9 +435,9 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 		AN(sp);
 		sp++;
 		while (xkey_tok(&sp, &ep)) {
-			SHA256_Init(&sha_ctx);
-			SHA256_Update(&sha_ctx, sp, ep - sp);
-			SHA256_Final(digest, &sha_ctx);
+			VSHA256_Init(&sha_ctx);
+			VSHA256_Update(&sha_ctx, sp, ep - sp);
+			VSHA256_Final(digest, &sha_ctx);
 			AZ(pthread_mutex_lock(&mtx));
 			xkey_insert(objcore, digest, sizeof(digest));
 			AZ(pthread_mutex_unlock(&mtx));
@@ -510,7 +510,7 @@ xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 static VCL_INT
 purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 {
-	SHA256_CTX sha_ctx;
+	VSHA256_CTX sha_ctx;
 	unsigned char digest[DIGEST_LEN];
 	struct xkey_hashhead *hashhead;
 	struct xkey_oc *oc;
@@ -526,9 +526,9 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	sp = key;
 	AZ(pthread_mutex_lock(&mtx));
 	while (xkey_tok(&sp, &ep)) {
-		SHA256_Init(&sha_ctx);
-		SHA256_Update(&sha_ctx, sp, ep - sp);
-		SHA256_Final(digest, &sha_ctx);
+		VSHA256_Init(&sha_ctx);
+		VSHA256_Update(&sha_ctx, sp, ep - sp);
+		VSHA256_Final(digest, &sha_ctx);
 
 		hashhead = xkey_hashtree_lookup(digest, sizeof(digest));
 		if (hashhead != NULL) {
