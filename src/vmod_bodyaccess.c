@@ -175,7 +175,7 @@ vmod_hash_req_body(VRT_CTX)
 	bodyaccess_bcat(ctx, vsb);
 	txtbody.b = VSB_data(vsb);
 	txtbody.e = txtbody.b + VSB_len(vsb);
-	SHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
+	VSHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
 	VSLbt(ctx->vsl, SLT_Hash, txtbody);
 	VSB_delete(vsb);
 }
