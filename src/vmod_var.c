@@ -32,7 +32,6 @@
 #include <sys/socket.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vsa.h"
 
 #include "vcc_var_if.h"

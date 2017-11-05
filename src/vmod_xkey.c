@@ -33,7 +33,6 @@
 #include <string.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vcl.h"
 #include "vsha256.h"
 

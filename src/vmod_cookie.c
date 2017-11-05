@@ -35,7 +35,6 @@
 #include <ctype.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vsb.h"
 #include "vqueue.h"
 

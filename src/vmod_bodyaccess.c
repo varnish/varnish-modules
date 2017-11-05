@@ -35,7 +35,6 @@
 #include "cache/cache.h"
 #include "vre.h"
 #include "vsb.h"
-#include "vrt.h"
 #include "vcl.h"
 #include "vsha256.h"
 #include "vcc_bodyaccess_if.h"

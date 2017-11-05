@@ -31,7 +31,6 @@
 #include <string.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 
 #include "vcc_tcp_if.h"
 

@@ -33,7 +33,6 @@
 #include <pthread.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vsb.h"
 #include "vcl.h"
 
