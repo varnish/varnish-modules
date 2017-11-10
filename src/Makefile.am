@@ -169,6 +169,7 @@ EXTRA_DIST = \
 	foreign \
 	vtree.h \
 	$(VMOD_TESTS) \
+	$(SOFTPURGE_TESTS) \
 	vmod_bodyaccess.vcc \
 	vmod_cookie.vcc \
 	vmod_header.vcc \
