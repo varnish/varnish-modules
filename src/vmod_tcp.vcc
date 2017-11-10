@@ -35,6 +35,7 @@ Example::
 .. vcl-end
 
 
+$ABI strict
 $Function INT congestion_algorithm(STRING algorithm)
 
 Set the client socket congestion control algorithm to S. Returns 0 on success, and -1 on error.

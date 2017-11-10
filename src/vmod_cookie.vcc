@@ -47,6 +47,7 @@ Filtering example::
 
 .. vcl-end
 
+$ABI vrt
 $Function VOID clean(PRIV_TASK)
 
 Description

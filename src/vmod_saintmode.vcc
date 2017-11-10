@@ -71,6 +71,7 @@ Example::
 .. vcl-end
 
 
+$ABI vrt
 $Function VOID blacklist(PRIV_VCL, DURATION expires)
 
 Marks the backend as sick for a specific object. Used in vcl_backend_response.

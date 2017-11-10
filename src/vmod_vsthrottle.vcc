@@ -61,8 +61,8 @@ Example::
 
 .. vcl-end
 
+$ABI vrt
 $Event event_function
-
 $Function BOOL is_denied(STRING key, INT limit, DURATION period,
                          DURATION block=0)
 

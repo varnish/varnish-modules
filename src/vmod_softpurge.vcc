@@ -46,6 +46,7 @@ Example::
 
 .. vcl-end
 
+$ABI strict
 $Function VOID softpurge()
 
 Performs a soft purge. Valid in vcl_hit and vcl_miss.
