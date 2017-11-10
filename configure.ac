@@ -36,12 +36,14 @@ VARNISH_VMODS([
 	cookie
 	header
 	saintmode
-	softpurge
 	tcp
 	var
 	vsthrottle
 	xkey
 ])
+
+AS_VERSION_COMPARE([$VARNISH_VERSION], [5.0], [VARNISH_VMODS([softpurge])])
+AM_CONDITIONAL([WITH_VMOD_SOFTPURGE], [test -n "$BUILD_VMOD_SOFTPURGE"])
 
 save_CFLAGS="$CFLAGS"
 CFLAGS="$VARNISHAPI_CFLAGS"
