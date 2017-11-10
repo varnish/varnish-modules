@@ -101,7 +101,69 @@ AM_VTC_LOG_FLAGS = \
 	-Dvmod_builddir=$(abs_top_builddir)/src \
 	-Dvmod_directors="directors from \"$(VARNISHAPI_VMODDIR)/libvmod_directors.so\""
 
+VMOD_TESTS = \
+	tests/bodyaccess/test01.vtc \
+	tests/bodyaccess/test02.vtc \
+	tests/bodyaccess/test03.vtc \
+	tests/bodyaccess/test04.vtc \
+	tests/bodyaccess/test05.vtc \
+	tests/cookie/01-set-delete-produce.vtc \
+	tests/cookie/02-clean.vtc \
+	tests/cookie/03-null.vtc \
+	tests/cookie/04-filter_except.vtc \
+	tests/cookie/05-filter.vtc \
+	tests/cookie/05-get.vtc \
+	tests/cookie/06-concurrent-query.vtc \
+	tests/cookie/07-isset.vtc \
+	tests/cookie/08-overflow.vtc \
+	tests/cookie/10-parser.vtc \
+	tests/cookie/30-format_1123.vtc \
+	tests/cookie/r28.vtc \
+	tests/header/append.vtc \
+	tests/header/copy.vtc \
+	tests/header/get.vtc \
+	tests/header/import.vtc \
+	tests/header/keep-others.vtc \
+	tests/header/remove.vtc \
+	tests/header/some-data.vtc \
+	tests/saintmode/test01.vtc \
+	tests/saintmode/test02.vtc \
+	tests/saintmode/test03.vtc \
+	tests/tcp/01-dumpinfo.vtc \
+	tests/tcp/02-congestion.vtc \
+	tests/tcp/03-read-tcpinfo.vtc \
+	tests/tcp/04-pacing.vtc \
+	tests/var/test01.vtc \
+	tests/var/test02.vtc \
+	tests/var/test03.vtc \
+	tests/var/test04.vtc \
+	tests/var/test05.vtc \
+	tests/vsthrottle/test01.vtc \
+	tests/vsthrottle/test02.vtc \
+	tests/vsthrottle/test03.vtc \
+	tests/xkey/test01.vtc \
+	tests/xkey/test02.vtc \
+	tests/xkey/test03.vtc \
+	tests/xkey/test04.vtc \
+	tests/xkey/test05.vtc \
+	tests/xkey/test06.vtc \
+	tests/xkey/test07.vtc \
+	tests/xkey/test08.vtc
+
+SOFTPURGE_TESTS = \
+	tests/softpurge/01-load.vtc \
+	tests/softpurge/02-simple-hit.vtc \
+	tests/softpurge/03-simple-miss.vtc \
+	tests/softpurge/10-softpurge-hit.vtc \
+	tests/softpurge/11-really-purged.vtc \
+	tests/softpurge/12-softpurge-variants.vtc \
+	tests/softpurge/13-softpurge-variants-sickbackend.vtc \
+	tests/softpurge/14-mind-the-refcounters.vtc
+
 TESTS = $(VMOD_TESTS)
+if WITH_VMOD_SOFTPURGE
+TESTS += $(SOFTPURGE_TESTS)
+endif
 
 EXTRA_DIST = \
 	foreign \

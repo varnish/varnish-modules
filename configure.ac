@@ -71,10 +71,6 @@ AC_CHECK_TYPE(struct tcp_info,
 		#include <netinet/in.h>
 	]])
 
-# Test suite
-VMOD_TESTS=$(cd $srcdir/src && echo tests/*/*.vtc)
-AC_SUBST([VMOD_TESTS])
-
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
