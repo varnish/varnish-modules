@@ -42,6 +42,9 @@ VARNISH_VMODS([
 	xkey
 ])
 
+AS_VERSION_COMPARE([$VARNISH_VERSION], [5.0], [VARNISH_VMODS([softpurge])])
+AM_CONDITIONAL([WITH_VMOD_SOFTPURGE], [test -n "$BUILD_VMOD_SOFTPURGE"])
+
 save_CFLAGS="$CFLAGS"
 CFLAGS="$VARNISHAPI_CFLAGS"
 AC_CHECK_MEMBER(struct objcore.exp,
@@ -67,10 +70,6 @@ AC_CHECK_TYPE(struct tcp_info,
 		#include <netinet/tcp.h>
 		#include <netinet/in.h>
 	]])
-
-# Test suite
-VMOD_TESTS=$(cd $srcdir/src && echo tests/*/*.vtc)
-AC_SUBST([VMOD_TESTS])
 
 AC_CONFIG_FILES([
 	Makefile

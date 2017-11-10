@@ -58,6 +58,7 @@ Example::
 .. vcl-end
 
 
+$ABI vrt
 $Function VOID set(PRIV_TASK, STRING key, STRING value)
 
 Set `key` to `value`.

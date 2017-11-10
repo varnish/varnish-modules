@@ -1,4 +1,5 @@
 $Module bodyaccess 3 Varnish Module for request body access
+
 DESCRIPTION
 ===========
 Varnish module that lets you access the request body.
@@ -48,9 +49,7 @@ It can be buffered using the cache_req_body() function from libvmod_std.
 These functions applies only to standard REST methods.
 Caching is *not* allowed on PUT requests.
 
-
-
-
+$ABI strict
 $Function INT rematch_req_body(PRIV_CALL, STRING re)
 
 Description

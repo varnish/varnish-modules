@@ -27,6 +27,7 @@ Example::
 .. vcl-end
 
 
+$ABI vrt
 $Event event_function
 $Function VOID append(HEADER, STRING_LIST)
 
