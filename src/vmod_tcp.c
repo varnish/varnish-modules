@@ -158,7 +158,7 @@ VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
  *
  * */
 
-VCL_VOID
+VCL_VOID v_matchproto_(td_std_set_socket_pace)
 vmod_set_socket_pace(const struct vrt_ctx *ctx, const long rate)
 {
 #ifndef SO_MAX_PACING_RATE

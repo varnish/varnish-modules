@@ -69,7 +69,7 @@ struct saintmode_objs {
 	VTAILQ_HEAD(, vmod_saintmode_saintmode) sm_list;
 };
 
-VCL_BACKEND
+VCL_BACKEND v_matchproto_(td_saintmode_saintmode_backend)
 vmod_saintmode_backend(VRT_CTX, struct vmod_saintmode_saintmode *sm) {
 	CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->sdir, DIRECTOR_MAGIC);
@@ -95,7 +95,7 @@ find_sm(const struct saintmode_objs *sm_objs,
 	return (NULL);
 }
 
-VCL_VOID
+VCL_VOID v_matchproto_(td_saintmode_blacklist)
 vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct trouble *tp;
 	struct saintmode_objs *sm_objs;
@@ -306,7 +306,7 @@ vmod_saintmode_is_healthy(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 		return healthy(sm->sdir, ctx->bo, NULL);
 }
 
-static const struct director *
+static const struct director *  v_matchproto_(vdi_resolve_f)
 resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	struct vmod_saintmode_saintmode *sm;
 	double changed = 0.0;
@@ -321,7 +321,7 @@ resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	return (sm->be);
 }
 
-VCL_VOID
+VCL_VOID  v_matchproto_(td_saintmode_saintmode__init)
 vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
     const char *vcl_name, struct vmod_priv *priv, VCL_BACKEND be,
     VCL_INT threshold) {
@@ -361,7 +361,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	VTAILQ_INSERT_TAIL(&sm_objs->sm_list, sm, list);
 }
 
-VCL_VOID
+VCL_VOID v_matchproto_(td_saintmode_saintmode__fini)
 vmod_saintmode__fini(struct vmod_saintmode_saintmode **smp) {
 	struct trouble *tr, *tr2;
 	struct vmod_saintmode_saintmode *sm;

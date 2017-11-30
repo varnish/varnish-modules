@@ -214,7 +214,7 @@ event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	return (0);
 }
 
-VCL_VOID
+VCL_VOID v_matchproto_()
 vmod_append(VRT_CTX, VCL_HEADER hdr, const char *fmt, ...)
 {
 	va_list ap;
@@ -236,7 +236,7 @@ vmod_append(VRT_CTX, VCL_HEADER hdr, const char *fmt, ...)
 	va_end(ap);
 }
 
-VCL_STRING
+VCL_STRING v_matchproto_()
 vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 {
 	struct http *hp;
@@ -256,7 +256,7 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 	return (p);
 }
 
-VCL_VOID
+VCL_VOID  v_matchproto_()
 vmod_copy(VRT_CTX, VCL_HEADER src, VCL_HEADER dst)
 {
 	struct http *src_hp;
@@ -267,7 +267,7 @@ vmod_copy(VRT_CTX, VCL_HEADER src, VCL_HEADER dst)
 	header_http_cphdr(ctx, src_hp, src->what, dst);
 }
 
-VCL_VOID
+VCL_VOID  v_matchproto_()
 vmod_remove(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 {
 	struct http *hp;
