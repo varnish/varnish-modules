@@ -461,7 +461,7 @@ xkey_cb_remove(struct objcore *objcore)
 }
 
 #if HAVE_ENUM_EXP_EVENT_E
-static void __match_proto__(exp_callback_f)
+static void v_matchproto_(exp_callback_f)
 xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
 {
@@ -483,7 +483,7 @@ xkey_cb(struct worker *wrk, struct objcore *objcore,
 	}
 }
 #else
-static void __match_proto__(obj_event_f)
+static void v_matchproto_(obj_event_f)
 xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 {
 
@@ -577,19 +577,19 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	return (i);
 }
 
-VCL_INT __match_proto__(td_xkey_purge)
+VCL_INT v_matchproto_(td_xkey_purge)
 vmod_purge(VRT_CTX, VCL_STRING key)
 {
 	return (purge(ctx, key, 0));
 }
 
-VCL_INT __match_proto__(td_xkey_softpurge)
+VCL_INT v_matchproto_(td_xkey_softpurge)
 vmod_softpurge(VRT_CTX, VCL_STRING key)
 {
 	return (purge(ctx, key, 1));
 }
 
-int __match_proto__(vmod_event_f)
+int v_matchproto_(vmod_event_f)
 vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 {
 	(void)ctx;

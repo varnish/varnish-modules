@@ -66,7 +66,7 @@ struct saintmode_objs {
 	VTAILQ_HEAD(, vmod_saintmode_saintmode) sm_list;
 };
 
-VCL_BACKEND __match_proto__(td_saintmode_saintmode_backend)
+VCL_BACKEND v_matchproto_(td_saintmode_saintmode_backend)
 vmod_saintmode_backend(VRT_CTX, struct vmod_saintmode_saintmode *sm) {
 	CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->sdir, DIRECTOR_MAGIC);
@@ -92,7 +92,7 @@ find_sm(const struct saintmode_objs *sm_objs,
 	return (NULL);
 }
 
-VCL_VOID __match_proto__(td_saintmode_blacklist)
+VCL_VOID v_matchproto_(td_saintmode_blacklist)
 vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct trouble *tp;
 	struct saintmode_objs *sm_objs;
@@ -191,7 +191,7 @@ vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 }
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned __match_proto__(vdi_healthy_f)
+static unsigned v_matchproto_(vdi_healthy_f)
 healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 {
 	struct trouble *tr;
@@ -256,7 +256,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	return (retval ? sm->be->healthy(sm->be, bo, changed) : 0);
 }
 
-static const struct director *  __match_proto__(vdi_resolve_f)
+static const struct director *  v_matchproto_(vdi_resolve_f)
 resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	struct vmod_saintmode_saintmode *sm;
 	double changed = 0.0;
@@ -271,7 +271,7 @@ resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	return (sm->be);
 }
 
-VCL_VOID  __match_proto__(td_saintmode_saintmode__init)
+VCL_VOID  v_matchproto_(td_saintmode_saintmode__init)
 vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
     const char *vcl_name, struct vmod_priv *priv, VCL_BACKEND be,
     VCL_INT threshold) {
@@ -311,7 +311,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	VTAILQ_INSERT_TAIL(&sm_objs->sm_list, sm, list);
 }
 
-VCL_VOID __match_proto__(td_saintmode_saintmode__fini)
+VCL_VOID v_matchproto_(td_saintmode_saintmode__fini)
 vmod_saintmode__fini(struct vmod_saintmode_saintmode **smp) {
 	struct trouble *tr, *tr2;
 	struct vmod_saintmode_saintmode *sm;
