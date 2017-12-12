@@ -88,8 +88,8 @@ header for a certain page might look like this::
     xkey: 166412
     xkey: 234323
 
-Alternatively you may instead use a single header with space seperated
-values like `xkey: 8155054 166412 234323`.
+Alternatively you may instead use a single header with space separated
+values like ``xkey: 8155054 166412 234323``.
 
 This requires a bit of VCL to be in place. The VCL can be found above.
 
@@ -102,9 +102,9 @@ with the matching xkey header::
     Host: www.example.com
     xkey-purge: 166412
 
-Several `xkey-purge` headers are also supported like in reponse example above, and you
-may also here instead use a single header with space seperated values like
-`xkey-purge: 166412 234323`.
+Several ``xkey-purge`` headers are also supported like in the response
+example above, and you may also here use a single header with space
+seperated values like ``xkey-purge: 166412 234323``.
 
 Note the xkey-purge header. It is probably a good idea to protect
 this with an ACL so random people from the Internet cannot purge your
