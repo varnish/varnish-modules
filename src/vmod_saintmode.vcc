@@ -156,3 +156,9 @@ Example:
    sub vcl_deliver {
        set resp.http.troublecount = sm.blacklist_count();
    }
+
+$Method BOOL .is_healthy()
+
+Checks if the object is currently blacklisted for a saintmode director object.
+If there are no valid objects available (called from vcl_hit or vcl_recv),
+the function will fall back to the backend's health function.

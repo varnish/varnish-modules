@@ -1,0 +1,76 @@
+varnishtest "varnish-modules issue #27"
+# exceeding trouble list limit makes the backend sick
+
+server s1 {
+	rxreq
+	expect req.url == "/a"
+	txresp -hdr "Saint: yes"
+	rxreq
+	expect req.url == "/b"
+	txresp -hdr "Saint: yes"
+	rxreq
+	expect req.url == "/c"
+	txresp -hdr "Saint: yes"
+
+	# this will never happen:
+	#rxreq
+	#expect req.url == "/d"
+	#txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
+	import directors;
+	import std;
+
+	sub vcl_init {
+		new sm = saintmode.saintmode(s1, 3);
+	}
+
+	sub vcl_backend_fetch {
+		set bereq.backend = sm.backend();
+	}
+
+	sub vcl_backend_response {
+		if (beresp.http.Saint == "yes") {
+			saintmode.blacklist(5s);
+			return (retry); # -> 503
+		}
+	}
+
+	sub vcl_deliver {
+		set resp.http.foo = std.healthy(sm.backend());
+		set resp.http.foo2 = sm.is_healthy();
+
+	}
+
+} -start
+
+client c1 {
+	txreq -url "/a"
+	rxresp
+	expect resp.status == 503
+	expect resp.http.foo == true
+	expect resp.http.foo2 == false
+
+	txreq -url "/b"
+	rxresp
+	expect resp.status == 503
+	expect resp.http.foo == true
+	expect resp.http.foo2 == false
+
+	txreq -url "/c"
+	rxresp
+	expect resp.status == 503
+	expect resp.http.foo == false
+	expect resp.http.foo2 == false
+
+	# the backend become sick, as the trouble list's length is 3
+	txreq -url "/d"
+	rxresp
+	expect resp.status == 503
+	expect resp.http.foo == false
+	expect resp.http.foo2 == false
+}
+
+client c1 -run

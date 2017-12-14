@@ -10,6 +10,8 @@ varnish-modules 0.13.0 (unreleased)
   time for a pending block.
 * [vmod-header]: Fix a bug where we would crash if a non-existing
   header would be passed as the final argument to header.append()
+* [vmod-saintmode] New function: is_healthy. Checks if the object is currently
+  blacklisted for a saintmode director object.
 
 
 varnish-modules 0.12.1 (2017-05-24)
