@@ -253,7 +253,7 @@ is_digest_healthy(const struct director *dir,
 }
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned
+static unsigned v_matchproto_(vdi_healthy_f)
 healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 {
 	struct vmod_saintmode_saintmode *sm;
