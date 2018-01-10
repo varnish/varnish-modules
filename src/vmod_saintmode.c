@@ -252,7 +252,7 @@ is_digest_healthy(const struct director *dir,
 }
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned __match_proto__(vdi_healthy_f)
+static unsigned v_matchproto_(vdi_healthy_f)
 healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 {
 	struct vmod_saintmode_saintmode *sm;
@@ -305,7 +305,7 @@ vmod_saintmode_is_healthy(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 		return healthy(sm->sdir, ctx->bo, NULL);
 }
 
-static const struct director *  __match_proto__(vdi_resolve_f)
+static const struct director *  v_matchproto_(vdi_resolve_f)
 resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	struct vmod_saintmode_saintmode *sm;
 	double changed = 0.0;
