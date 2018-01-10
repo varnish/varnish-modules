@@ -1,6 +1,6 @@
 This is a running log of changes to varnish-modules.
 
-varnish-modules 0.13.0 (unreleased)
+varnish-modules 0.13.0 (2018-01-10)
 -----------------------------------
 
 * [vmod-vsthrottle] Add an optional block parameter to
