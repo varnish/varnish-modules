@@ -128,6 +128,8 @@ VMOD_TESTS = \
 	tests/saintmode/test01.vtc \
 	tests/saintmode/test02.vtc \
 	tests/saintmode/test03.vtc \
+	tests/saintmode/test04.vtc \
+	tests/saintmode/test05.vtc \
 	tests/tcp/01-dumpinfo.vtc \
 	tests/tcp/02-congestion.vtc \
 	tests/tcp/03-read-tcpinfo.vtc \

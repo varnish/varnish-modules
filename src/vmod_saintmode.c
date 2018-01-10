@@ -37,6 +37,8 @@
 #include "vcl.h"
 
 #include "cache/cache_director.h"
+#include "cache/cache_backend.h"
+#include "vtim.h"
 
 #include "vcc_saintmode_if.h"
 
@@ -190,9 +192,11 @@ vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 	return (c);
 }
 
-/* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned v_matchproto_(vdi_healthy_f)
-healthy(const struct director *dir, const struct busyobj *bo, double *changed)
+static unsigned
+is_digest_healthy(const struct director *dir,
+		  const uint8_t* digest,
+		  double t_prev,
+		  struct vsl_log* log)
 {
 	struct trouble *tr;
 	struct trouble *tr2;
@@ -204,19 +208,8 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->be, DIRECTOR_MAGIC);
-	CHECK_OBJ_ORNULL(bo, BUSYOBJ_MAGIC);
 
-	/* If we don't have a bo with a digest to look at, we can't
-	 * know if we are on the trouble list or not. Fall back to the
-	 * backend's healthy() function. */
-	if (!bo)
-		return (sm->be->healthy(sm->be, bo, changed));
-
-	/* Saintmode is disabled, or list is empty */
-	if (sm->threshold == 0 || sm->n_trouble == 0)
-		return (sm->be->healthy(sm->be, bo, changed));
-
-	now = bo->t_prev;
+	now = t_prev;
 	retval = 1;
 	VTAILQ_INIT(&troublelist);
 	pthread_mutex_lock(&sm->mtx);
@@ -230,7 +223,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 			continue;
 		}
 
-		if (!memcmp(tr->digest, bo->digest, sizeof tr->digest)) {
+		if (digest && !memcmp(tr->digest, digest, sizeof tr->digest)) {
 			retval = 0;
 			break;
 		}
@@ -241,22 +234,78 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 		retval = 0;
 	pthread_mutex_unlock(&sm->mtx);
 
-	if (bl)
-		VSLb(((struct busyobj *)TRUST_ME(bo))->vsl, SLT_VCL_Log,
-		    "saintmode: unhealthy: object blacklisted for backend %s",
-			sm->be->vcl_name);
-	else if (retval == 0)
-		VSLb(((struct busyobj *)TRUST_ME(bo))->vsl, SLT_VCL_Log,
-		    "saintmode: unhealthy: hit threshold for backend %s",
-		    sm->be->vcl_name);
+	if (log) {
+		if (bl)
+			VSLb(log, SLT_VCL_Log,
+			     "saintmode: unhealthy: object blacklisted for "
+			     "backend %s", sm->be->vcl_name);
+		else if (retval == 0)
+			VSLb(log, SLT_VCL_Log,
+			     "saintmode: unhealthy: hit threshold for "
+			     "backend %s", sm->be->vcl_name);
+	}
 
 	VTAILQ_FOREACH_SAFE(tr, &troublelist, list, tr2)
 		FREE_OBJ(tr);
 
+	return retval;
+}
+
+/* All adapted from PHK's saintmode implementation in Varnish 3.0 */
+static unsigned __match_proto__(vdi_healthy_f)
+healthy(const struct director *dir, const struct busyobj *bo, double *changed)
+{
+	struct vmod_saintmode_saintmode *sm;
+	unsigned retval;
+	const uint8_t* digest;
+	double t_prev;
+	struct vsl_log* log;
+
+	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
+	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
+	CHECK_OBJ_NOTNULL(sm->be, DIRECTOR_MAGIC);
+	CHECK_OBJ_ORNULL(bo, BUSYOBJ_MAGIC);
+
+	/* Saintmode is disabled, or list is empty */
+	if (sm->threshold == 0 || sm->n_trouble == 0)
+		return (sm->be->healthy(sm->be, bo, changed));
+
+	if (!bo) {
+		digest = NULL;
+		t_prev = VTIM_real();
+		log = NULL;
+	} else {
+		digest = bo->digest;
+		t_prev = bo->t_prev;
+		log = ((struct busyobj *)TRUST_ME(bo))->vsl;
+	}
+
+	retval = is_digest_healthy(dir, digest, t_prev, log);
 	return (retval ? sm->be->healthy(sm->be, bo, changed) : 0);
 }
 
-static const struct director *  v_matchproto_(vdi_resolve_f)
+VCL_BOOL
+vmod_saintmode_is_healthy(VRT_CTX, struct vmod_saintmode_saintmode *sm)
+{
+	uint8_t* digest;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
+	CHECK_OBJ_NOTNULL(sm->sdir, DIRECTOR_MAGIC);
+
+	if (ctx->req != NULL) {
+		if (ctx->method == VCL_MET_RECV || ctx->method == VCL_MET_HASH)
+			digest = NULL;
+		else
+			digest = ctx->req->digest;
+
+		return  is_digest_healthy(sm->sdir, digest,
+					  ctx->req->t_prev, ctx->req->vsl);
+	} else
+		return healthy(sm->sdir, ctx->bo, NULL);
+}
+
+static const struct director *  __match_proto__(vdi_resolve_f)
 resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	struct vmod_saintmode_saintmode *sm;
 	double changed = 0.0;

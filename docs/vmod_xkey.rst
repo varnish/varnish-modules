@@ -65,8 +65,8 @@ VCL example::
             if (client.ip !~ purgers) {
                 return (synth(403, "Forbidden"));
             }
-            set req.http.n-gone = xkey.purge(req.http.key);
-            # or: set req.http.n-gone = xkey.softpurge(req.http.key)
+            set req.http.n-gone = xkey.purge(req.http.xkey-purge);
+            # or: set req.http.n-gone = xkey.softpurge(req.http.xkey-purge)
 
             return (synth(200, "Invalidated "+req.http.n-gone+" objects"));
         }
@@ -105,6 +105,9 @@ with the matching xkey header::
 Several ``xkey-purge`` headers are also supported like in the response
 example above, and you may also here use a single header with space
 seperated values like ``xkey-purge: 166412 234323``.
+
+Unlike `xkey` header for responses, purge header is fully configurable
+by means of adjusting the name of the header in the VCL example above. 
 
 Note the xkey-purge header. It is probably a good idea to protect
 this with an ACL so random people from the Internet cannot purge your
