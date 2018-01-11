@@ -347,6 +347,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	sm->sdir->healthy = healthy;
 	REPLACE(sm->sdir->vcl_name, vcl_name);
 	sm->sdir->name = "saintmode";
+	sm->sdir->admin_health = VDI_AH_HEALTHY;
 	sm->sdir->priv = sm;
 
 	if (!priv->priv) {
