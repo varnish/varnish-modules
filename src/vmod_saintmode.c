@@ -197,7 +197,7 @@ static unsigned
 is_digest_healthy(const struct director *dir,
 		  const uint8_t* digest,
 		  double t_prev,
-		  struct vsl_log* log)
+		  struct vsl_log* vsl)
 {
 	struct trouble *tr;
 	struct trouble *tr2;
@@ -235,13 +235,13 @@ is_digest_healthy(const struct director *dir,
 		retval = 0;
 	pthread_mutex_unlock(&sm->mtx);
 
-	if (log) {
+	if (vsl) {
 		if (bl)
-			VSLb(log, SLT_VCL_Log,
+			VSLb(vsl, SLT_VCL_Log,
 			     "saintmode: unhealthy: object blacklisted for "
 			     "backend %s", sm->be->vcl_name);
 		else if (retval == 0)
-			VSLb(log, SLT_VCL_Log,
+			VSLb(vsl, SLT_VCL_Log,
 			     "saintmode: unhealthy: hit threshold for "
 			     "backend %s", sm->be->vcl_name);
 	}
@@ -260,7 +260,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	unsigned retval;
 	const uint8_t* digest;
 	double t_prev;
-	struct vsl_log* log;
+	struct vsl_log* vsl;
 
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
@@ -274,14 +274,14 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	if (!bo) {
 		digest = NULL;
 		t_prev = VTIM_real();
-		log = NULL;
+		vsl = NULL;
 	} else {
 		digest = bo->digest;
 		t_prev = bo->t_prev;
-		log = ((struct busyobj *)TRUST_ME(bo))->vsl;
+		vsl = ((struct busyobj *)TRUST_ME(bo))->vsl;
 	}
 
-	retval = is_digest_healthy(dir, digest, t_prev, log);
+	retval = is_digest_healthy(dir, digest, t_prev, vsl);
 	return (retval ? sm->be->healthy(sm->be, bo, changed) : 0);
 }
 
