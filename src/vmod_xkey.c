@@ -30,10 +30,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
-#include "vcl.h"
 #include "cache/cache.h"
-#include "vrt.h"
+#include "vcl.h"
 #include "vsha256.h"
 
 #include "vtree.h"
@@ -419,7 +419,7 @@ xkey_tok(const char **b, const char **e)
 static void
 xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 {
-	SHA256_CTX sha_ctx;
+	VSHA256_CTX sha_ctx;
 	unsigned char digest[DIGEST_LEN];
 	const char hdr_xkey[] = "xkey:";
 	const char hdr_h2[] = "X-HashTwo:";
@@ -435,9 +435,9 @@ xkey_cb_insert(struct worker *wrk, struct objcore *objcore)
 		AN(sp);
 		sp++;
 		while (xkey_tok(&sp, &ep)) {
-			SHA256_Init(&sha_ctx);
-			SHA256_Update(&sha_ctx, sp, ep - sp);
-			SHA256_Final(digest, &sha_ctx);
+			VSHA256_Init(&sha_ctx);
+			VSHA256_Update(&sha_ctx, sp, ep - sp);
+			VSHA256_Final(digest, &sha_ctx);
 			AZ(pthread_mutex_lock(&mtx));
 			xkey_insert(objcore, digest, sizeof(digest));
 			AZ(pthread_mutex_unlock(&mtx));
@@ -461,7 +461,7 @@ xkey_cb_remove(struct objcore *objcore)
 }
 
 #if HAVE_ENUM_EXP_EVENT_E
-static void __match_proto__(exp_callback_f)
+static void v_matchproto_(exp_callback_f)
 xkey_cb(struct worker *wrk, struct objcore *objcore,
     enum exp_event_e event, void *priv)
 {
@@ -483,7 +483,7 @@ xkey_cb(struct worker *wrk, struct objcore *objcore,
 	}
 }
 #else
-static void __match_proto__(obj_event_f)
+static void v_matchproto_(obj_event_f)
 xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 {
 
@@ -510,7 +510,7 @@ xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 static VCL_INT
 purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 {
-	SHA256_CTX sha_ctx;
+	VSHA256_CTX sha_ctx;
 	unsigned char digest[DIGEST_LEN];
 	struct xkey_hashhead *hashhead;
 	struct xkey_oc *oc;
@@ -526,9 +526,9 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	sp = key;
 	AZ(pthread_mutex_lock(&mtx));
 	while (xkey_tok(&sp, &ep)) {
-		SHA256_Init(&sha_ctx);
-		SHA256_Update(&sha_ctx, sp, ep - sp);
-		SHA256_Final(digest, &sha_ctx);
+		VSHA256_Init(&sha_ctx);
+		VSHA256_Update(&sha_ctx, sp, ep - sp);
+		VSHA256_Final(digest, &sha_ctx);
 
 		hashhead = xkey_hashtree_lookup(digest, sizeof(digest));
 		if (hashhead != NULL) {
@@ -577,19 +577,19 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	return (i);
 }
 
-VCL_INT __match_proto__(td_xkey_purge)
+VCL_INT v_matchproto_(td_xkey_purge)
 vmod_purge(VRT_CTX, VCL_STRING key)
 {
 	return (purge(ctx, key, 0));
 }
 
-VCL_INT __match_proto__(td_xkey_softpurge)
+VCL_INT v_matchproto_(td_xkey_softpurge)
 vmod_softpurge(VRT_CTX, VCL_STRING key)
 {
 	return (purge(ctx, key, 1));
 }
 
-int __match_proto__(vmod_event_f)
+int v_matchproto_(vmod_event_f)
 vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 {
 	(void)ctx;

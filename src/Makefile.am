@@ -68,7 +68,6 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 @BUILD_VMOD_COOKIE@
 @BUILD_VMOD_HEADER@
 @BUILD_VMOD_SAINTMODE@
-@BUILD_VMOD_SOFTPURGE@
 @BUILD_VMOD_TCP@
 @BUILD_VMOD_VAR@
 @BUILD_VMOD_VSTHROTTLE@
@@ -176,7 +175,6 @@ EXTRA_DIST = \
 	vmod_cookie.vcc \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \
-	vmod_softpurge.vcc \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \
