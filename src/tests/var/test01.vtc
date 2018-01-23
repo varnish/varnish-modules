@@ -10,7 +10,7 @@ server s1 {
 varnish v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 
-	backend dummy { .host = "${bad_backend}"; }
+	backend dummy { .host = "${bad_ip}"; .port = "1234"; }
 
 	sub vcl_backend_fetch {
 		var.set_backend("be1", s1);
