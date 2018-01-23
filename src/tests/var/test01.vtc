@@ -2,12 +2,23 @@ varnishtest "Test var vmod"
 
 server s1 {
        rxreq
+       expect req.http.be-notused == "dummy"
+       expect req.http.be-used == "s1"
        txresp
 } -start
 
 varnish v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 
+	backend dummy { .host = "${bad_backend}"; }
+
+	sub vcl_backend_fetch {
+		var.set_backend("be1", s1);
+		set bereq.backend = dummy;
+		set bereq.http.be-notused = bereq.backend;
+		set bereq.backend = var.get_backend("be1");
+		set bereq.http.be-used = bereq.backend;
+	}
 	sub vcl_deliver {
 		var.set("foo", "bar");
 		set resp.http.x-foo = var.get("foo");

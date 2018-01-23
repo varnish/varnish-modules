@@ -41,7 +41,8 @@ enum VAR_TYPE {
 	INT,
 	REAL,
 	DURATION,
-	IP
+	IP,
+	BACKEND
 };
 
 struct var {
@@ -55,6 +56,7 @@ struct var {
 		double REAL;
 		double DURATION;
 		VCL_IP IP;
+		VCL_BACKEND BACKEND;
 	} value;
 	VTAILQ_ENTRY(var) list;
 };
@@ -227,6 +229,7 @@ vmod_set_##vcl_type_l(const struct vrt_ctx *ctx, struct vmod_priv *priv,\
 VMOD_SET_X(INT, int, VCL_INT)
 VMOD_SET_X(REAL, real, VCL_REAL)
 VMOD_SET_X(DURATION, duration, VCL_DURATION)
+VMOD_SET_X(BACKEND, backend, VCL_BACKEND)
 
 #define VMOD_GET_X(vcl_type_u, vcl_type_l, ctype)	\
 ctype							\
@@ -248,6 +251,7 @@ vmod_get_##vcl_type_l(const struct vrt_ctx *ctx, struct vmod_priv *priv,\
 VMOD_GET_X(INT, int, VCL_INT)
 VMOD_GET_X(REAL, real, VCL_REAL)
 VMOD_GET_X(DURATION, duration, VCL_DURATION)
+VMOD_GET_X(BACKEND, backend, VCL_BACKEND)
 
 VCL_VOID
 vmod_clear(const struct vrt_ctx *ctx, struct vmod_priv *priv)

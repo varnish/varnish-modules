@@ -111,6 +111,15 @@ $Function IP get_ip(PRIV_TASK, STRING key)
 
 Get `key` with data type IP. If stored `key` is not an IP null will be returned.
 
+$Function VOID set_backend(PRIV_TASK, STRING key, BACKEND value)
+
+Set `key` to `value`.
+
+$Function BACKEND get_backend(PRIV_TASK, STRING key)
+
+Get `key` with data type BACKEND. If stored `key` is not a BACKEND,
+null will be returned.
+
 $Function VOID clear(PRIV_TASK)
 
 Clear all non-global variables.
