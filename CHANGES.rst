@@ -1,5 +1,11 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.14.0 (tbd)
+----------------------------
+
+* [vmod-var] Add set_backend() and get_backend()
+
+
 varnish-modules 0.13.0 (2018-01-10)
 -----------------------------------
 
