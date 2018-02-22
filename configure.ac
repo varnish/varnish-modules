@@ -1,4 +1,4 @@
-AC_INIT([varnish-modules], [0.13.0])
+AC_INIT([varnish-modules], [0.14.0])
 AC_COPYRIGHT([Copyright (c) 2016 Varnish Software Group])
 
 AC_PREREQ(2.63)
