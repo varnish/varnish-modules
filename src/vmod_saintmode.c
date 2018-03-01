@@ -29,11 +29,14 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
+#include <string.h>
 
-#include "vcl.h"
 #include "cache/cache.h"
-#include "vrt.h"
+#include "vcl.h"
+#include "vsb.h"
+
 #include "cache/cache_director.h"
 #include "cache/cache_backend.h"
 #include "vtim.h"
@@ -66,7 +69,7 @@ struct saintmode_objs {
 	VTAILQ_HEAD(, vmod_saintmode_saintmode) sm_list;
 };
 
-VCL_BACKEND __match_proto__(td_saintmode_saintmode_backend)
+VCL_BACKEND v_matchproto_(td_saintmode_saintmode_backend)
 vmod_saintmode_backend(VRT_CTX, struct vmod_saintmode_saintmode *sm) {
 	CHECK_OBJ_NOTNULL(sm, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->sdir, DIRECTOR_MAGIC);
@@ -92,7 +95,7 @@ find_sm(const struct saintmode_objs *sm_objs,
 	return (NULL);
 }
 
-VCL_VOID __match_proto__(td_saintmode_blacklist)
+VCL_VOID v_matchproto_(td_saintmode_blacklist)
 vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct trouble *tp;
 	struct saintmode_objs *sm_objs;
@@ -194,7 +197,7 @@ static unsigned
 is_digest_healthy(const struct director *dir,
 		  const uint8_t* digest,
 		  double t_prev,
-		  struct vsl_log* log)
+		  struct vsl_log* vsl)
 {
 	struct trouble *tr;
 	struct trouble *tr2;
@@ -232,13 +235,13 @@ is_digest_healthy(const struct director *dir,
 		retval = 0;
 	pthread_mutex_unlock(&sm->mtx);
 
-	if (log) {
+	if (vsl) {
 		if (bl)
-			VSLb(log, SLT_VCL_Log,
+			VSLb(vsl, SLT_VCL_Log,
 			     "saintmode: unhealthy: object blacklisted for "
 			     "backend %s", sm->be->vcl_name);
 		else if (retval == 0)
-			VSLb(log, SLT_VCL_Log,
+			VSLb(vsl, SLT_VCL_Log,
 			     "saintmode: unhealthy: hit threshold for "
 			     "backend %s", sm->be->vcl_name);
 	}
@@ -250,14 +253,14 @@ is_digest_healthy(const struct director *dir,
 }
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned __match_proto__(vdi_healthy_f)
+static unsigned v_matchproto_(vdi_healthy_f)
 healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 {
 	struct vmod_saintmode_saintmode *sm;
 	unsigned retval;
 	const uint8_t* digest;
 	double t_prev;
-	struct vsl_log* log;
+	struct vsl_log* vsl;
 
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
@@ -271,14 +274,14 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	if (!bo) {
 		digest = NULL;
 		t_prev = VTIM_real();
-		log = NULL;
+		vsl = NULL;
 	} else {
 		digest = bo->digest;
 		t_prev = bo->t_prev;
-		log = ((struct busyobj *)TRUST_ME(bo))->vsl;
+		vsl = ((struct busyobj *)TRUST_ME(bo))->vsl;
 	}
 
-	retval = is_digest_healthy(dir, digest, t_prev, log);
+	retval = is_digest_healthy(dir, digest, t_prev, vsl);
 	return (retval ? sm->be->healthy(sm->be, bo, changed) : 0);
 }
 
@@ -303,7 +306,7 @@ vmod_saintmode_is_healthy(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 		return healthy(sm->sdir, ctx->bo, NULL);
 }
 
-static const struct director *  __match_proto__(vdi_resolve_f)
+static const struct director *  v_matchproto_(vdi_resolve_f)
 resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	struct vmod_saintmode_saintmode *sm;
 	double changed = 0.0;
@@ -318,7 +321,7 @@ resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
 	return (sm->be);
 }
 
-VCL_VOID  __match_proto__(td_saintmode_saintmode__init)
+VCL_VOID  v_matchproto_(td_saintmode_saintmode__init)
 vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
     const char *vcl_name, struct vmod_priv *priv, VCL_BACKEND be,
     VCL_INT threshold) {
@@ -344,6 +347,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	sm->sdir->healthy = healthy;
 	REPLACE(sm->sdir->vcl_name, vcl_name);
 	sm->sdir->name = "saintmode";
+	sm->sdir->admin_health = VDI_AH_HEALTHY;
 	sm->sdir->priv = sm;
 
 	if (!priv->priv) {
@@ -358,7 +362,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	VTAILQ_INSERT_TAIL(&sm_objs->sm_list, sm, list);
 }
 
-VCL_VOID __match_proto__(td_saintmode_saintmode__fini)
+VCL_VOID v_matchproto_(td_saintmode_saintmode__fini)
 vmod_saintmode__fini(struct vmod_saintmode_saintmode **smp) {
 	struct trouble *tr, *tr2;
 	struct vmod_saintmode_saintmode *sm;

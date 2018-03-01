@@ -29,11 +29,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
+#include <string.h>
 
 #include "cache/cache.h"
+
+#include "vsb.h"
 #include "vre.h"
-#include "vrt.h"
 #include "vcl.h"
 #include "vsha256.h"
 #include "vcc_bodyaccess_if.h"
@@ -88,7 +91,8 @@ bodyaccess_log(struct bodyaccess_log_ctx *ctx, const void *ptr, size_t len)
 }
 
 #if defined(HAVE_REQ_BODY_ITER_F)
-static int __match_proto__(req_body_iter_f)
+static int v_matchproto_(req_body_iter_f)
+
 bodyaccess_bcat_cb(struct req *req, void *priv, void *ptr, size_t len)
 {
 
@@ -98,7 +102,7 @@ bodyaccess_bcat_cb(struct req *req, void *priv, void *ptr, size_t len)
 	return (VSB_bcat(priv, ptr, len));
 }
 
-static int __match_proto__(req_body_iter_f)
+static int v_matchproto_(req_body_iter_f)
 bodyaccess_log_cb(struct req *req, void *priv, void *ptr, size_t len)
 {
 
@@ -108,7 +112,8 @@ bodyaccess_log_cb(struct req *req, void *priv, void *ptr, size_t len)
 	return (bodyaccess_log(priv, ptr, len));
 }
 #elif defined(HAVE_OBJITERATE_F)
-static int __match_proto__(objiterate_f)
+static int v_matchproto_(objiterate_f)
+
 bodyaccess_bcat_cb(void *priv, int flush, const void *ptr, ssize_t len)
 {
 
@@ -118,7 +123,7 @@ bodyaccess_bcat_cb(void *priv, int flush, const void *ptr, ssize_t len)
 	return (VSB_bcat(priv, ptr, len));
 }
 
-static int __match_proto__(objiterate_f)
+static int v_matchproto_(objiterate_f)
 bodyaccess_log_cb(void *priv, int flush, const void *ptr, ssize_t len)
 {
 
@@ -172,7 +177,7 @@ vmod_hash_req_body(VRT_CTX)
 	bodyaccess_bcat(ctx, vsb);
 	txtbody.b = VSB_data(vsb);
 	txtbody.e = txtbody.b + VSB_len(vsb);
-	SHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
+	VSHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
 	VSLbt(ctx->vsl, SLT_Hash, txtbody);
 	VSB_delete(vsb);
 }

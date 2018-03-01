@@ -35,8 +35,8 @@
 #include <ctype.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vqueue.h"
+#include "vsb.h"
 
 #include "vcc_cookie_if.h"
 
