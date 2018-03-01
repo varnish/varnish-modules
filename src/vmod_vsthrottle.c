@@ -35,9 +35,17 @@
 #include <pthread.h>
 #include <errno.h>
 
+#include <cache/cache.h>
 #include "vcl.h"
-#include "vdef.h"
-#include "vrt.h"
+
+#ifndef VRT_H_INCLUDED
+#  include <vrt.h>
+#endif
+
+#ifndef VDEF_H_INCLUDED
+#  include <vdef.h>
+#endif
+
 #include "vas.h"
 #include "vtim.h"
 #include "miniobj.h"

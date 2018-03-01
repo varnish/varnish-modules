@@ -26,18 +26,27 @@
  */
 
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "cache/cache.h"
-#include "vrt.h"
-
-#include "vcc_tcp_if.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <netinet/in.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <cache/cache.h>
+
+#ifndef VRT_H_INCLUDED
+#  include <vrt.h>
+#endif
+
+#ifndef VDEF_H_INCLUDED
+#  include <vdef.h>
+#endif
+
+#include "vcc_tcp_if.h"
 
 #ifndef TCP_CONGESTION
 #define TCP_CONGESTION	13

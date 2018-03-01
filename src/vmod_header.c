@@ -27,12 +27,21 @@
  */
 
 #include "config.h"
-#include <stdlib.h>
-#include <pthread.h>
 
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <cache/cache.h>
 #include "vcl.h"
-#include "cache/cache.h"
-#include "vrt.h"
+
+#ifndef VRT_H_INCLUDED
+#  include <vrt.h>
+#endif
+
+#ifndef VDEF_H_INCLUDED
+#  include <vdef.h>
+#endif
 
 #include "vcc_header_if.h"
 

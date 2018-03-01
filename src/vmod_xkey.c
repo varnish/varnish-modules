@@ -27,15 +27,24 @@
  */
 
 #include "config.h"
-#include <stdlib.h>
-#include <stdio.h>
+
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include <cache/cache.h>
 #include "vcl.h"
-#include "cache/cache.h"
-#include "vrt.h"
-#include "vsha256.h"
 
+#ifndef VRT_H_INCLUDED
+#  include <vrt.h>
+#endif
+
+#ifndef VDEF_H_INCLUDED
+#  include <vdef.h>
+#endif
+
+#include "vsha256.h"
 #include "vtree.h"
 
 #include "vcc_xkey_if.h"

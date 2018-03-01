@@ -27,15 +27,27 @@
  */
 
 #include "config.h"
+
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <string.h>
 
+#include <cache/cache.h>
 #include "vcl.h"
-#include "cache/cache.h"
-#include "vrt.h"
+
+#ifndef VRT_H_INCLUDED
+#  include <vrt.h>
+#endif
+
+#ifndef VDEF_H_INCLUDED
+#  include <vdef.h>
+#endif
+
 #include "cache/cache_director.h"
 #include "cache/cache_backend.h"
+
+#include "vsb.h"
 #include "vtim.h"
 
 #include "vcc_saintmode_if.h"
