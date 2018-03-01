@@ -33,19 +33,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cache/cache.h>
-
-#ifndef VRT_H_INCLUDED
-#  include <vrt.h>
-#endif
-
-#ifndef VDEF_H_INCLUDED
-#  include <vdef.h>
-#endif
+#include "vmod_config.h"
 
 #include "vre.h"
 #include "vsb.h"
-#include "vcl.h"
 #include "vsha256.h"
 #include "vcc_bodyaccess_if.h"
 

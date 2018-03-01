@@ -35,16 +35,7 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include <cache/cache.h>
-#include "vcl.h"
-
-#ifndef VRT_H_INCLUDED
-#  include <vrt.h>
-#endif
-
-#ifndef VDEF_H_INCLUDED
-#  include <vdef.h>
-#endif
+#include "vmod_config.h"
 
 #include "vas.h"
 #include "vtim.h"

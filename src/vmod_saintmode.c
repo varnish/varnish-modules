@@ -33,16 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cache/cache.h>
-#include "vcl.h"
-
-#ifndef VRT_H_INCLUDED
-#  include <vrt.h>
-#endif
-
-#ifndef VDEF_H_INCLUDED
-#  include <vdef.h>
-#endif
+#include "vmod_config.h"
 
 #include "cache/cache_director.h"
 #include "cache/cache_backend.h"

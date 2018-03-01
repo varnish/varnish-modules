@@ -34,15 +34,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <cache/cache.h>
-
-#ifndef VRT_H_INCLUDED
-#  include <vrt.h>
-#endif
-
-#ifndef VDEF_H_INCLUDED
-#  include <vdef.h>
-#endif
+#include "vmod_config.h"
 
 #include "vqueue.h"
 #include "vsb.h"

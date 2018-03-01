@@ -36,15 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cache/cache.h>
-
-#ifndef VRT_H_INCLUDED
-#  include <vrt.h>
-#endif
-
-#ifndef VDEF_H_INCLUDED
-#  include <vdef.h>
-#endif
+#include "vmod_config.h"
 
 #include "vcc_tcp_if.h"
 
