@@ -33,7 +33,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vmod_config.h"
+#ifdef HAVE_CACHE_CACHE_VARNISHD_H
+#  include <cache/cache_varnishd.h>
+#else
+#  include "vmod_config.h"
+#endif
 
 #include "vsha256.h"
 #include "vtree.h"
