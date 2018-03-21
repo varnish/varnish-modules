@@ -50,7 +50,7 @@
  * Based on the information found here:
  *   http://linuxgazette.net/136/pfeiffer.html
 */
-void vmod_dump_info(const struct vrt_ctx *ctx) {
+void vmod_dump_info(VRT_CTX) {
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	if (ctx->req == NULL) {
 	    return;
@@ -81,7 +81,7 @@ void vmod_dump_info(const struct vrt_ctx *ctx) {
 }
 
 /* TODO: Use a vmod object for these getters. */
-VCL_REAL vmod_get_estimated_rtt(const struct vrt_ctx *ctx) {
+VCL_REAL vmod_get_estimated_rtt(VRT_CTX) {
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	if (ctx->req == NULL) {
 	    return(0.0);
@@ -113,7 +113,7 @@ VCL_REAL vmod_get_estimated_rtt(const struct vrt_ctx *ctx) {
 // http://sgros.blogspot.com/2012/12/controlling-which-congestion-control.html
 // https://fasterdata.es.net/host-tuning/linux/
 
-VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
+VCL_INT vmod_congestion_algorithm(VRT_CTX, VCL_STRING new) {
 #ifdef HAVE_TCP_INFO
 	char strategy[TCP_CA_NAME_MAX + 1];
 #endif
@@ -160,7 +160,7 @@ VCL_INT vmod_congestion_algorithm(const struct vrt_ctx *ctx, VCL_STRING new) {
  * */
 
 VCL_VOID
-vmod_set_socket_pace(const struct vrt_ctx *ctx, const long rate)
+vmod_set_socket_pace(VRT_CTX, VCL_INT rate)
 {
 #ifndef SO_MAX_PACING_RATE
 #define SO_MAX_PACING_RATE 47
