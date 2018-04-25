@@ -43,6 +43,11 @@
 
 #include "vcc_saintmode_if.h"
 
+static unsigned
+healthy(const struct director *, const struct busyobj *, double *);
+static const struct director *
+resolve(const struct director *, struct worker *, struct busyobj *);
+
 struct trouble {
 	unsigned		magic;
 #define TROUBLE_MAGIC		0x4211ab21
@@ -62,6 +67,14 @@ struct vmod_saintmode_saintmode {
 	VTAILQ_ENTRY(vmod_saintmode_saintmode)	list;
 	VTAILQ_HEAD(, trouble)			troublelist;
 };
+
+static const struct director_methods vmod_saintmode_methods[1] = {{
+	.magic =		DIRECTOR_METHODS_MAGIC,
+	.type =			"saintmode",
+	.healthy =		healthy,
+	.resolve =		resolve
+}};
+
 
 struct saintmode_objs {
 	unsigned				magic;
@@ -269,7 +282,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 
 	/* Saintmode is disabled, or list is empty */
 	if (sm->threshold == 0 || sm->n_trouble == 0)
-		return (sm->be->healthy(sm->be, bo, changed));
+		return (sm->be->methods->healthy(sm->be, bo, changed));
 
 	if (!bo) {
 		digest = NULL;
@@ -282,7 +295,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	}
 
 	retval = is_digest_healthy(dir, digest, t_prev, vsl);
-	return (retval ? sm->be->healthy(sm->be, bo, changed) : 0);
+	return (retval ? sm->be->methods->healthy(sm->be, bo, changed) : 0);
 }
 
 VCL_BOOL
@@ -343,13 +356,11 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	VTAILQ_INIT(&sm->troublelist);
 
 	sm->sdir->magic = DIRECTOR_MAGIC;
-	sm->sdir->resolve = resolve;
-	sm->sdir->healthy = healthy;
+	sm->sdir->methods = vmod_saintmode_methods;
 #ifdef HAVE_DIRECTOR_ADMIN_HEALTH
 	sm->sdir->admin_health = VDI_AH_HEALTHY;
 #endif
 	REPLACE(sm->sdir->vcl_name, vcl_name);
-	sm->sdir->name = "saintmode";
 	sm->sdir->priv = sm;
 
 	if (!priv->priv) {
