@@ -43,10 +43,10 @@
 
 #include "vcc_saintmode_if.h"
 
-static unsigned
-healthy(const struct director *, const struct busyobj *, double *);
-static const struct director *
-resolve(const struct director *, struct worker *, struct busyobj *);
+static VCL_BOOL v_matchproto_(vdi_healthy_f)
+healthy(VRT_CTX, VCL_BACKEND, VCL_TIME *);
+static VCL_BACKEND v_matchproto_(vdi_resolve_f)
+resolve(VRT_CTX, VCL_BACKEND);
 
 struct trouble {
 	unsigned		magic;
@@ -266,23 +266,26 @@ is_digest_healthy(const struct director *dir,
 }
 
 /* All adapted from PHK's saintmode implementation in Varnish 3.0 */
-static unsigned
-healthy(const struct director *dir, const struct busyobj *bo, double *changed)
+static VCL_BOOL v_matchproto_(vdi_healthy_f)
+healthy(VRT_CTX, VCL_BACKEND dir, VCL_TIME *changed)
 {
 	struct vmod_saintmode_saintmode *sm;
+	const struct busyobj *bo;
 	unsigned retval;
 	const uint8_t* digest;
 	double t_prev;
 	struct vsl_log* vsl;
 
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
 	CHECK_OBJ_NOTNULL(sm->be, DIRECTOR_MAGIC);
+	bo = ctx->bo;
 	CHECK_OBJ_ORNULL(bo, BUSYOBJ_MAGIC);
 
 	/* Saintmode is disabled, or list is empty */
 	if (sm->threshold == 0 || sm->n_trouble == 0)
-		return (sm->be->methods->healthy(sm->be, bo, changed));
+		return (VRT_Healthy(ctx, sm->be, changed));
 
 	if (!bo) {
 		digest = NULL;
@@ -295,7 +298,7 @@ healthy(const struct director *dir, const struct busyobj *bo, double *changed)
 	}
 
 	retval = is_digest_healthy(dir, digest, t_prev, vsl);
-	return (retval ? sm->be->methods->healthy(sm->be, bo, changed) : 0);
+	return (retval ? VRT_Healthy(ctx, sm->be, changed) : 0);
 }
 
 VCL_BOOL
@@ -316,19 +319,17 @@ vmod_saintmode_is_healthy(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 		return  is_digest_healthy(sm->sdir, digest,
 					  ctx->req->t_prev, ctx->req->vsl);
 	} else
-		return healthy(sm->sdir, ctx->bo, NULL);
+		return healthy(ctx, sm->sdir, NULL);
 }
 
-static const struct director *
-resolve(const struct director *dir, struct worker *wrk, struct busyobj *bo) {
+static VCL_BACKEND v_matchproto_(vdi_resolve_f)
+resolve(VRT_CTX, VCL_BACKEND dir) {
 	struct vmod_saintmode_saintmode *sm;
-	double changed = 0.0;
 
 	CHECK_OBJ_NOTNULL(dir, DIRECTOR_MAGIC);
 	CAST_OBJ_NOTNULL(sm, dir->priv, VMOD_SAINTMODE_MAGIC);
-	(void)wrk;
 
-	if (!healthy(dir, bo, &changed))
+	if (!healthy(ctx, dir, NULL))
 		return (NULL);
 
 	return (sm->be);
@@ -358,7 +359,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	sm->sdir->magic = DIRECTOR_MAGIC;
 	sm->sdir->methods = vmod_saintmode_methods;
 #ifdef HAVE_DIRECTOR_ADMIN_HEALTH
-	sm->sdir->admin_health = VDI_AH_HEALTHY;
+	sm->sdir->admin_health = VDI_AH_PROBE;
 #endif
 	REPLACE(sm->sdir->vcl_name, vcl_name);
 	sm->sdir->priv = sm;
