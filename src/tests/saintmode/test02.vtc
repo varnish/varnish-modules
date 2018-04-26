@@ -51,6 +51,8 @@ varnish v1 -vcl+backend {
 
 } -start
 
+varnish v1 -cliok "backend.list"
+
 client c1 {
 	txreq -url "/a"
 	rxresp
