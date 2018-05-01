@@ -35,9 +35,6 @@
 
 #include "vmod_config.h"
 
-#include "cache/cache_director.h"
-#include "cache/cache_backend.h"
-
 #include "vsb.h"
 #include "vtim.h"
 
@@ -59,7 +56,7 @@ struct trouble {
 struct vmod_saintmode_saintmode {
 	unsigned				magic;
 #define VMOD_SAINTMODE_MAGIC			0xa03756e4
-	struct director				sdir[1];
+	const struct director			*sdir;
 	const struct director			*be;
 	pthread_mutex_t				mtx;
 	unsigned				threshold;
@@ -68,8 +65,8 @@ struct vmod_saintmode_saintmode {
 	VTAILQ_HEAD(, trouble)			troublelist;
 };
 
-static const struct director_methods vmod_saintmode_methods[1] = {{
-	.magic =		DIRECTOR_METHODS_MAGIC,
+static const struct vdi_methods vmod_saintmode_methods[1] = {{
+	.magic =		VDI_METHODS_MAGIC,
 	.type =			"saintmode",
 	.healthy =		healthy,
 	.resolve =		resolve
@@ -356,13 +353,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 	sm->be = be;
 	VTAILQ_INIT(&sm->troublelist);
 
-	sm->sdir->magic = DIRECTOR_MAGIC;
-	sm->sdir->methods = vmod_saintmode_methods;
-#ifdef HAVE_DIRECTOR_ADMIN_HEALTH
-	sm->sdir->admin_health = VDI_AH_PROBE;
-#endif
-	REPLACE(sm->sdir->vcl_name, vcl_name);
-	sm->sdir->priv = sm;
+	sm->sdir = VRT_AddDirector(ctx, vmod_saintmode_methods, sm, "%s", vcl_name);
 
 	if (!priv->priv) {
 		ALLOC_OBJ(sm_objs, SAINTMODE_OBJS_MAGIC);
@@ -392,7 +383,7 @@ vmod_saintmode__fini(struct vmod_saintmode_saintmode **smp) {
 		FREE_OBJ(tr);
 	}
 
-	free(sm->sdir->vcl_name);
+	VRT_DelDirector(&sm->sdir);
 	AZ(pthread_mutex_destroy(&sm->mtx));
 
 	/* We can no longer refer to the sm_objs after this
