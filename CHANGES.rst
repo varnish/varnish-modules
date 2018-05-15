@@ -1,5 +1,11 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.15.0 (2018-05-15)
+-----------------------------------
+
+* Varnish 6 compatibility
+
+
 varnish-modules 0.14.0 (2018-02-19)
 -----------------------------------
 
