@@ -118,6 +118,9 @@ VMOD_TESTS = \
 	tests/cookie/08-overflow.vtc \
 	tests/cookie/10-parser.vtc \
 	tests/cookie/30-format_1123.vtc \
+	tests/cookie/31-get_regex.vtc \
+	tests/cookie/32-filter_regex.vtc \
+	tests/cookie/33-keep_regex.vtc \
 	tests/cookie/r28.vtc \
 	tests/header/append.vtc \
 	tests/header/copy.vtc \
