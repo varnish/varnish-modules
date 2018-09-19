@@ -90,6 +90,23 @@ Example
                         // "cookie3: value3";
                 }
 
+
+$Function VOID filter_re(PRIV_TASK, STRING expression)
+
+Description
+        Delete all cookies from internal vmod storage that matches the
+	regular expression `expression`.
+
+Example
+        ::
+
+                sub vcl_recv {
+                        cookie.parse("cookie1: value1; cookie2: value2; cookie3: value3");
+                        cookie.filter_re("^cookie[12]$");
+                        // get_string() will now yield
+                        // "cookie3: value3";
+                }
+
 $Function VOID filter_except(PRIV_TASK, STRING filterstring)
 
 Description
@@ -132,6 +149,19 @@ Example
                 sub vcl_recv {
                         cookie.parse("cookie1: value1; cookie2: value2;");
                         std.log("cookie1 value is: " + cookie.get("cookie1"));
+                }
+
+$Function STRING get_re(PRIV_TASK, STRING expression)
+
+Description
+        Get the value of the first cookie in internal vmod storage that matches regular expression `expression`. If nothing matches, an empty string is returned.
+Example
+        ::
+
+                import std;
+                sub vcl_recv {
+                        cookie.parse("cookie1: value1; cookie2: value2;");
+                        std.log("cookie1 value is: " + cookie.get_re("^cookie1$"));
                 }
 
 $Function STRING get_string(PRIV_TASK)

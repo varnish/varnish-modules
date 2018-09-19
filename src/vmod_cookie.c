@@ -38,8 +38,11 @@
 
 #include "vqueue.h"
 #include "vsb.h"
+#include "vre.h"
 
 #include "vcc_cookie_if.h"
+
+vre_t * compile_re(VRT_CTX, VCL_STRING expression);
 
 struct cookie {
 	unsigned magic;
@@ -213,6 +216,50 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name)
 }
 
 
+
+vre_t *
+compile_re(VRT_CTX, VCL_STRING expression) {
+	vre_t *vre;
+	const char *error;
+	int erroroffset;
+
+	// TODO: Stop doing this per-request
+	vre = VRE_compile(expression, 0, &error, &erroroffset);
+	if (vre == NULL) {
+		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: PCRE compile error at char %i: %s", erroroffset, error);
+		return(NULL);
+	}
+	return(vre);
+}
+
+
+VCL_STRING
+vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
+{
+	struct vmod_cookie *vcp = cobj_get(priv);
+	(void)ctx;
+	int ovector[8];
+	vre_t * vre;
+
+	if (expression == NULL || *expression == '\0')
+		return(NULL);
+
+	vre = compile_re(ctx, expression);
+
+	struct cookie *cookie;
+	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
+		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
+		if (VRE_exec(vre, cookie->name, strlen(cookie->name),
+					 0, 0, ovector, 8, NULL))
+			break;
+	}
+	if (vre)
+		VRE_free(&vre);
+
+	return (cookie ? cookie->value : NULL);
+}
+
+
 VCL_VOID
 vmod_delete(VRT_CTX, struct vmod_priv *priv, VCL_STRING name)
 {
@@ -317,6 +364,34 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 {
 	(void)ctx;
 	filter_cookies(priv, blacklist_s, FILTER_ACTION_BLACKLIST);
+}
+
+
+VCL_VOID
+vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
+	struct vmod_cookie *vcp = cobj_get(priv);
+	struct cookie *curr, *safeptr;
+	(void)ctx;
+	(void)priv;
+	(void)expression;
+	int ovector[8];
+
+	vre_t *vre = compile_re(ctx, expression);
+	if (!vre)
+		return;   // Not much else to do, error already logged.
+
+	VTAILQ_FOREACH_SAFE(curr, &vcp->cookielist, list, safeptr) {
+		CHECK_OBJ_NOTNULL(curr, VMOD_COOKIE_ENTRY_MAGIC);
+
+		if (VRE_exec(vre, curr->name, strlen(curr->name),
+					 0, 0, ovector, 8, NULL) > -1)
+			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", curr->name, curr->value);
+			VTAILQ_REMOVE(&vcp->cookielist, curr, list);
+		}
+
+	if (vre)
+		VRE_free(&vre);
+	return;
 }
 
 VCL_STRING

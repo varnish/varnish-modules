@@ -1,0 +1,36 @@
+varnishtest "Test filter_re in vmod-cookie"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import cookie from "${vmod_builddir}/.libs/libvmod_cookie.so";
+
+	sub vcl_deliver {
+		cookie.set("biscuit", "standard");
+		cookie.set("bredela", "eggwhites");
+		cookie.set("chocolatechip", "verychippy");
+		cookie.set("empire", "jellytots");
+
+		set resp.http.X-first = cookie.get_re("biscuit");
+
+		cookie.filter_re("^NOT-MATCHING-ANYTHING$");
+		set resp.http.X-foo = cookie.get_string();
+
+#		cookie.parse("foo=bar; bar=baz;");
+#		cookie.filter_re(req.http.none);
+#		set resp.http.X-baz = cookie.get_string();
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+	expect resp.http.X-first == "biscuit=standard;"
+	expect resp.http.X-foo == "meh";  # bredela=eggwhites;"
+
+#	expect resp.http.X-baz == "foo=bar; bar=baz;"
+}
+client c1 -run
