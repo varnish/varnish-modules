@@ -377,28 +377,29 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 VCL_VOID
 vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 	struct vmod_cookie *vcp = cobj_get(priv);
-	struct cookie *curr, *safeptr;
+	struct cookie *current, *safeptr;
 	(void)ctx;
-	(void)priv;
-	(void)expression;
-	int ovector[VRE_MATCHES_MAX];
+	int i, ovector[VRE_MATCHES_MAX];
 
 	vre_t *vre = compile_re(ctx, expression);
 	if (!vre)
 		return;   // Not much else to do, error already logged.
 
-	VTAILQ_FOREACH_SAFE(curr, &vcp->cookielist, list, safeptr) {
-		CHECK_OBJ_NOTNULL(curr, VMOD_COOKIE_ENTRY_MAGIC);
+	VTAILQ_FOREACH_SAFE(current, &vcp->cookielist, list, safeptr) {
+		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 
-		if (VRE_exec(vre, curr->name, strlen(curr->name),
-					 0, 0, ovector, VRE_MATCHES_MAX, NULL) > -1)
-			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", curr->name, curr->value);
-			VTAILQ_REMOVE(&vcp->cookielist, curr, list);
+		i = VRE_exec(vre, current->name, strlen(current->name),
+					 0, 0, ovector, VRE_MATCHES_MAX, NULL);
+		if (i >= 0) {
+			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", current->name, current->value);
+			VTAILQ_REMOVE(&vcp->cookielist, current, list);
 		}
+	}
 
 	if (vre)
 		VRE_free(&vre);
 }
+
 
 VCL_STRING
 vmod_get_string(VRT_CTX, struct vmod_priv *priv)
