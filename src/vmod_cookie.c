@@ -43,7 +43,7 @@
 #include "vcc_cookie_if.h"
 
 vre_t * compile_re(VRT_CTX, VCL_STRING expression);
-#define VRE_MATCHES_MAX 8
+#define VRE_MAX_GROUPS 8
 
 struct cookie {
 	unsigned magic;
@@ -237,7 +237,7 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
-	int i, ovector[VRE_MATCHES_MAX];
+	int i, ovector[VRE_MAX_GROUPS];
 	struct cookie *cookie = NULL;
 	struct cookie *current;
 	vre_t * vre;
@@ -251,7 +251,7 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: checking %s", current->name);
 		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0, ovector,
-				     VRE_MATCHES_MAX, NULL);
+				     VRE_MAX_GROUPS, NULL);
 		if (i >= 0) {
 			VSLb(ctx->vsl, SLT_VCL_Log, "cookie: %s is a match for regex '%s'", current->name, expression);
 			cookie = current;
@@ -388,7 +388,7 @@ vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct cookie *current, *safeptr;
 	(void)ctx;
-	int i, ovector[VRE_MATCHES_MAX];
+	int i, ovector[VRE_MAX_GROUPS];
 
 	vre_t *vre = compile_re(ctx, expression);
 	if (!vre)
@@ -398,7 +398,7 @@ vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 
 		i = VRE_exec(vre, current->name, strlen(current->name),
-					 0, 0, ovector, VRE_MATCHES_MAX, NULL);
+					 0, 0, ovector, VRE_MAX_GROUPS, NULL);
 		if (i >= 0) {
 			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", current->name, current->value);
 			VTAILQ_REMOVE(&vcp->cookielist, current, list);
