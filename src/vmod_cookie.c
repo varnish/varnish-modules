@@ -308,9 +308,18 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
 VCL_VOID
 vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s)
 {
+	VSLb(ctx->vsl, SLT_VCL_Log,
+		"cookie.filter_except() is DEPRECATED, use keep() instead");
+	vmod_keep(ctx, priv, whitelist_s);
+}
+
+VCL_VOID
+vmod_keep(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s)
+{
 	(void)ctx;
 	filter_cookies(priv, whitelist_s, FILTER_ACTION_WHITELIST);
 }
+
 
 VCL_VOID
 vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)

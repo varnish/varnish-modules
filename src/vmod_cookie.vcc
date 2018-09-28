@@ -32,8 +32,8 @@ Filtering example::
             cookie.parse(req.http.cookie);
             # Either delete the ones you want to get rid of:
             cookie.delete("cookie2");
-            # or filter everything but a few:
-            cookie.filter_except("SESSIONID,PHPSESSID");
+            # or delete all but a few:
+            cookie.keep("SESSIONID,PHPSESSID");
 
             # Store it back into req so it will be passed to the backend.
             set req.http.cookie = cookie.get_string();
@@ -93,6 +93,12 @@ Example
 $Function VOID filter_except(PRIV_TASK, STRING filterstring)
 
 Description
+        DEPRECATED.  This function has been renamed to keep().
+
+
+$Function VOID keep(PRIV_TASK, STRING filterstring)
+
+Description
         Delete all cookies from internal vmod storage that is not in the
         comma-separated argument cookienames.
 Example
@@ -100,10 +106,11 @@ Example
 
                 sub vcl_recv {
                         cookie.parse("cookie1: value1; cookie2: value2; cookie3: value3");
-                        cookie.filter_except("cookie1,cookie2");
+                        cookie.keep("cookie1,cookie2");
                         // get_string() will now yield
                         // "cookie1: value1; cookie2: value2;";
                 }
+
 
 $Function STRING format_rfc1123(TIME now, DURATION timedelta)
 

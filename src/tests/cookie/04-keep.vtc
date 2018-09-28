@@ -1,4 +1,4 @@
-varnishtest "Test filter_expect in vmod-cookie"
+varnishtest "Test keep() in vmod-cookie"
 
 server s1 {
        rxreq
@@ -13,16 +13,18 @@ varnish v1 -vcl+backend {
         cookie.set("bredela", "eggwhites");
         cookie.set("chocolatechip", "verychippy");
         cookie.set("empire", "jellytots");
-        cookie.filter_except("bredela,empire,baz");
+        cookie.keep("bredela,empire,baz");
         set resp.http.X-foo = cookie.get_string();
 
         # Test exotic admin-supplied filter strings.
         cookie.parse("bredela=eggwhites; empire=jellytots;");
-        cookie.filter_except(",,,,bredela,    ,empire,baz,");
+        cookie.keep(",,,,bredela,    ,empire,baz,");
         set resp.http.X-bar = cookie.get_string();
 
-        cookie.filter_except(req.http.none);
+        cookie.keep(req.http.none);
         set resp.http.X-baz = cookie.get_string();
+
+        cookie.filter_except(req.http.none);
     }
 } -start
 

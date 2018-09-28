@@ -110,7 +110,7 @@ VMOD_TESTS = \
 	tests/cookie/01-set-delete-produce.vtc \
 	tests/cookie/02-clean.vtc \
 	tests/cookie/03-null.vtc \
-	tests/cookie/04-filter_except.vtc \
+	tests/cookie/04-keep.vtc \
 	tests/cookie/05-filter.vtc \
 	tests/cookie/05-get.vtc \
 	tests/cookie/06-concurrent-query.vtc \
