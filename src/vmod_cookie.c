@@ -384,6 +384,35 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 
 
 VCL_VOID
+vmod_keep_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
+	struct vmod_cookie *vcp = cobj_get(priv);
+	struct cookie *current, *safeptr;
+	(void)ctx;
+	int i, ovector[VRE_MAX_GROUPS];
+
+	vre_t *vre = compile_re(ctx, expression);
+	if (!vre)
+		return;   // Not much else to do, error already logged.
+
+	VTAILQ_FOREACH_SAFE(current, &vcp->cookielist, list, safeptr) {
+		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
+
+		i = VRE_exec(vre, current->name, strlen(current->name),
+					 0, 0, ovector, VRE_MAX_GROUPS, NULL);
+		if (i >= 0) {
+			VSLb(ctx->vsl, SLT_VCL_Log, "Cookie %s matches expression '%s'", current->name, expression);
+		} else {
+			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", current->name, current->value);
+			VTAILQ_REMOVE(&vcp->cookielist, current, list);
+		}
+	}
+
+	if (vre)
+		VRE_free(&vre);
+}
+
+
+VCL_VOID
 vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct cookie *current, *safeptr;
