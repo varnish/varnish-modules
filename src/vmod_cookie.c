@@ -43,6 +43,7 @@
 #include "vcc_cookie_if.h"
 
 vre_t * compile_re(VRT_CTX, VCL_STRING expression);
+#define VRE_MATCHES_MAX 8
 
 struct cookie {
 	unsigned magic;
@@ -216,7 +217,6 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_STRING name)
 }
 
 
-
 vre_t *
 compile_re(VRT_CTX, VCL_STRING expression) {
 	vre_t *vre;
@@ -232,13 +232,14 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 	return(vre);
 }
 
-
 VCL_STRING
 vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
-	int ovector[8];
+	int i, ovector[VRE_MATCHES_MAX];
+	struct cookie *cookie = NULL;
+	struct cookie *current;
 	vre_t * vre;
 
 	if (expression == NULL || *expression == '\0')
@@ -246,13 +247,18 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
 
 	vre = compile_re(ctx, expression);
 
-	struct cookie *cookie;
-	VTAILQ_FOREACH(cookie, &vcp->cookielist, list) {
-		CHECK_OBJ_NOTNULL(cookie, VMOD_COOKIE_ENTRY_MAGIC);
-		if (VRE_exec(vre, cookie->name, strlen(cookie->name),
-					 0, 0, ovector, 8, NULL))
+	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
+		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
+		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: checking %s", current->name);
+		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0, ovector,
+				     VRE_MATCHES_MAX, NULL);
+		if (i >= 0) {
+			VSLb(ctx->vsl, SLT_VCL_Log, "cookie: %s is a match for regex '%s'", current->name, expression);
+			cookie = current;
 			break;
+		}
 	}
+
 	if (vre)
 		VRE_free(&vre);
 
@@ -317,6 +323,7 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
 			continue;
 		}
 
+		// Why is this not on the workspace?
 		mlentry = malloc(sizeof(struct matchlist));
 		AN(mlentry);
 		mlentry->name = strndup(p, q - p);
@@ -374,7 +381,7 @@ vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 	(void)ctx;
 	(void)priv;
 	(void)expression;
-	int ovector[8];
+	int ovector[VRE_MATCHES_MAX];
 
 	vre_t *vre = compile_re(ctx, expression);
 	if (!vre)
@@ -384,14 +391,13 @@ vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
 		CHECK_OBJ_NOTNULL(curr, VMOD_COOKIE_ENTRY_MAGIC);
 
 		if (VRE_exec(vre, curr->name, strlen(curr->name),
-					 0, 0, ovector, 8, NULL) > -1)
+					 0, 0, ovector, VRE_MATCHES_MAX, NULL) > -1)
 			VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", curr->name, curr->value);
 			VTAILQ_REMOVE(&vcp->cookielist, curr, list);
 		}
 
 	if (vre)
 		VRE_free(&vre);
-	return;
 }
 
 VCL_STRING
