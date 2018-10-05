@@ -57,7 +57,7 @@ Example
 $Function VOID remove(PRIV_CALL, HEADER header, STRING regex)
 
 Description
-        Remove all occurences of `header` that matches `regex`.
+        Remove all occurrences of `header` that matches `regex`.
 Example
     ::
     header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
