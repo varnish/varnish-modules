@@ -114,6 +114,26 @@ bodyaccess_log_cb(struct req *req, void *priv, void *ptr, size_t len)
 
 	return (bodyaccess_log(priv, ptr, len));
 }
+#elif defined(HAVE_OBJITERATE_F) && defined(OBJ_ITER_FLUSH)
+static int
+bodyaccess_bcat_cb(void *priv, unsigned flush, const void *ptr, ssize_t len)
+{
+
+	AN(priv);
+
+	(void)flush;
+	return (VSB_bcat(priv, ptr, len));
+}
+
+static int
+bodyaccess_log_cb(void *priv, unsigned flush, const void *ptr, ssize_t len)
+{
+
+	AN(priv);
+
+	(void)flush;
+	return (bodyaccess_log(priv, ptr, len));
+}
 #elif defined(HAVE_OBJITERATE_F)
 static int
 bodyaccess_bcat_cb(void *priv, int flush, const void *ptr, ssize_t len)
