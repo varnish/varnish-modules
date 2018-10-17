@@ -174,7 +174,7 @@ vmod_set_socket_pace(VRT_CTX, VCL_INT rate)
             sizeof(pacerate)) != 0)
                 VSLb(ctx->vsl, SLT_VCL_Error, "set_socket_pace(): Error setting pace rate.");
 	else
-                VSLb(ctx->vsl, SLT_VCL_Log, "vmod-tcp: Socket paced to %lu KB/s.", rate);
+                VSLb(ctx->vsl, SLT_VCL_Log, "vmod-tcp: Socket paced to %jd KB/s.", (intmax_t)rate);
 
 #  ifndef NDEBUG
         int retval;
