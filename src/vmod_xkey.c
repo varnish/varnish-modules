@@ -410,11 +410,11 @@ xkey_tok(const char **b, const char **e)
 	t = *b;
 	AN(t);
 
-	while (isblank(*t))
+	while (*t != ',' && isblank(*t))
 		t++;
 	*b = t;
 
-	while (*t != '\0' && !isblank(*t))
+	while (*t != '\0' && *t != ',' && !isblank(*t))
 		t++;
 	*e = t;
 	return (*b < *e);
