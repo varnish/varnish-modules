@@ -4,6 +4,9 @@ varnishtest "Test xkey vmod multiple keys, comma separated"
 server s1 {
 	rxreq
 	txresp -hdr "xkey: asdf, fdsa"
+
+	rxreq
+	txresp -hdr "xkey: qwer, rewq"
 } -start
 
 varnish v1 -vcl+backend {
@@ -33,13 +36,26 @@ varnish v1 -vcl+backend {
 client c1 {
 	txreq
 	rxresp
+	txreq -url /2
+	rxresp
 } -run
 
-varnish v1 -expect n_object == 1
+varnish v1 -expect n_object == 2
 
 client c1 {
 	# Test the purge using the asdf key, so we check that we didn't include the comma
 	txreq -hdr "xkey-purge: asdf"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.reason == "Purged"
+} -run
+
+delay 1
+
+varnish v1 -expect n_object == 1
+
+client c1 {
+	txreq -hdr "xkey-purge: rewq"
 	rxresp
 	expect resp.status == 200
 	expect resp.http.reason == "Purged"
