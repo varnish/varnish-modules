@@ -15,8 +15,8 @@ Similarly with an e-commerce site, where various SKUs are often
 referenced on a page.
 
 Hash keys are specified in the ``xkey`` response header. Multiple keys
-can be specified per header line with a space
-separator. Alternatively, they can be specified in multiple ``xkey``
+can be specified per header line with spaces and/or commas as
+separators. Alternatively, they can be specified in multiple ``xkey``
 response headers.
 
 Preferably the secondary hash keys are set from the backend
