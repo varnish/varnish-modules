@@ -1,6 +1,7 @@
 /*-
  * Copyright (c) 2012-2016 Varnish Software
  *
+ * Author: Lasse Karstensen <lasse.karstensen@gmail.com>
  * Author: Lasse Karstensen <lkarsten@varnish-software.com>
  *
  * Redistribution and use in source and binary forms, with or without
