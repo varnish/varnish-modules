@@ -226,7 +226,6 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 	const char *error;
 	int erroroffset;
 
-	// TODO: Stop doing this per-request
 	vre = VRE_compile(expression, 0, &error, &erroroffset);
 	if (vre == NULL) {
 		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: PCRE compile error at char %i: %s", erroroffset, error);
@@ -330,7 +329,6 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
 			continue;
 		}
 
-		// Why is this not on the workspace?
 		mlentry = malloc(sizeof(struct matchlist));
 		AN(mlentry);
 		mlentry->name = strndup(p, q - p);
@@ -480,5 +478,5 @@ vmod_get_string(VRT_CTX, struct vmod_priv *priv)
 VCL_STRING
 vmod_format_rfc1123(VRT_CTX, VCL_TIME ts, VCL_DURATION duration)
 {
-        return VRT_TIME_string(ctx, ts + duration);
+	return VRT_TIME_string(ctx, ts + duration);
 }
