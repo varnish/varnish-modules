@@ -94,7 +94,7 @@ Example
                 }
 
 
-$Function VOID filter_re(PRIV_TASK, STRING expression)
+$Function VOID filter_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Delete all cookies from internal vmod storage that matches the
@@ -131,7 +131,7 @@ Example
                         // "cookie1: value1; cookie2: value2;";
                 }
 
-$Function VOID keep_re(PRIV_TASK, STRING expression)
+$Function VOID keep_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Delete all cookies from internal vmod storage that does not match expression `expression`.
@@ -177,7 +177,7 @@ Example
                         std.log("cookie1 value is: " + cookie.get("cookie1"));
                 }
 
-$Function STRING get_re(PRIV_TASK, STRING expression)
+$Function STRING get_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Get the value of the first cookie in internal vmod storage that matches regular expression `expression`. If nothing matches, an empty string is returned.

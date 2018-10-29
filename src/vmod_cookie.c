@@ -45,7 +45,7 @@
 #define VRE_MAX_GROUPS 8
 
 vre_t * compile_re(VRT_CTX, VCL_STRING);
-VCL_VOID re_filter(VRT_CTX, struct vmod_priv *, VCL_STRING, int);
+VCL_VOID re_filter(VRT_CTX, struct vmod_priv *, struct vmod_priv *, VCL_STRING, int);
 
 struct cookie {
 	unsigned magic;
@@ -235,19 +235,26 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 }
 
 VCL_STRING
-vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
+vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
 	int i, ovector[VRE_MAX_GROUPS];
 	struct cookie *cookie = NULL;
 	struct cookie *current;
-	vre_t * vre;
+	vre_t *vre = NULL;
 
 	if (expression == NULL || *expression == '\0')
 		return(NULL);
 
-	vre = compile_re(ctx, expression);
+	if (priv_call->priv == NULL) {
+		vre = compile_re(ctx, expression);
+		if (!vre)
+			return(NULL);   // Not much else to do, error already logged.
+
+		priv_call->priv = vre;
+		priv_call->free = free;
+	}
 
 	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
@@ -260,9 +267,6 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression)
 			break;
 		}
 	}
-
-	if (vre)
-		VRE_free(&vre);
 
 	return (cookie ? cookie->value : NULL);
 }
@@ -386,20 +390,26 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 
 
 VCL_VOID
-re_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression, int mode) {
+re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression, int mode) {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct cookie *current, *safeptr;
 	(void)ctx;
 	int i, ovector[VRE_MAX_GROUPS];
+	vre_t *vre = NULL;
 
-	vre_t *vre = compile_re(ctx, expression);
-	if (!vre)
-		return;   // Not much else to do, error already logged.
+	if (priv_call->priv == NULL) {
+		vre = compile_re(ctx, expression);
+		if (!vre)
+			return;   // Not much else to do, error already logged.
+
+		priv_call->priv = vre;
+		priv_call->free = free;
+	}
 
 	VTAILQ_FOREACH_SAFE(current, &vcp->cookielist, list, safeptr) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 
-		i = VRE_exec(vre, current->name, strlen(current->name),
+		i = VRE_exec(priv_call->priv, current->name, strlen(current->name),
 					 0, 0, ovector, VRE_MAX_GROUPS, NULL);
 
 		if (mode == FILTER_ACTION_BLACKLIST) {
@@ -418,21 +428,18 @@ re_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression, int mode) {
 		}
 			else WRONG("invalid mode");
 	}
-
-	if (vre)
-		VRE_free(&vre);
 }
 
 
 VCL_VOID
-vmod_keep_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
-	re_filter(ctx, priv, expression, FILTER_ACTION_WHITELIST);
+vmod_keep_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression) {
+	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_WHITELIST);
 }
 
 
 VCL_VOID
-vmod_filter_re(VRT_CTX, struct vmod_priv *priv, VCL_STRING expression) {
-	re_filter(ctx, priv, expression, FILTER_ACTION_BLACKLIST);
+vmod_filter_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression) {
+	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_BLACKLIST);
 }
 
 
