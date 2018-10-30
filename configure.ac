@@ -7,7 +7,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR(src/vmod_cookie.vcc)
 AC_CONFIG_HEADERS(config.h)
 
-AM_INIT_AUTOMAKE([1.11 foreign])
+AM_INIT_AUTOMAKE([1.12.2 foreign])
 AM_SILENT_RULES([yes])
 AM_EXTRA_RECURSIVE_TARGETS([rst-docs])
 
