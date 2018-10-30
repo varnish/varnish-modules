@@ -20,9 +20,12 @@ varnish v1 -vcl+backend {
 client c1 {
 	txreq -url "/"
 	rxresp
-	expect resp.http.a == "0"
-	expect resp.http.b == "-1"
-	expect resp.http.c == "0"
+	# XXX: it would be better to skip the test altogether when we
+	#      don't have struct tcp_info available on the system.
+	#      See https://github.com/varnish/varnish-modules/issues/115
+	expect resp.http.a <= 0
+	expect resp.http.b == -1
+	expect resp.http.c <= 0
 }
 
 client c1 -run
