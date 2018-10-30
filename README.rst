@@ -49,7 +49,6 @@ If you are using the distro provided packages::
 
 Then proceed to the configure and build::
 
-    ./bootstrap   # If running from git.
     ./configure
     make
     make check   # optional
@@ -85,6 +84,18 @@ The source git tree lives on Github: https://github.com/varnish/varnish-modules
 
 All source code is placed in the master git branch. Pull requests and issue
 reporting are appreciated.
+
+Unlike building from releases, you need to first bootstrap the build system
+when you work from git::
+
+    ./bootstrap
+    ./configure
+    make
+    make check # recommended
+
+If the ``configure`` step succeeds but the ``make`` step fails, check for
+warnings in the ``./configure`` output or the ``config.log`` file. You may be
+missing bootstrap dependencies not required by release archives.
 
 Porting
 -------
