@@ -51,23 +51,23 @@ uintptr_t xkey_cb_handle;
 
 struct xkey_hashkey {
 	char				digest[DIGEST_LEN];
-	VRB_ENTRY(xkey_hashkey)		entry;
+	VRBT_ENTRY(xkey_hashkey)		entry;
 };
 static int xkey_hashcmp(const struct xkey_hashkey *k1,
     const struct xkey_hashkey *k2);
-VRB_HEAD(xkey_hashtree, xkey_hashkey);
-static struct xkey_hashtree xkey_hashtree = VRB_INITIALIZER(&xkey_hashtree);
-VRB_PROTOTYPE(xkey_hashtree, xkey_hashkey, entry, xkey_hashcmp);
+VRBT_HEAD(xkey_hashtree, xkey_hashkey);
+static struct xkey_hashtree xkey_hashtree = VRBT_INITIALIZER(&xkey_hashtree);
+VRBT_PROTOTYPE(xkey_hashtree, xkey_hashkey, entry, xkey_hashcmp);
 
 struct xkey_ptrkey {
 	uintptr_t			ptr;
-	VRB_ENTRY(xkey_ptrkey)		entry;
+	VRBT_ENTRY(xkey_ptrkey)		entry;
 };
 static int xkey_ptrcmp(const struct xkey_ptrkey *k1,
     const struct xkey_ptrkey *k2);
-VRB_HEAD(xkey_octree, xkey_ptrkey);
-static struct xkey_octree xkey_octree = VRB_INITIALIZER(&xkey_octree);
-VRB_PROTOTYPE(xkey_octree, xkey_ptrkey, entry, xkey_ptrcmp)
+VRBT_HEAD(xkey_octree, xkey_ptrkey);
+static struct xkey_octree xkey_octree = VRBT_INITIALIZER(&xkey_octree);
+VRBT_PROTOTYPE(xkey_octree, xkey_ptrkey, entry, xkey_ptrcmp)
 
 struct xkey_hashhead;
 struct xkey_ochead;
@@ -114,8 +114,8 @@ static struct {
 
 /*******************/
 
-VRB_GENERATE(xkey_hashtree, xkey_hashkey, entry, xkey_hashcmp);
-VRB_GENERATE(xkey_octree, xkey_ptrkey, entry, xkey_ptrcmp);
+VRBT_GENERATE(xkey_hashtree, xkey_hashkey, entry, xkey_hashcmp);
+VRBT_GENERATE(xkey_octree, xkey_ptrkey, entry, xkey_ptrcmp);
 
 static int
 xkey_hashcmp(const struct xkey_hashkey *k1, const struct xkey_hashkey *k2)
@@ -246,7 +246,7 @@ xkey_hashtree_lookup(const unsigned char *digest, unsigned len)
 	AN(digest);
 	assert(len == sizeof(key.digest));
 	memcpy(&key.digest, digest, len);
-	pkey = VRB_FIND(xkey_hashtree, &xkey_hashtree, &key);
+	pkey = VRBT_FIND(xkey_hashtree, &xkey_hashtree, &key);
 	if (pkey != NULL)
 		CAST_OBJ_NOTNULL(head, (void *)pkey, XKEY_HASHHEAD_MAGIC);
 	return (head);
@@ -262,7 +262,7 @@ xkey_hashtree_insert(const unsigned char *digest, unsigned len)
 	head = xkey_hashhead_new();
 	assert(len == sizeof(head->key.digest));
 	memcpy(&head->key.digest, digest, len);
-	key = VRB_INSERT(xkey_hashtree, &xkey_hashtree, &head->key);
+	key = VRBT_INSERT(xkey_hashtree, &xkey_hashtree, &head->key);
 	if (key != NULL) {
 		xkey_hashhead_delete(&head);
 		CAST_OBJ_NOTNULL(head, (void *)key, XKEY_HASHHEAD_MAGIC);
@@ -278,7 +278,7 @@ xkey_octree_lookup(uintptr_t ptr)
 
 	AN(ptr);
 	key.ptr = ptr;
-	pkey = VRB_FIND(xkey_octree, &xkey_octree, &key);
+	pkey = VRBT_FIND(xkey_octree, &xkey_octree, &key);
 	if (pkey)
 		CAST_OBJ_NOTNULL(head, (void *)pkey, XKEY_OCHEAD_MAGIC);
 	return (head);
@@ -293,7 +293,7 @@ xkey_octree_insert(uintptr_t ptr)
 	AN(ptr);
 	head = xkey_ochead_new();
 	head->key.ptr = ptr;
-	key = VRB_INSERT(xkey_octree, &xkey_octree, &head->key);
+	key = VRBT_INSERT(xkey_octree, &xkey_octree, &head->key);
 	if (key != NULL) {
 		xkey_ochead_delete(&head);
 		CAST_OBJ_NOTNULL(head, (void *)key, XKEY_OCHEAD_MAGIC);
@@ -342,7 +342,7 @@ xkey_remove(struct xkey_ochead **pochead)
 		oc->hashhead = NULL;
 		VTAILQ_REMOVE(&hashhead->ocs, oc, list_hashhead);
 		if (VTAILQ_EMPTY(&hashhead->ocs)) {
-			VRB_REMOVE(xkey_hashtree, &xkey_hashtree,
+			VRBT_REMOVE(xkey_hashtree, &xkey_hashtree,
 			    &hashhead->key);
 			xkey_hashhead_delete(&hashhead);
 		}
@@ -351,7 +351,7 @@ xkey_remove(struct xkey_ochead **pochead)
 		xkey_oc_delete(&oc);
 	}
 	AN(VTAILQ_EMPTY(&ochead->ocs));
-	VRB_REMOVE(xkey_octree, &xkey_octree, &ochead->key);
+	VRBT_REMOVE(xkey_octree, &xkey_octree, &ochead->key);
 	xkey_ochead_delete(&ochead);
 }
 
@@ -364,19 +364,19 @@ xkey_cleanup(void)
 	struct xkey_ochead *ochead;
 	struct xkey_oc *oc;
 
-	VRB_FOREACH(hashkey, xkey_hashtree, &xkey_hashtree) {
+	VRBT_FOREACH(hashkey, xkey_hashtree, &xkey_hashtree) {
 		CAST_OBJ_NOTNULL(hashhead, (void *)hashkey,
 		    XKEY_HASHHEAD_MAGIC);
 		VTAILQ_CONCAT(&xkey_pool.ocs, &hashhead->ocs, list_ochead);
 		VTAILQ_INSERT_HEAD(&xkey_pool.hashheads, hashhead, list);
 	}
-	VRB_INIT(&xkey_hashtree);
+	VRBT_INIT(&xkey_hashtree);
 
-	VRB_FOREACH(ockey, xkey_octree, &xkey_octree) {
+	VRBT_FOREACH(ockey, xkey_octree, &xkey_octree) {
 		CAST_OBJ_NOTNULL(ochead, (void *)ockey, XKEY_OCHEAD_MAGIC);
 		VTAILQ_INSERT_HEAD(&xkey_pool.ocheads, ochead, list);
 	}
-	VRB_INIT(&xkey_octree);
+	VRBT_INIT(&xkey_octree);
 
 	while (!VTAILQ_EMPTY(&xkey_pool.hashheads)) {
 		hashhead = VTAILQ_FIRST(&xkey_pool.hashheads);
