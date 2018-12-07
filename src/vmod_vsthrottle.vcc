@@ -1,4 +1,4 @@
-$Module vsthrottle 3 Throttling VMOD
+$Module vsthrottle 3 "Throttling VMOD"
 DESCRIPTION
 ===========
 

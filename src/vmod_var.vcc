@@ -1,4 +1,4 @@
-$Module var 3 Variable support for Varnish VCL
+$Module var 3 "Variable support for Varnish VCL"
 
 This VMOD implements basic variable support in VCL.
 

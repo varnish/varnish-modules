@@ -1,4 +1,4 @@
-$Module bodyaccess 3 Varnish Module for request body access
+$Module bodyaccess 3 "Varnish Module for request body access"
 
 DESCRIPTION
 ===========

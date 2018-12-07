@@ -1,4 +1,4 @@
-$Module softpurge Soft purge vmod
+$Module softpurge 3 "Soft purge vmod"
 DESCRIPTION
 ===========
 

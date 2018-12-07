@@ -1,4 +1,4 @@
-$Module tcp 3 TCP vmod
+$Module tcp 3 "TCP vmod"
 DESCRIPTION
 ===========
 

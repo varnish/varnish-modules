@@ -1,4 +1,4 @@
-$Module header 3 Header VMOD for Varnish
+$Module header 3 "Header VMOD for Varnish"
 DESCRIPTION
 ===========
 

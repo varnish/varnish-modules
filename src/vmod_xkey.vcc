@@ -1,4 +1,4 @@
-$Module xkey 3 Surrogate keys support for Varnish Cache
+$Module xkey 3 "Surrogate keys support for Varnish Cache"
 DESCRIPTION
 ===========
 
