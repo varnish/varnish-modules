@@ -170,7 +170,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 		p = WS_Printf(ctx->ws, "%s", value);
 		if (p == NULL) {
 			VSLb(ctx->vsl, SLT_Error,
-					"cookie: Workspace overflow in set()");
+			    "cookie: Workspace overflow in set()");
 		} else
 			cookie->value = p;
 
@@ -180,7 +180,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 	cookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
 	if (cookie == NULL) {
 		VSLb(ctx->vsl, SLT_Error,
-				"cookie: unable to get storage for cookie");
+		    "cookie: unable to get storage for cookie");
 		return;
 	}
 	cookie->magic = VMOD_COOKIE_ENTRY_MAGIC;
@@ -188,7 +188,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 	cookie->value = WS_Printf(ctx->ws, "%s", value);
 	if (cookie->name == NULL || cookie->value == NULL) {
 		VSLb(ctx->vsl, SLT_Error,
-				"cookie: unable to get storage for cookie");
+		    "cookie: unable to get storage for cookie");
 		return;
 	}
 	VTAILQ_INSERT_TAIL(&vcp->cookielist, cookie, list);
@@ -238,7 +238,8 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 }
 
 VCL_STRING
-vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression)
+vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+    VCL_STRING expression)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	(void)ctx;
@@ -263,6 +264,7 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_ST
 
 	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
+
 		// VSLb(ctx->vsl, SLT_VCL_Log, "cookie: checking %s", current->name);
 		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0, ovector,
 				     VRE_MAX_GROUPS, NULL);
@@ -307,7 +309,7 @@ vmod_clean(VRT_CTX, struct vmod_priv *priv)
 
 static void
 filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
-		VCL_BOOL filter_action)
+    VCL_BOOL filter_action)
 {
 	struct cookie *cookieptr, *safeptr;
 	struct vmod_cookie *vcp = cobj_get(priv);
@@ -373,7 +375,7 @@ VCL_VOID
 vmod_filter_except(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s)
 {
 	VSLb(ctx->vsl, SLT_VCL_Log,
-		"cookie.filter_except() is DEPRECATED, use keep() instead");
+	    "cookie.filter_except() is DEPRECATED, use keep() instead");
 	vmod_keep(ctx, priv, whitelist_s);
 }
 
@@ -394,7 +396,9 @@ vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 
 
 VCL_VOID
-re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression, int mode) {
+re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+		  VCL_STRING expression, int mode)
+{
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct cookie *current, *safeptr;
 	(void)ctx;
@@ -437,13 +441,17 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRI
 
 
 VCL_VOID
-vmod_keep_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression) {
+vmod_keep_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+    VCL_STRING expression)
+{
 	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_WHITELIST);
 }
 
 
 VCL_VOID
-vmod_filter_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRING expression) {
+vmod_filter_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+    VCL_STRING expression)
+{
 	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_BLACKLIST);
 }
 
