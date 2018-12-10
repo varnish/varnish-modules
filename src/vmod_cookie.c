@@ -169,7 +169,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 	if (cookie != NULL) {
 		p = WS_Printf(ctx->ws, "%s", value);
 		if (p == NULL) {
-			VSLb(ctx->vsl, SLT_VCL_Log,
+			VSLb(ctx->vsl, SLT_Error,
 					"cookie: Workspace overflow in set()");
 		} else
 			cookie->value = p;
@@ -179,7 +179,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 
 	cookie = WS_Alloc(ctx->ws, sizeof(struct cookie));
 	if (cookie == NULL) {
-		VSLb(ctx->vsl, SLT_VCL_Log,
+		VSLb(ctx->vsl, SLT_Error,
 				"cookie: unable to get storage for cookie");
 		return;
 	}
@@ -187,7 +187,7 @@ vmod_set(VRT_CTX, struct vmod_priv *priv, VCL_STRING name, VCL_STRING value)
 	cookie->name = WS_Printf(ctx->ws, "%s", name);
 	cookie->value = WS_Printf(ctx->ws, "%s", value);
 	if (cookie->name == NULL || cookie->value == NULL) {
-		VSLb(ctx->vsl, SLT_VCL_Log,
+		VSLb(ctx->vsl, SLT_Error,
 				"cookie: unable to get storage for cookie");
 		return;
 	}
@@ -231,7 +231,7 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 
 	vre = VRE_compile(expression, 0, &error, &erroroffset);
 	if (vre == NULL) {
-		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: PCRE compile error at char %i: %s", erroroffset, error);
+		VSLb(ctx->vsl, SLT_Error, "cookie: PCRE compile error at char %i: %s", erroroffset, error);
 		return(NULL);
 	}
 	return(vre);
@@ -430,7 +430,6 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRI
 				VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", current->name, current->value);
 			    VTAILQ_REMOVE(&vcp->cookielist, current, list);
 			}
-
 		}
 			else WRONG("invalid mode");
 	}
@@ -472,7 +471,7 @@ vmod_get_string(VRT_CTX, struct vmod_priv *priv)
 
 	u = WS_Alloc(ctx->ws, VSB_len(output) + 1);
 	if (!u) {
-		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: Workspace overflow");
+		VSLb(ctx->vsl, SLT_Error, "cookie: Workspace overflow");
 		VSB_delete(output);
 		return(NULL);
 	}
