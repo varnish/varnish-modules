@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <pthread.h>
 
 #include "vmod_config.h"
 
@@ -47,6 +48,8 @@
 
 vre_t * compile_re(VRT_CTX, VCL_STRING);
 VCL_VOID re_filter(VRT_CTX, struct vmod_priv *, struct vmod_priv *, VCL_STRING, int);
+
+static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
 struct cookie {
 	unsigned magic;
@@ -248,12 +251,14 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_ST
 		return(NULL);
 
 	if (priv_call->priv == NULL) {
+		AZ(pthread_mutex_lock(&mtx));
 		vre = compile_re(ctx, expression);
 		if (!vre)
 			return(NULL);   // Not much else to do, error already logged.
 
 		priv_call->priv = vre;
 		priv_call->free = free;
+		AZ(pthread_mutex_unlock(&mtx));
 	}
 
 	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
@@ -397,12 +402,14 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call, VCL_STRI
 	vre_t *vre = NULL;
 
 	if (priv_call->priv == NULL) {
+		AZ(pthread_mutex_lock(&mtx));
 		vre = compile_re(ctx, expression);
 		if (!vre)
 			return;   // Not much else to do, error already logged.
 
 		priv_call->priv = vre;
 		priv_call->free = free;
+		AZ(pthread_mutex_unlock(&mtx));
 	}
 
 	VTAILQ_FOREACH_SAFE(current, &vcp->cookielist, list, safeptr) {
