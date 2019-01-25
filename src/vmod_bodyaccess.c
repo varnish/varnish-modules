@@ -207,6 +207,8 @@ vmod_hash_req_body(VRT_CTX)
 VCL_INT
 vmod_len_req_body(VRT_CTX)
 {
+	uint64_t u;
+
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
@@ -222,7 +224,10 @@ vmod_len_req_body(VRT_CTX)
 		return (-1);
 	}
 
-	return (ctx->req->req_bodybytes);
+	AZ(ObjGetU64(ctx->req->wrk, ctx->req->body_oc, OA_LEN, &u));
+	AZ(u > INT64_MAX);
+
+	return ((VCL_INT)u);
 }
 
 VCL_INT
