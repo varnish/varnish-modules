@@ -193,7 +193,7 @@ header_http_cphdr(VRT_CTX, const struct http *hp, const char *hdr,
  * vmod entrypoint. Sets up the header mutex.
  */
 int
-event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
+vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 {
 	(void)ctx;
 	(void)priv;

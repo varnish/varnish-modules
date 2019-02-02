@@ -93,7 +93,7 @@ Varnish will find the objects and clear them out, responding with::
 The objects are now cleared.
 
 $ABI strict
-$Event vmod_event
+$Event event
 $Function INT purge(STRING keys)
 
 Description

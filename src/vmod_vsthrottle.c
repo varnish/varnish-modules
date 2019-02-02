@@ -328,7 +328,7 @@ fini(void *priv)
 }
 
 int
-event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
+vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 {
 	if (e != VCL_EVENT_LOAD)
 		return (0);
