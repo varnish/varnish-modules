@@ -1,0 +1,110 @@
+From 5d181cddc18edb0a74a5271b5781838031bc83e7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Erik=20Junesj=C3=B6?= <erikju@varnish-software.com>
+Date: Fri, 22 Feb 2019 16:03:07 +0100
+Subject: [PATCH] Create 0001-Update.patch
+
+---
+ 0001-Update.patch | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
+ create mode 100644 0001-Update.patch
+
+diff --git a/0001-Update.patch b/0001-Update.patch
+new file mode 100644
+index 0000000..0fe72c4
+--- /dev/null
++++ b/0001-Update.patch
+@@ -0,0 +1,91 @@
++From 8a7ce6fe71bb862d2b6d6fb9fc1822e9740cb69c Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?P=C3=A5l=20Hermunn=20Johansen?=
++ <hermunn@varnish-software.com>
++Date: Wed, 13 Feb 2019 15:26:52 +0100
++Subject: [PATCH] Update README with Varnish Software policies and disclaimer
++
++This adds the official stanse on VMODs in this repository.
++---
++ README.rst | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ 1 file changed, 69 insertions(+)
++
++diff --git a/README.rst b/README.rst
++index a2c779f..591ac65 100644
++--- a/README.rst
+++++ b/README.rst
++@@ -1,3 +1,72 @@
+++Status of this repository
+++=========================
+++
+++Modules in this repository are generally not in active development by
+++Varnish Software. However, any security related bugs and issues will
+++always be a high priority, and in some cases we will accept new
+++features to the VMODs
+++
+++For Varnish Software, the maintainer of this repository, the VMODs are
+++categorized as follows.
+++
+++VMODs under development
+++-----------------------
+++
+++The VMODs in this category are ``tcp`` and ``vsthrottle``.
+++
+++New features for these VMODs will be considered on a case-by-case
+++basis, and new features will be accepted if they fit together with
+++existing features in VMOD.
+++
+++Feature complete VMODs
+++----------------------
+++
+++The VMODs in this category are ``Cookie``, ``xkey``, ``saintmode``,
+++``softpurge``, ``bodyaccess``, ``header`` and ``var``.
+++
+++This software in this repository is considered feature complete and we
+++do no longer accept contributions that introduce new features. The
+++software is maintained with security and bug fixes, and contributions
+++related to this will be accepted.
+++
+++Deprecated VMODs
+++----------------
+++
+++There are no VMODs in this category.
+++
+++This software has been deprecated and is no longer maintained.
+++Contributions will not be accepted.
+++
+++
+++Moved or replaced VMODs
+++-----------------------
+++
+++VMODs in this category are no longer maintained because their
+++functionality is covered by other functionality or newer VMODs.
+++
+++In this repository there is only one such vmod:
+++
+++* ``softpurge`` is now replaced by the ``purge`` VMOD in Varnish.
+++  Note that this VMOD is also in the "feature complete" category,
+++  since it is still needed for Varnish Cache 4.1.
+++
+++General note
+++------------
+++
+++If you want to contribute a feature for this software, please create
+++an issue and describe your implementation plans before you get
+++started. This allows us to verify that the contribution is in line
+++with the software's roadmap.
+++
+++Future compatibility
+++--------------------
+++
+++Varnish has no commitment to update this software to be compatible
+++with future versions of Varnish Cache. At the same time, the license
+++of the sotware allows anyone to improve the product in any way, for
+++example by making it compatible with future versions of Varnish Cache.
+++
+++
++ Varnish module collection by Varnish Software
++ =============================================
++ 
++-- 
++2.17.1
++
+-- 
+2.20.1
+
