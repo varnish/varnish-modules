@@ -205,6 +205,32 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	return (ret);
 }
 
+VCL_VOID
+vmod_return_token(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
+               VCL_DURATION block)
+{
+	struct tbucket *b;
+	double now;
+
+	struct vsthrottle *v;
+	unsigned char digest[SHA256_LEN];
+	unsigned part;
+
+	(void)ctx;
+
+	if (!key)
+		return;
+	do_digest(digest, key, limit, period, block);
+
+	part = digest[0] & N_PART_MASK;
+	v = &vsthrottle[part];
+	AZ(pthread_mutex_lock(&v->mtx));
+	now = VTIM_mono();
+	b = get_bucket(digest, limit, period, now);
+	b->tokens++;
+	AZ(pthread_mutex_unlock(&v->mtx));
+}
+
 /* Clean up expired entries. */
 static void
 run_gc(double now, unsigned part)

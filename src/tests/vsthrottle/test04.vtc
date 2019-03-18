@@ -1,0 +1,40 @@
+varnishtest "Test vsthrottle return_token()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
+
+	sub vcl_deliver {
+		set resp.http.foo-count0 = vsthrottle.remaining("foo", 1, 1s);
+		if (!vsthrottle.is_denied("foo", 1, 1s)) {
+			set resp.http.f1 = "OK";
+		}
+		set resp.http.foo-count1 = vsthrottle.remaining("foo", 1, 1s);
+
+		if (!vsthrottle.is_denied("foo", 1, 1s)) {
+			set resp.http.f2 = "OK";
+		}
+		set resp.http.foo-count2 = vsthrottle.remaining("foo", 1, 1s);
+
+		vsthrottle.return_token("foo", 1, 1s);
+
+		set resp.http.foo-count3 = vsthrottle.remaining("foo", 1, 1s);
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+	expect resp.http.foo-count0 == "1"
+	expect resp.http.f1 == "OK"
+	expect resp.http.foo-count1 == "0"
+	expect resp.http.f2 == <undef>
+	expect resp.http.foo-count2 == "0"
+	expect resp.http.foo-count3 == "1"
+}
+
+client c1 -run

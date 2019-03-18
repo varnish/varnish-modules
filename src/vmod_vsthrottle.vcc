@@ -71,16 +71,17 @@ Arguments:
   - key: A unique identifier to define what is being throttled - more examples below
   - limit: How many requests in the specified period
   - period: The time period
-  - block: a period to deny all access after meeting the threshold
+  - block: a period to deny all access after hitting the threshold. Default is 0s
 
 Description
   Can be used to rate limit the traffic for a specific key to a
   maximum of 'limit' requests per 'period' time. If 'block' is > 0s,
   (0s by default), then always deny for 'key' for that length of time
-  after hitting the threshold. A token bucket is uniquely identified
-  by the 4-tuple of its key, limit, period and block, so using the
-  same key multiple places with different rules will create multiple
-  token buckets.
+  after hitting the threshold.
+
+  Note: A token bucket is uniquely identified by the 4-tuple of its
+  key, limit, period and block, so using the same key multiple places
+  with different rules will create multiple token buckets.
 
 Example
         ::
@@ -95,14 +96,48 @@ Example
 		}
 
 
+$Function VOID return_token(STRING key, INT limit, DURATION period,
+                         DURATION block=0)
+
+Arguments:
+  - Same arguments as is_denied()
+
+Description
+  Increment (by one) the number of tokens in the specified bucket. is_denied()
+  decrements the bucket by one token and return_token() adds it back.
+  Using these two, you can effectively make a token bucket act like a limit on
+  concurrent requests instead of requests / time.
+
+  Note: This function doesn't enforce anything, it merely credits a token to
+  appropriate bucket.
+
+  Warning: If streaming is enabled (beresp.do_stream = true) as it is by
+  default now, vcl_deliver() is called *before* the response is sent
+  to the client (who may download it slowly). Thus you may credit the token
+  back too early if you use return_token() in vcl_backend_response().
+
+Example
+        ::
+
+		sub vcl_recv {
+			if (vsthrottle.is_denied(client.identity, 20, 20s)) {
+				# Client has more than 20 concurrent requests
+				return (synth(429, "Too Many Requests In Flight"));
+			}
+
+			# ...
+		}
+
+		sub vcl_deliver {
+			vsthrottle.return_token(client.identity, 10, 10s);
+		}
+
+
 $Function INT remaining(STRING key, INT limit, DURATION period,
                         DURATION block=0)
 
 Arguments:
-  - key: A unique identifier to define what is being throttled
-  - limit: How many requests in the specified period
-  - period: The time period
-  - block: duration to block, defaults to 0s
+  - Same arguments as is_denied()
 
 Description
 
@@ -122,10 +157,7 @@ $Function DURATION blocked(STRING key, INT limit, DURATION period,
                            DURATION block)
 
 Arguments:
-  - key: A unique identifier to define what is being throttled
-  - limit: How many requests in the specified period
-  - period: The time period
-  - block: duration to block
+  - Same arguments as is_denied()
 
 Description
 
