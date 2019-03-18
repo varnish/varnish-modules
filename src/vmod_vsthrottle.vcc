@@ -95,6 +95,44 @@ Example
 		}
 
 
+$ABI vrt
+$Function VOID return_token(STRING key, INT limit, DURATION period,
+                         DURATION block=0)
+
+Arguments:
+
+  - key: A unique identifier to define what is being throttled - more examples below
+  - limit: How many requests in the specified period
+  - period: The time period
+  - block: a period to deny all access after meeting the threshold
+
+Description
+  Increment (by one) the number of tokens in the specified bucket. is_denied()
+  decrements the bucket by a token and return_token() adds it back.
+  Using these two, you can effectively make a token bucket act like a limit on
+  concurrent requests instead of requests / time.
+  Note: this function doesn't enforce anything, it merely credits a token to
+  appropriate bucket. A token bucket is uniquely identified by the 4-tuple of
+  its key, limit, period and block, so using the same key multiple places with
+  different rules will create multiple token buckets.
+
+Example
+        ::
+
+		sub vcl_recv {
+			if (vsthrottle.is_denied(client.identity, 20, 20s)) {
+				# Client has more than 20 concurrent requests
+				return (synth(429, "Too Many Requests In Flight"));
+			}
+
+			# ...
+		}
+
+		sub vcl_deliver {
+			vsthrottle.return_token(client.identity, 10, 10s);
+		}
+
+
 $Function INT remaining(STRING key, INT limit, DURATION period,
                         DURATION block=0)
 
