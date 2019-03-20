@@ -71,16 +71,17 @@ Arguments:
   - key: A unique identifier to define what is being throttled - more examples below
   - limit: How many requests in the specified period
   - period: The time period
-  - block: a period to deny all access after meeting the threshold
+  - block: a period to deny all access after hitting the threshold. Default is 0s
 
 Description
   Can be used to rate limit the traffic for a specific key to a
   maximum of 'limit' requests per 'period' time. If 'block' is > 0s,
   (0s by default), then always deny for 'key' for that length of time
-  after hitting the threshold. A token bucket is uniquely identified
-  by the 4-tuple of its key, limit, period and block, so using the
-  same key multiple places with different rules will create multiple
-  token buckets.
+  after hitting the threshold.
+
+  Note: A token bucket is uniquely identified by the 4-tuple of its
+  key, limit, period and block, so using the same key multiple places
+  with different rules will create multiple token buckets.
 
 Example
         ::
@@ -100,20 +101,19 @@ $Function VOID return_token(STRING key, INT limit, DURATION period,
 
 Arguments:
 
-  - key: A unique identifier to define what is being throttled - more examples below
-  - limit: How many requests in the specified period
-  - period: The time period
-  - block: a period to deny all access after meeting the threshold
+  - key: See is_denied()
+  - limit: See is_denied()
+  - period: See is_denied()
+  - block: See is_denied()
 
 Description
   Increment (by one) the number of tokens in the specified bucket. is_denied()
-  decrements the bucket by a token and return_token() adds it back.
+  decrements the bucket by one token and return_token() adds it back.
   Using these two, you can effectively make a token bucket act like a limit on
   concurrent requests instead of requests / time.
-  Note: this function doesn't enforce anything, it merely credits a token to
-  appropriate bucket. A token bucket is uniquely identified by the 4-tuple of
-  its key, limit, period and block, so using the same key multiple places with
-  different rules will create multiple token buckets.
+
+  Note: This function doesn't enforce anything, it merely credits a token to
+  appropriate bucket.
 
 Example
         ::
@@ -136,10 +136,10 @@ $Function INT remaining(STRING key, INT limit, DURATION period,
                         DURATION block=0)
 
 Arguments:
-  - key: A unique identifier to define what is being throttled
-  - limit: How many requests in the specified period
-  - period: The time period
-  - block: duration to block, defaults to 0s
+  - key: See is_denied()
+  - limit: See is_denied()
+  - period: See is_denied()
+  - block: See is_denied()
 
 Description
 
@@ -159,10 +159,10 @@ $Function DURATION blocked(STRING key, INT limit, DURATION period,
                            DURATION block)
 
 Arguments:
-  - key: A unique identifier to define what is being throttled
-  - limit: How many requests in the specified period
-  - period: The time period
-  - block: duration to block
+  - key: See is_denied()
+  - limit: See is_denied()
+  - period: See is_denied()
+  - block: See is_denied()
 
 Description
 
