@@ -243,7 +243,7 @@ run_gc(double now, unsigned part)
 		CHECK_OBJ_NOTNULL(x, TBUCKET_MAGIC);
 		if (now - x->last_used > x->period) {
 			VRB_REMOVE(tbtree, buckets, x);
-			free(x);
+			FREE_OBJ(x);
 		}
 	}
 }
