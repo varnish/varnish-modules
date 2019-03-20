@@ -228,7 +228,6 @@ vmod_return_token(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	now = VTIM_mono();
 	b = get_bucket(digest, limit, period, now);
 	b->tokens++;
-	calc_tokens(b, now);
 	AZ(pthread_mutex_unlock(&v->mtx));
 }
 
