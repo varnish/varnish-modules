@@ -100,11 +100,7 @@ $Function VOID return_token(STRING key, INT limit, DURATION period,
                          DURATION block=0)
 
 Arguments:
-
-  - key: See is_denied()
-  - limit: See is_denied()
-  - period: See is_denied()
-  - block: See is_denied()
+  - Same arguments as is_denied()
 
 Description
   Increment (by one) the number of tokens in the specified bucket. is_denied()
@@ -136,10 +132,7 @@ $Function INT remaining(STRING key, INT limit, DURATION period,
                         DURATION block=0)
 
 Arguments:
-  - key: See is_denied()
-  - limit: See is_denied()
-  - period: See is_denied()
-  - block: See is_denied()
+  - Same arguments as is_denied()
 
 Description
 
@@ -159,10 +152,7 @@ $Function DURATION blocked(STRING key, INT limit, DURATION period,
                            DURATION block)
 
 Arguments:
-  - key: See is_denied()
-  - limit: See is_denied()
-  - period: See is_denied()
-  - block: See is_denied()
+  - Same arguments as is_denied()
 
 Description
 
