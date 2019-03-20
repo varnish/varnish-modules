@@ -111,6 +111,11 @@ Description
   Note: This function doesn't enforce anything, it merely credits a token to
   appropriate bucket.
 
+  Warning: If streaming is enabled (beresp.do_stream = true) as it is by
+  default now, vcl_deliver() is called *before* the response is sent
+  to the client (who may download it slowly). Thus you may credit the token
+  back too early if you use return_token() in vcl_backend_response().
+
 Example
         ::
 
