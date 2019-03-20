@@ -95,7 +95,6 @@ Example
 		}
 
 
-$ABI vrt
 $Function VOID return_token(STRING key, INT limit, DURATION period,
                          DURATION block=0)
 
