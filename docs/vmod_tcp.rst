@@ -4,25 +4,30 @@
 .. Edit vmod.vcc and run make instead
 ..
 
-.. role:: ref(emphasis)
+
+:tocdepth: 1
 
 .. _vmod_tcp(3):
 
-========
-vmod_tcp
-========
-
---------
-TCP vmod
---------
-
-:Manual section: 3
+===================
+VMOD tcp - TCP vmod
+===================
 
 SYNOPSIS
 ========
 
-import tcp [from "path"] ;
+.. parsed-literal::
 
+  import tcp [from "path"]
+  
+  :ref:`vmod_tcp.congestion_algorithm`
+   
+  :ref:`vmod_tcp.dump_info`
+   
+  :ref:`vmod_tcp.get_estimated_rtt`
+   
+  :ref:`vmod_tcp.set_socket_pace`
+   
 DESCRIPTION
 ===========
 
@@ -59,22 +64,10 @@ Example::
 .. vcl-end
 
 
-CONTENTS
-========
+.. _vmod_tcp.congestion_algorithm:
 
-* :ref:`func_congestion_algorithm`
-* :ref:`func_dump_info`
-* :ref:`func_get_estimated_rtt`
-* :ref:`func_set_socket_pace`
-
-.. _func_congestion_algorithm:
-
-congestion_algorithm
---------------------
-
-::
-
-	INT congestion_algorithm(STRING algorithm)
+INT congestion_algorithm(STRING algorithm)
+------------------------------------------
 
 Set the client socket congestion control algorithm to S. Returns 0 on success, and -1 on error.
 
@@ -84,15 +77,10 @@ Example::
         set req.http.x-tcp = tcp.congestion_algorithm("cubic");
     }
 
+.. _vmod_tcp.dump_info:
 
-.. _func_dump_info:
-
-dump_info
----------
-
-::
-
-	VOID dump_info()
+VOID dump_info()
+----------------
 
 Write the contents of the TCP_INFO data structure into varnishlog.
 
@@ -107,17 +95,10 @@ Example varnishlog output::
         -   VCL_Log        tcpi2: pmtu=1500 rtt=152000 rttvar=76000 snd_cwnd=10 advmss=1448 reordering=3
         -   VCL_Log        getsockopt() returned: cubic
 
+.. _vmod_tcp.get_estimated_rtt:
 
-
-
-.. _func_get_estimated_rtt:
-
-get_estimated_rtt
------------------
-
-::
-
-	REAL get_estimated_rtt()
+REAL get_estimated_rtt()
+------------------------
 
 Get the estimated round-trip-time for the client socket. Unit: milliseconds.
 
@@ -127,15 +108,10 @@ Example::
         std.log("client is far away.");
     }
 
+.. _vmod_tcp.set_socket_pace:
 
-.. _func_set_socket_pace:
-
-set_socket_pace
----------------
-
-::
-
-	VOID set_socket_pace(INT)
+VOID set_socket_pace(INT)
+-------------------------
 
 Set socket pacing on client-side TCP connection to PACE KB/s. Network interface
 used must be using a supported scheduler. (fq)
@@ -143,5 +119,3 @@ used must be using a supported scheduler. (fq)
 Example::
 
     tcp.set_socket_pace(1000);
-
-

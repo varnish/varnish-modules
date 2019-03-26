@@ -4,26 +4,56 @@
 .. Edit vmod.vcc and run make instead
 ..
 
-.. role:: ref(emphasis)
+
+:tocdepth: 1
 
 .. _vmod_var(3):
 
-========
-vmod_var
-========
-
---------------------------------
-Variable support for Varnish VCL
---------------------------------
-
-:Manual section: 3
+===========================================
+VMOD var - Variable support for Varnish VCL
+===========================================
 
 SYNOPSIS
 ========
 
-import var [from "path"] ;
+.. parsed-literal::
 
-
+  import var [from "path"]
+  
+  :ref:`vmod_var.set`
+   
+  :ref:`vmod_var.get`
+   
+  :ref:`vmod_var.global_set`
+   
+  :ref:`vmod_var.global_get`
+   
+  :ref:`vmod_var.set_int`
+   
+  :ref:`vmod_var.get_int`
+   
+  :ref:`vmod_var.set_string`
+   
+  :ref:`vmod_var.get_string`
+   
+  :ref:`vmod_var.set_real`
+   
+  :ref:`vmod_var.get_real`
+   
+  :ref:`vmod_var.set_duration`
+   
+  :ref:`vmod_var.get_duration`
+   
+  :ref:`vmod_var.set_ip`
+   
+  :ref:`vmod_var.get_ip`
+   
+  :ref:`vmod_var.set_backend`
+   
+  :ref:`vmod_var.get_backend`
+   
+  :ref:`vmod_var.clear`
+   
 This VMOD implements basic variable support in VCL.
 
 It supports strings, integers and real numbers. There are methods to get and
@@ -82,183 +112,122 @@ Example::
 .. vcl-end
 
 
-CONTENTS
-========
+.. _vmod_var.set:
 
-* :ref:`func_clear`
-* :ref:`func_get`
-* :ref:`func_get_duration`
-* :ref:`func_get_int`
-* :ref:`func_get_ip`
-* :ref:`func_get_real`
-* :ref:`func_get_string`
-* :ref:`func_global_get`
-* :ref:`func_global_set`
-* :ref:`func_set`
-* :ref:`func_set_duration`
-* :ref:`func_set_int`
-* :ref:`func_set_ip`
-* :ref:`func_set_real`
-* :ref:`func_set_string`
-
-.. _func_set:
-
-set
----
-
-::
-
-	VOID set(PRIV_TASK, STRING key, STRING value)
+VOID set(STRING key, STRING value)
+----------------------------------
 
 Set `key` to `value`.
 
-.. _func_get:
+.. _vmod_var.get:
 
-get
----
-
-::
-
-	STRING get(PRIV_TASK, STRING)
+STRING get(STRING)
+------------------
 
 Get `key` with data type STRING. If stored `key` is not a STRING an empty string is returned.
 
-.. _func_global_set:
+.. _vmod_var.global_set:
 
-global_set
-----------
+VOID global_set(STRING, STRING)
+-------------------------------
 
-::
 
-	VOID global_set(STRING, STRING)
 
-.. _func_global_get:
+.. _vmod_var.global_get:
 
-global_get
-----------
+STRING global_get(STRING)
+-------------------------
 
-::
 
-	STRING global_get(STRING)
 
-.. _func_set_int:
+.. _vmod_var.set_int:
 
-set_int
--------
-
-::
-
-	VOID set_int(PRIV_TASK, STRING key, INT value)
+VOID set_int(STRING key, INT value)
+-----------------------------------
 
 Set `key` to `value`.
 
-.. _func_get_int:
+.. _vmod_var.get_int:
 
-get_int
--------
-
-::
-
-	INT get_int(PRIV_TASK, STRING key)
+INT get_int(STRING key)
+-----------------------
 
 Get `key` with data type INT. If stored `key` is not an INT zero will be returned.
 
-.. _func_set_string:
+.. _vmod_var.set_string:
 
-set_string
-----------
-
-::
-
-	VOID set_string(PRIV_TASK, STRING key, STRING value)
+VOID set_string(STRING key, STRING value)
+-----------------------------------------
 
 Identical to set().
 
-.. _func_get_string:
+.. _vmod_var.get_string:
 
-get_string
-----------
-
-::
-
-	STRING get_string(PRIV_TASK, STRING key)
+STRING get_string(STRING key)
+-----------------------------
 
 Identical to get().
 
-.. _func_set_real:
+.. _vmod_var.set_real:
 
-set_real
---------
-
-::
-
-	VOID set_real(PRIV_TASK, STRING key, REAL value)
+VOID set_real(STRING key, REAL value)
+-------------------------------------
 
 Set `key` to `value`.
 
-.. _func_get_real:
+.. _vmod_var.get_real:
 
-get_real
---------
-
-::
-
-	REAL get_real(PRIV_TASK, STRING key)
+REAL get_real(STRING key)
+-------------------------
 
 Get `key` with data type REAL. If stored `key` is not a REAL zero will be returned.
 
-.. _func_set_duration:
+.. _vmod_var.set_duration:
 
-set_duration
-------------
-
-::
-
-	VOID set_duration(PRIV_TASK, STRING key, DURATION value)
+VOID set_duration(STRING key, DURATION value)
+---------------------------------------------
 
 Set `key` to `value`.
 
-.. _func_get_duration:
+.. _vmod_var.get_duration:
 
-get_duration
-------------
-
-::
-
-	DURATION get_duration(PRIV_TASK, STRING key)
+DURATION get_duration(STRING key)
+---------------------------------
 
 Get `key` with data type DURATION. If stored `key` is not a DURATION zero will be returned.
 
-.. _func_set_ip:
+.. _vmod_var.set_ip:
 
-set_ip
-------
-
-::
-
-	VOID set_ip(PRIV_TASK, STRING key, IP value)
+VOID set_ip(STRING key, IP value)
+---------------------------------
 
 Set `key` to `value`.
 
-.. _func_get_ip:
+.. _vmod_var.get_ip:
 
-get_ip
-------
-
-::
-
-	IP get_ip(PRIV_TASK, STRING key)
+IP get_ip(STRING key)
+---------------------
 
 Get `key` with data type IP. If stored `key` is not an IP null will be returned.
 
-.. _func_clear:
+.. _vmod_var.set_backend:
 
-clear
------
+VOID set_backend(STRING key, BACKEND value)
+-------------------------------------------
 
-::
+Set `key` to `value`.
 
-	VOID clear(PRIV_TASK)
+.. _vmod_var.get_backend:
+
+BACKEND get_backend(STRING key)
+-------------------------------
+
+Get `key` with data type BACKEND. If stored `key` is not a BACKEND,
+null will be returned.
+
+.. _vmod_var.clear:
+
+VOID clear()
+------------
 
 Clear all non-global variables.
-

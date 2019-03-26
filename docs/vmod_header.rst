@@ -4,25 +4,30 @@
 .. Edit vmod.vcc and run make instead
 ..
 
-.. role:: ref(emphasis)
+
+:tocdepth: 1
 
 .. _vmod_header(3):
 
-===========
-vmod_header
-===========
-
------------------------
-Header VMOD for Varnish
------------------------
-
-:Manual section: 3
+=====================================
+VMOD header - Header VMOD for Varnish
+=====================================
 
 SYNOPSIS
 ========
 
-import header [from "path"] ;
+.. parsed-literal::
 
+  import header [from "path"]
+  
+  :ref:`vmod_header.append`
+   
+  :ref:`vmod_header.copy`
+   
+  :ref:`vmod_header.get`
+   
+  :ref:`vmod_header.remove`
+   
 DESCRIPTION
 ===========
 
@@ -51,22 +56,10 @@ Example::
 .. vcl-end
 
 
-CONTENTS
-========
+.. _vmod_header.append:
 
-* :ref:`func_append`
-* :ref:`func_copy`
-* :ref:`func_get`
-* :ref:`func_remove`
-
-.. _func_append:
-
-append
-------
-
-::
-
-	VOID append(HEADER, STRING)
+VOID append(HEADER, STRING)
+---------------------------
 
 Description
         Append an extra occurrence to an existing header.
@@ -74,14 +67,10 @@ Example
     ::
     header.append(beresp.http.Set-Cookie, "foo=bar")
 
-.. _func_copy:
+.. _vmod_header.copy:
 
-copy
-----
-
-::
-
-	VOID copy(HEADER, HEADER)
+VOID copy(HEADER, HEADER)
+-------------------------
 
 Description
         Copy all source headers to a new header.
@@ -89,14 +78,10 @@ Example
     ::
     header.copy(beresp.http.set-cookie, beresp.http.x-old-cookie);
 
-.. _func_get:
+.. _vmod_header.get:
 
-get
----
-
-::
-
-	STRING get(PRIV_CALL, HEADER header, STRING regex)
+STRING get(HEADER header, STRING regex)
+---------------------------------------
 
 Description
         Fetches the value of the first `header` that matches the given
@@ -105,17 +90,13 @@ Example
     ::
     set beresp.http.xusr = header.get(beresp.http.set-cookie,"user=");
 
-.. _func_remove:
+.. _vmod_header.remove:
 
-remove
-------
-
-::
-
-	VOID remove(PRIV_CALL, HEADER header, STRING regex)
+VOID remove(HEADER header, STRING regex)
+----------------------------------------
 
 Description
-        Remove all occurences of `header` that matches `regex`.
+        Remove all occurrences of `header` that matches `regex`.
 Example
     ::
     header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
@@ -135,4 +116,3 @@ BUGS
 
 You can't use dynamic regular expressions, which also holds true for normal
 regular expressions in regsub().
-

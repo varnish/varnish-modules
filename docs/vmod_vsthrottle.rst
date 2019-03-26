@@ -4,25 +4,30 @@
 .. Edit vmod.vcc and run make instead
 ..
 
-.. role:: ref(emphasis)
+
+:tocdepth: 1
 
 .. _vmod_vsthrottle(3):
 
-===============
-vmod_vsthrottle
-===============
-
----------------
-Throttling VMOD
----------------
-
-:Manual section: 3
+=================================
+VMOD vsthrottle - Throttling VMOD
+=================================
 
 SYNOPSIS
 ========
 
-import vsthrottle [from "path"] ;
+.. parsed-literal::
 
+  import vsthrottle [from "path"]
+  
+  :ref:`vmod_vsthrottle.is_denied`
+   
+  :ref:`vmod_vsthrottle.return_token`
+   
+  :ref:`vmod_vsthrottle.remaining`
+   
+  :ref:`vmod_vsthrottle.blocked`
+   
 DESCRIPTION
 ===========
 
@@ -36,6 +41,12 @@ specific cookie value, an API token, etc.
 The request rate is specified as the number of requests permitted over
 a period. To keep things simple, this is passed as two separate
 parameters, 'limit' and 'period'.
+
+If an optional duration 'block' is specified, then access is denied
+altogether for that period of time after the rate limit is
+reached. This is a way to entirely turn away a particularly
+troublesome source of traffic for a while, rather than let them back
+in as soon as the rate slips back under the threshold.
 
 This VMOD implements a `token bucket algorithm`_. State associated
 with the token bucket for each key is stored in-memory using BSD's
@@ -58,8 +69,9 @@ Example::
     sub vcl_recv {
         # Varnish will set client.identity for you based on client IP.
 
-        if (vsthrottle.is_denied(client.identity, 15, 10s)) {
-            # Client has exceeded 15 reqs per 10s
+        if (vsthrottle.is_denied(client.identity, 15, 10s, 30s)) {
+            # Client has exceeded 15 reqs per 10s.
+            # When this happens, block altogether for the next 30s.
             return (synth(429, "Too Many Requests"));
         }
 
@@ -78,33 +90,37 @@ Example::
 
 .. vcl-end
 
-CONTENTS
-========
 
-* :ref:`func_is_denied`
-* :ref:`func_remaining`
+.. _vmod_vsthrottle.is_denied:
 
-.. _func_is_denied:
-
-is_denied
----------
+BOOL is_denied(STRING key, INT limit, DURATION period, DURATION block)
+----------------------------------------------------------------------
 
 ::
 
-	BOOL is_denied(STRING key, INT limit, DURATION period)
+   BOOL is_denied(
+      STRING key,
+      INT limit,
+      DURATION period,
+      DURATION block=0
+   )
 
 Arguments:
 
   - key: A unique identifier to define what is being throttled - more examples below
   - limit: How many requests in the specified period
   - period: The time period
+  - block: a period to deny all access after hitting the threshold. Default is 0s
 
 Description
   Can be used to rate limit the traffic for a specific key to a
-  maximum of 'limit' requests per 'period' time. A token bucket
-  is uniquely identified by the triplet of its key, limit and
-  period, so using the same key multiple places with different
-  rules will create multiple token buckets.
+  maximum of 'limit' requests per 'period' time. If 'block' is > 0s,
+  (0s by default), then always deny for 'key' for that length of time
+  after hitting the threshold.
+
+  Note: A token bucket is uniquely identified by the 4-tuple of its
+  key, limit, period and block, so using the same key multiple places
+  with different rules will create multiple token buckets.
 
 Example
         ::
@@ -118,20 +134,69 @@ Example
 			# ...
 		}
 
+.. _vmod_vsthrottle.return_token:
 
-.. _func_remaining:
-
-remaining
----------
+VOID return_token(STRING key, INT limit, DURATION period, DURATION block)
+-------------------------------------------------------------------------
 
 ::
 
-	INT remaining(STRING key, INT limit, DURATION period)
+   VOID return_token(
+      STRING key,
+      INT limit,
+      DURATION period,
+      DURATION block=0
+   )
 
 Arguments:
-  - key: A unique identifier to define what is being throttled
-  - limit: How many requests in the specified period
-  - period: The time period
+  - Same arguments as is_denied()
+
+Description
+  Increment (by one) the number of tokens in the specified bucket. is_denied()
+  decrements the bucket by one token and return_token() adds it back.
+  Using these two, you can effectively make a token bucket act like a limit on
+  concurrent requests instead of requests / time.
+
+  Note: This function doesn't enforce anything, it merely credits a token to
+  appropriate bucket.
+
+  Warning: If streaming is enabled (beresp.do_stream = true) as it is by
+  default now, vcl_deliver() is called *before* the response is sent
+  to the client (who may download it slowly). Thus you may credit the token
+  back too early if you use return_token() in vcl_backend_response().
+
+Example
+        ::
+
+		sub vcl_recv {
+			if (vsthrottle.is_denied(client.identity, 20, 20s)) {
+				# Client has more than 20 concurrent requests
+				return (synth(429, "Too Many Requests In Flight"));
+			}
+
+			# ...
+		}
+
+		sub vcl_deliver {
+			vsthrottle.return_token(client.identity, 10, 10s);
+		}
+
+.. _vmod_vsthrottle.remaining:
+
+INT remaining(STRING key, INT limit, DURATION period, DURATION block)
+---------------------------------------------------------------------
+
+::
+
+   INT remaining(
+      STRING key,
+      INT limit,
+      DURATION period,
+      DURATION block=0
+   )
+
+Arguments:
+  - Same arguments as is_denied()
 
 Description
 
@@ -147,3 +212,36 @@ Example
 	set resp.http.X-RateLimit-Remaining = vsthrottle.remaining(client.identity, 15, 10s);
      }
 
+.. _vmod_vsthrottle.blocked:
+
+DURATION blocked(STRING key, INT limit, DURATION period, DURATION block)
+------------------------------------------------------------------------
+
+::
+
+   DURATION blocked(
+      STRING key,
+      INT limit,
+      DURATION period,
+      DURATION block
+   )
+
+Arguments:
+  - Same arguments as is_denied()
+
+Description
+
+  If the token bucket identified by the four parameters has been
+  blocked by use of the 'block' parameter in 'is_denied()', then
+  return the time remaining in the block. If it is not blocked,
+  return 0s. This can be used to inform clients how long they
+  will be locked out.
+
+
+Example
+  ::
+
+     sub vcl_deliver {
+	set resp.http.Retry-After
+		= vsthrottle.blocked(client.identity, 15, 10s, 30s);
+     }
