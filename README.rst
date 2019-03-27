@@ -124,7 +124,7 @@ Then proceed to the configure and build::
     sudo make install
 
 
-The resulting loadable modules (``libvmod_foo*.so`` files) will be installed to
+The resulting loadable modules (``libvmod_*.so`` files) will be installed to
 the Varnish module directory. (default `/usr/lib/varnish/vmods/`)
 
 
