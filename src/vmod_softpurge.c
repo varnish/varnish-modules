@@ -53,7 +53,11 @@ vmod_softpurge(VRT_CTX)
 	oh = ctx->req->objcore->objhead;
 	CHECK_OBJ_NOTNULL(oh, OBJHEAD_MAGIC);
 	spc = WS_Reserve(ctx->ws, 0);
-	assert(spc >= sizeof *ocp);
+	if (spc < sizeof *ocp) {
+		WS_Release(ctx->ws, 0);
+		VRT_fail(ctx, "insufficient workspace");
+		return;
+	}
 
 	nobj = 0;
 	ocp = (void*)ctx->ws->f;
