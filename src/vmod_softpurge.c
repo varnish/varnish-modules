@@ -52,7 +52,7 @@ vmod_softpurge(VRT_CTX)
 	CHECK_OBJ_NOTNULL(ctx->req->wrk, WORKER_MAGIC);
 	oh = ctx->req->objcore->objhead;
 	CHECK_OBJ_NOTNULL(oh, OBJHEAD_MAGIC);
-	spc = WS_Reserve(ctx->ws, 0);
+	spc = WS_ReserveAll(ctx->ws);
 	if (spc < sizeof *ocp) {
 		WS_Release(ctx->ws, 0);
 		VRT_fail(ctx, "insufficient workspace");
