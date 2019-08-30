@@ -34,6 +34,8 @@
 
 #include "vmod_config.h"
 
+#include "vre.h"
+
 #include "vcc_header_if.h"
 
 /*
@@ -267,4 +269,82 @@ vmod_remove(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 
 	hp = VRT_selecthttp(ctx, hdr->where);
 	header_http_Unset(ctx, hp, hdr->what, priv->priv);
+}
+
+/* XXX: http_VSLH() and http_VSLH_del() copied from cache_http.c */
+
+static void
+http_VSLH(const struct http *hp, unsigned hdr)
+{
+        int i;
+
+        if (hp->vsl != NULL) {
+                AN(hp->vsl->wid & (VSL_CLIENTMARKER|VSL_BACKENDMARKER));
+                i = hdr;
+                if (i > HTTP_HDR_FIRST)
+                        i = HTTP_HDR_FIRST;
+                i += hp->logtag;
+                VSLbt(hp->vsl, (enum VSL_tag_e)i, hp->hd[hdr]);
+        }
+}
+
+static void
+http_VSLH_del(const struct http *hp, unsigned hdr)
+{
+        int i;
+
+        if (hp->vsl != NULL) {
+                /* We don't support unsetting stuff in the first line */
+                assert (hdr >= HTTP_HDR_FIRST);
+                AN(hp->vsl->wid & (VSL_CLIENTMARKER|VSL_BACKENDMARKER));
+                i = (HTTP_HDR_UNSET - HTTP_HDR_METHOD);
+                i += hp->logtag;
+                VSLbt(hp->vsl, (enum VSL_tag_e)i, hp->hd[hdr]);
+        }
+}
+
+VCL_VOID
+vmod_regsub(VRT_CTX, struct vmod_priv *priv, VCL_HTTP hp, VCL_STRING regex,
+    VCL_STRING sub, VCL_BOOL all)
+{
+	vre_t *re;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(hp, HTTP_MAGIC);
+	AN(priv);
+
+	if (regex == NULL) {
+		VRT_fail(ctx, "header.regsub(): regex is NULL");
+		return;
+	}
+	if (priv->priv == NULL) {
+		const char *err;
+		int erroffset;
+
+		if (VRE_compile(regex, 0, &err, &erroffset) == NULL) {
+			VRT_fail(ctx, "header.regsub(): cannot compile '%s': "
+			    "%s (offset %d)", regex, err, erroffset);
+			return;
+		}
+		header_init_re(priv, regex);
+	}
+
+	AN(priv->priv);
+	re = (vre_t *)priv->priv;
+	for (unsigned u = HTTP_HDR_FIRST; u < hp->nhd; u++) {
+		const char *hdr;
+		VCL_STRING rewrite;
+
+		Tcheck(hp->hd[u]);
+		hdr = hp->hd[u].b;
+		if (!VRT_re_match(ctx, hdr, re))
+			continue;
+		rewrite = VRT_regsub(ctx, all, hdr, re, sub);
+		if (rewrite == hdr)
+			continue;
+		http_VSLH_del(hp, u);
+		hp->hd[u].b = rewrite;
+		hp->hd[u].e = strchr(rewrite, '\0');
+		http_VSLH(hp, u);
+	}
 }
