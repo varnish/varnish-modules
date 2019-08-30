@@ -1,0 +1,114 @@
+varnishtest "Header-vmod: Test substitution"
+
+server s1 {
+	loop 2 {
+		rxreq
+		expect req.http.Pebbles == "quuxquux"
+		expect req.http.Y-Prefix-Foo == "foo"
+		expect req.http.X-Prefix-Foo == <undef>
+		txresp -hdr "Foo: barf" -hdr "v1: val=foo" -hdr "v2: VAL=bar"
+	}
+} -start
+
+varnish v1 -vcl+backend {
+	import header from "${vmod_builddir}/.libs/libvmod_header.so";
+
+	sub vcl_recv {
+		header.regsub(req, "bam", "quux", all=true);
+		return (pass);
+	}
+
+	sub vcl_backend_fetch {
+		header.regsub(bereq, "^(?i)X-Prefix", "Y-Prefix");
+	}
+
+	sub vcl_backend_response {
+		header.regsub(beresp, "^Foo: (b)(a)(r)(f)", "Bar: \4\3\2p");
+	}
+
+	sub vcl_deliver {
+		header.regsub(resp, "^(?i)V(\d): (?-i)val=(.*)$", "Val\1: \2");
+	}
+} -start
+
+client c1 {
+	# Run twice to test the cached compiled regexen in PRIV_CALL scope
+	loop 2 {
+		txreq -hdr "x-prefix-foo: foo" -hdr "Pebbles: bambam"
+		rxresp
+		expect resp.status == 200
+		expect resp.http.Bar == "frap"
+		expect resp.http.Foo == <undef>
+		expect resp.http.Val1 == "foo"
+		expect resp.http.V2 == "VAL=bar"
+		expect resp.http.Val2 == <undef>
+	}
+} -run
+
+logexpect l1 -v v1 -d 1 -g vxid -q {Begin ~ "^bereq"} {
+ 	expect 0 * Begin bereq
+ 	expect * = BereqUnset   "^x-prefix-foo: foo$"
+ 	expect 0 = BereqHeader  "^Y-Prefix-foo: foo$"
+ 	expect * = BerespUnset  "^Foo: barf$"
+ 	expect 0 = BerespHeader "^Bar: frap$"
+ 	expect * = End
+} -run
+
+logexpect l1 -v v1 -d 1 -g vxid -q {Begin ~ "^req"} {
+ 	expect 0 * Begin req
+ 	expect * = ReqUnset   "^Pebbles: bambam$"
+ 	expect 0 = ReqHeader  "^Pebbles: quuxquux$"
+ 	expect * = RespUnset  "^v1: val=foo"
+ 	expect 0 = RespHeader "^Val1: foo$"
+ 	expect * = End
+} -run
+
+## Errors
+
+varnish v1 -vcl {
+	import header from "${vmod_builddir}/.libs/libvmod_header.so";
+	backend b { .host="${bad_ip}"; }
+
+	sub vcl_recv {
+		header.regsub(req, req.http.No-Such-Header, "a");
+	}
+}
+
+logexpect l1 -v v1 -d 0 -g vxid {
+ 	expect 0 * Begin req
+ 	expect * = VCL_Error {^header\.regsub\(\): regex is NULL$}
+ 	expect * = End
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.status == 503
+	expect resp.reason == "VCL failed"
+} -run
+
+logexpect l1 -wait
+
+varnish v1 -vcl {
+	import header from "${vmod_builddir}/.libs/libvmod_header.so";
+	backend b { .host="${bad_ip}"; }
+
+	sub vcl_recv {
+		header.regsub(req, "(", "a");
+	}
+}
+
+logexpect l1 -v v1 -d 0 -g vxid {
+ 	expect 0 * Begin req
+ 	expect * = VCL_Error {^header\.regsub\(\): cannot compile '\('}
+ 	expect * = End
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.status == 503
+	expect resp.reason == "VCL failed"
+} -run
+
+logexpect l1 -wait

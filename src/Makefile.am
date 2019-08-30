@@ -126,6 +126,7 @@ VMOD_TESTS = \
 	tests/header/keep-others.vtc \
 	tests/header/remove.vtc \
 	tests/header/some-data.vtc \
+	tests/header/regsub.vtc \
 	tests/saintmode/test01.vtc \
 	tests/saintmode/test02.vtc \
 	tests/saintmode/test03.vtc \

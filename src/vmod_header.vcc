@@ -62,7 +62,45 @@ Example
     ::
     header.remove(beresp.http.set-cookie,"^(?!(funcookie=))");
 
+$Function VOID regsub(PRIV_CALL, HTTP, STRING regex, STRING sub, BOOL all=0)
 
+Description
+        For every header line in the HTTP object, which can be one of
+        ``req``, ``resp``, ``bereq`` or ``beresp``, if the line
+        matches the regular expression ``regex``, then replace it with
+        the result of a substitution using the string ``sub``. ``sub``
+        may include backreferences of the form ``\1`` through ``\9``,
+        which refer to capturing expressions in the ``regex``, or
+        ``\0`` to refer to the entire matched portion of the header
+        line.
+
+        If ``all`` is ``false``, replace the first matched portion of
+        the header line with ``sub``. This is the same operation
+        performed by the VCL native function ``regsub()``. ``all`` is
+        ``false`` by default.
+
+        If ``all`` is ``true``, replace each non-overlapping matched
+        portion of the header line with ``sub``. This is the same
+        operation performed by native ``regsuball()``.
+
+        Note that unlike the other functions in this VMOD,
+        ``regsub()`` applies to the *entire* header line, including
+        the header name, colon separator, and header value. Take care
+        that your substitutions result in valid headers, since
+        ill-formed headers can interfere with the HTTP protocol.
+
+        Consider case sensitivity in the regex match. The standard
+        dictates that header names are case insensitive, but header
+        values are not. The VMOD function does not take care of that
+        for you, but you can express it in the ``regex`` using the
+        ``(?i)`` flag, as shown in the example below (use ``(?-i)`` to
+        turn it off).
+
+        Consider using the ``^`` starting anchor in ``regex`` to be
+        sure to match a header name (and not the same string somewhere
+        in the middle of the line).
+Example
+    :: header.regsub(req, "^(?i)Foo(\\d): (?-i)bar=(.*)$", "Bar\\1: \\2")
 
 ACKNOWLEDGEMENTS
 ================
