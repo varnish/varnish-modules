@@ -54,12 +54,12 @@ static void
 header_init_re(struct vmod_priv *priv, const char *s)
 {
 	if (priv->priv == NULL) {
-		assert(pthread_mutex_lock(&header_mutex) == 0);
+		AZ(pthread_mutex_lock(&header_mutex));
 		if (priv->priv == NULL) {
 			VRT_re_init(&priv->priv, s);
 			priv->free = VRT_re_fini;
 		}
-		pthread_mutex_unlock(&header_mutex);
+		AZ(pthread_mutex_unlock(&header_mutex));
 	}
 }
 
@@ -200,7 +200,7 @@ vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 
 	if (e != VCL_EVENT_LOAD)
 		return (0);
-	assert(pthread_mutex_init(&header_mutex, NULL) == 0);
+	AZ(pthread_mutex_init(&header_mutex, NULL));
 	return (0);
 }
 
