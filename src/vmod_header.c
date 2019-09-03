@@ -49,8 +49,6 @@ pthread_mutex_t header_mutex;
 
 /*
  * Initialize the regex *s on priv, if it hasn't already been done.
- * XXX: We have to recheck the condition after grabbing the lock to avoid a
- * XXX: race condition.
  */
 static void
 header_init_re(struct vmod_priv *priv, const char *s)
