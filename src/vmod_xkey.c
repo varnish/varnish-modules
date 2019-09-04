@@ -516,37 +516,15 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 				CHECK_OBJ_NOTNULL(oc->objcore, OBJCORE_MAGIC);
 				if (oc->objcore->flags & OC_F_BUSY)
 					continue;
-#if defined HAVE_OBJCORE_EXP
-				if (do_soft && oc->objcore->exp.ttl <=
-				    (ctx->now - oc->objcore->exp.t_origin))
-					continue;
-#else
 				if (do_soft &&
 				    oc->objcore->ttl <= (ctx->now - oc->objcore->t_origin))
 					continue;
-#endif
-#if defined HAVE_OBJCORE_EXP && defined VARNISH_PLUS
-				if (do_soft)
-					EXP_Rearm(ctx->req->wrk, oc->objcore, ctx->now, 0,
-					    oc->objcore->exp.grace, oc->objcore->exp.keep);
-				else
-					EXP_Rearm(ctx->req->wrk, oc->objcore,
-					    oc->objcore->exp.t_origin, 0, 0, 0);
-#elif defined HAVE_OBJCORE_EXP
-				if (do_soft)
-					EXP_Rearm(oc->objcore, ctx->now, 0,
-					    oc->objcore->exp.grace, oc->objcore->exp.keep);
-				else
-					EXP_Rearm(oc->objcore, oc->objcore->exp.t_origin,
-					    0, 0, 0);
-#else
 				if (do_soft)
 					EXP_Rearm(oc->objcore, ctx->now, 0,
 					    oc->objcore->grace, oc->objcore->keep);
 				else
 					EXP_Rearm(oc->objcore, oc->objcore->t_origin,
 					    0, 0, 0);
-#endif
 				i++;
 			}
 		}
