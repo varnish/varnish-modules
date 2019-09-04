@@ -464,29 +464,6 @@ xkey_cb_remove(struct objcore *objcore)
 	AZ(pthread_mutex_unlock(&mtx));
 }
 
-#if HAVE_ENUM_EXP_EVENT_E
-static void
-xkey_cb(struct worker *wrk, struct objcore *objcore,
-    enum exp_event_e event, void *priv)
-{
-
-	CHECK_OBJ_NOTNULL(wrk, WORKER_MAGIC);
-	CHECK_OBJ_NOTNULL(objcore, OBJCORE_MAGIC);
-	AZ(priv);
-
-	switch (event) {
-	case EXP_INSERT:
-	case EXP_INJECT:
-		xkey_cb_insert(wrk, objcore);
-		break;
-	case EXP_REMOVE:
-		xkey_cb_remove(objcore);
-		break;
-	default:
-		WRONG("enum exp_event_e");
-	}
-}
-#else
 static void
 xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 {
@@ -507,7 +484,6 @@ xkey_cb(struct worker *wrk, void *priv, struct objcore *oc, unsigned ev)
 		WRONG("Unexpected event");
 	}
 }
-#endif
 
 /**************************/
 
@@ -603,13 +579,8 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
 		if (n_init == 0)
-#ifdef HAVE_ENUM_EXP_EVENT_E
-			xkey_cb_handle =
-			    EXP_Register_Callback(xkey_cb, NULL);
-#else
 			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
 			    OEV_INSERT|OEV_EXPIRE);
-#endif
 		AN(xkey_cb_handle);
 		n_init++;
 		AZ(pthread_mutex_unlock(&mtx));
@@ -621,11 +592,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		AN(xkey_cb_handle);
 		if (n_init == 0) {
 			/* Do cleanup */
-#ifdef HAVE_ENUM_EXP_EVENT_E
-			EXP_Deregister_Callback(&xkey_cb_handle);
-#else
 			ObjUnsubscribeEvents(&xkey_cb_handle);
-#endif
 			AZ(xkey_cb_handle);
 			xkey_cleanup();
 		}

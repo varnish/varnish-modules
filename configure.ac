@@ -69,7 +69,7 @@ AC_CHECK_MEMBER(struct director.admin_health,
 		#include <cache/cache_director.h>
 	])
 
-AC_CHECK_TYPES([req_body_iter_f, objiterate_f, enum exp_event_e],
+AC_CHECK_TYPES([req_body_iter_f, objiterate_f],
 	[], [], [#include <cache/cache.h>])
 
 CPPFLAGS=$save_CPPFLAGS
