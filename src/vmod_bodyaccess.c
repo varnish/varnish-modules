@@ -33,12 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_CACHE_CACHE_VARNISHD_H
-#  include <cache/cache_varnishd.h>
-#  include <vcl.h>
-#else
-#  include "vmod_config.h"
-#endif
+#include <cache/cache_varnishd.h>
+#include <vcl.h>
 
 #include "vre.h"
 #include "vsb.h"
