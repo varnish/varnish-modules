@@ -118,7 +118,9 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader)
 	}
 
 	if (!VTAILQ_EMPTY(&vcp->cookielist)) {
-		/* If called twice during the same request, clean out old state */
+		/*
+		 * If called twice during the same request, clean out old state
+		 */
 		vmod_clean(ctx, priv);
 	}
 
@@ -237,7 +239,8 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 
 	vre = VRE_compile(expression, 0, &error, &erroroffset);
 	if (vre == NULL) {
-		VSLb(ctx->vsl, SLT_Error, "cookie: PCRE compile error at char %i: %s", erroroffset, error);
+		VSLb(ctx->vsl, SLT_Error, "cookie: PCRE compile error at char %i: %s",
+		    erroroffset, error);
 		return(NULL);
 	}
 	return(vre);
@@ -262,7 +265,7 @@ vmod_get_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 		vre = compile_re(ctx, expression);
 		if (!vre) {
 			AZ(pthread_mutex_unlock(&mtx));
-			return(NULL);   // Not much else to do, error already logged.
+			return(NULL);
 		}
 
 		priv_call->priv = vre;
@@ -273,13 +276,15 @@ vmod_get_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 		VSLb(ctx->vsl, SLT_Debug, "cookie: checking %s", current->name);
-		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0, ovector,
-				     VRE_MAX_GROUPS, NULL);
-		if (i >= 0) {
-			VSLb(ctx->vsl, SLT_Debug, "cookie: %s is a match for regex '%s'", current->name, expression);
-			cookie = current;
-			break;
-		}
+		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0,
+		    ovector, VRE_MAX_GROUPS, NULL);
+		if (i < 0)
+			continue;
+
+		VSLb(ctx->vsl, SLT_Debug, "cookie: %s is a match for regex '%s'",
+		    current->name, expression);
+		cookie = current;
+		break;
 	}
 
 	return (cookie ? cookie->value : NULL);
@@ -425,23 +430,26 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 	VTAILQ_FOREACH_SAFE(current, &vcp->cookielist, list, safeptr) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
 
-		i = VRE_exec(priv_call->priv, current->name, strlen(current->name),
-					 0, 0, ovector, VRE_MAX_GROUPS, NULL);
+		i = VRE_exec(priv_call->priv, current->name,
+		    strlen(current->name), 0, 0, ovector, VRE_MAX_GROUPS, NULL);
 
 		switch (mode) {
 		case blacklist:
 			if (i < 0)
 				continue;
-			VSLb(ctx->vsl, SLT_Debug, "Removing matching cookie %s (value: %s)", current->name, current->value);
+			VSLb(ctx->vsl, SLT_Debug, "Removing matching cookie %s (value: %s)",
+			    current->name, current->value);
 			VTAILQ_REMOVE(&vcp->cookielist, current, list);
 			break;
 		case whitelist:
 			if (i >= 0) {
-				VSLb(ctx->vsl, SLT_Debug, "Cookie %s matches expression '%s'", current->name, expression);
+				VSLb(ctx->vsl, SLT_Debug, "Cookie %s matches expression '%s'",
+				    current->name, expression);
 				continue;
 			}
 
-			VSLb(ctx->vsl, SLT_Debug, "Removing cookie %s (value: %s)", current->name, current->value);
+			VSLb(ctx->vsl, SLT_Debug, "Removing cookie %s (value: %s)",
+			    current->name, current->value);
 			VTAILQ_REMOVE(&vcp->cookielist, current, list);
 			break;
 		default:
