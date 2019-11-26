@@ -46,8 +46,14 @@
 
 #define VRE_MAX_GROUPS 8
 
+enum filter_action {
+	blacklist = 0,
+	whitelist = 1
+};
+
 vre_t * compile_re(VRT_CTX, VCL_STRING);
-VCL_VOID re_filter(VRT_CTX, struct vmod_priv *, struct vmod_priv *, VCL_STRING, int);
+VCL_VOID re_filter(VRT_CTX, struct vmod_priv *, struct vmod_priv *,
+    VCL_STRING, enum filter_action);
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
@@ -305,12 +311,9 @@ vmod_clean(VRT_CTX, struct vmod_priv *priv)
 	VTAILQ_INIT(&vcp->cookielist);
 }
 
-#define FILTER_ACTION_BLACKLIST 0
-#define FILTER_ACTION_WHITELIST 1
-
 static void
 filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
-    VCL_BOOL filter_action)
+    enum filter_action mode)
 {
 	struct cookie *cookieptr, *safeptr;
 	struct vmod_cookie *vcp = cobj_get(priv);
@@ -361,7 +364,7 @@ filter_cookies(struct vmod_priv *priv, VCL_STRING list_s,
 				break;
 			}
 		}
-		if (matched != filter_action)
+		if (matched != mode)
 			VTAILQ_REMOVE(&vcp->cookielist, cookieptr, list);
 	}
 
@@ -384,7 +387,7 @@ VCL_VOID
 vmod_keep(VRT_CTX, struct vmod_priv *priv, VCL_STRING whitelist_s)
 {
 	(void)ctx;
-	filter_cookies(priv, whitelist_s, FILTER_ACTION_WHITELIST);
+	filter_cookies(priv, whitelist_s, whitelist);
 }
 
 
@@ -392,13 +395,13 @@ VCL_VOID
 vmod_filter(VRT_CTX, struct vmod_priv *priv, VCL_STRING blacklist_s)
 {
 	(void)ctx;
-	filter_cookies(priv, blacklist_s, FILTER_ACTION_BLACKLIST);
+	filter_cookies(priv, blacklist_s, blacklist);
 }
 
 
 VCL_VOID
 re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
-		  VCL_STRING expression, int mode)
+		  VCL_STRING expression, enum filter_action mode)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
 	struct cookie *current, *safeptr;
@@ -425,20 +428,25 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 		i = VRE_exec(priv_call->priv, current->name, strlen(current->name),
 					 0, 0, ovector, VRE_MAX_GROUPS, NULL);
 
-		if (mode == FILTER_ACTION_BLACKLIST) {
-			if (i >= 0) {
-				VSLb(ctx->vsl, SLT_Debug, "Removing matching cookie %s (value: %s)", current->name, current->value);
-				VTAILQ_REMOVE(&vcp->cookielist, current, list);
-			}
-		} else if (mode == FILTER_ACTION_WHITELIST) {
+		switch (mode) {
+		case blacklist:
+			if (i < 0)
+				continue;
+			VSLb(ctx->vsl, SLT_Debug, "Removing matching cookie %s (value: %s)", current->name, current->value);
+			VTAILQ_REMOVE(&vcp->cookielist, current, list);
+			break;
+		case whitelist:
 			if (i >= 0) {
 				VSLb(ctx->vsl, SLT_Debug, "Cookie %s matches expression '%s'", current->name, expression);
-			} else {
-				VSLb(ctx->vsl, SLT_Debug, "Removing cookie %s (value: %s)", current->name, current->value);
-			    VTAILQ_REMOVE(&vcp->cookielist, current, list);
+				continue;
 			}
+
+			VSLb(ctx->vsl, SLT_Debug, "Removing cookie %s (value: %s)", current->name, current->value);
+			VTAILQ_REMOVE(&vcp->cookielist, current, list);
+			break;
+		default:
+			WRONG("invalid mode");
 		}
-			else WRONG("invalid mode");
 	}
 }
 
@@ -447,7 +455,7 @@ VCL_VOID
 vmod_keep_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
 {
-	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_WHITELIST);
+	re_filter(ctx, priv, priv_call, expression, whitelist);
 }
 
 
@@ -455,7 +463,7 @@ VCL_VOID
 vmod_filter_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
 {
-	re_filter(ctx, priv, priv_call, expression, FILTER_ACTION_BLACKLIST);
+	re_filter(ctx, priv, priv_call, expression, blacklist);
 }
 
 
