@@ -107,7 +107,7 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader)
 	int i = 0;
 
 	if (!cookieheader || *cookieheader == '\0') {
-		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: nothing to parse");
+		VSLb(ctx->vsl, SLT_Debug, "cookie: nothing to parse");
 		return;
 	}
 
@@ -138,7 +138,7 @@ vmod_parse(VRT_CTX, struct vmod_priv *priv, VCL_STRING cookieheader)
 			break;
 		p = sep + 1;
 	}
-	VSLb(ctx->vsl, SLT_VCL_Log, "cookie: parsed %i cookies.", i);
+	VSLb(ctx->vsl, SLT_Debug, "cookie: parsed %i cookies.", i);
 }
 
 static struct cookie *
@@ -266,11 +266,11 @@ vmod_get_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 
 	VTAILQ_FOREACH(current, &vcp->cookielist, list) {
 		CHECK_OBJ_NOTNULL(current, VMOD_COOKIE_ENTRY_MAGIC);
-		VSLb(ctx->vsl, SLT_VCL_Log, "cookie: checking %s", current->name);
+		VSLb(ctx->vsl, SLT_Debug, "cookie: checking %s", current->name);
 		i = VRE_exec(vre, current->name, strlen(current->name), 0, 0, ovector,
 				     VRE_MAX_GROUPS, NULL);
 		if (i >= 0) {
-			VSLb(ctx->vsl, SLT_VCL_Log, "cookie: %s is a match for regex '%s'", current->name, expression);
+			VSLb(ctx->vsl, SLT_Debug, "cookie: %s is a match for regex '%s'", current->name, expression);
 			cookie = current;
 			break;
 		}
@@ -427,14 +427,14 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 
 		if (mode == FILTER_ACTION_BLACKLIST) {
 			if (i >= 0) {
-				VSLb(ctx->vsl, SLT_VCL_Log, "Removing matching cookie %s (value: %s)", current->name, current->value);
+				VSLb(ctx->vsl, SLT_Debug, "Removing matching cookie %s (value: %s)", current->name, current->value);
 				VTAILQ_REMOVE(&vcp->cookielist, current, list);
 			}
 		} else if (mode == FILTER_ACTION_WHITELIST) {
 			if (i >= 0) {
-				VSLb(ctx->vsl, SLT_VCL_Log, "Cookie %s matches expression '%s'", current->name, expression);
+				VSLb(ctx->vsl, SLT_Debug, "Cookie %s matches expression '%s'", current->name, expression);
 			} else {
-				VSLb(ctx->vsl, SLT_VCL_Log, "Removing cookie %s (value: %s)", current->name, current->value);
+				VSLb(ctx->vsl, SLT_Debug, "Removing cookie %s (value: %s)", current->name, current->value);
 			    VTAILQ_REMOVE(&vcp->cookielist, current, list);
 			}
 		}
