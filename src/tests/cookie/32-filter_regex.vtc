@@ -1,4 +1,4 @@
-varnishtest "Test filter_regex in vmod-cookie"
+varnishtest "Test filter_re in vmod-cookie"
 
 server s1 {
        rxreq
@@ -14,13 +14,13 @@ varnish v1 -vcl+backend {
 		cookie.set("empire", "jellytots");
 
 		set resp.http.X-foo = cookie.get_string();
-		cookie.filter_regex("^NOT-MATCHING-ANYTHING$");
+		cookie.filter_re("^NOT-MATCHING-ANYTHING$");
 		set resp.http.X-bar = cookie.get_string();
 
-		cookie.filter_regex("^bredela");
+		cookie.filter_re("^bredela");
 		set resp.http.X-baz = cookie.get_string();
 
-		cookie.filter_regex(".*");
+		cookie.filter_re(".*");
 		set resp.http.X-qux = cookie.get_string();
 	}
 } -start

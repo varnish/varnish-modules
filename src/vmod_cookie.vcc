@@ -94,7 +94,7 @@ Example
                 }
 
 
-$Function VOID filter_regex(PRIV_TASK, PRIV_CALL, STRING expression)
+$Function VOID filter_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Delete all cookies from internal vmod storage that matches the
@@ -105,7 +105,7 @@ Example
 
                 sub vcl_recv {
                         cookie.parse("cookie1: value1; cookie2: value2; cookie3: value3");
-                        cookie.filter_regex("^cookie[12]$");
+                        cookie.filter_re("^cookie[12]$");
                         // get_string() will now yield
                         // "cookie3: value3";
                 }
@@ -131,7 +131,7 @@ Example
                         // "cookie1: value1; cookie2: value2;";
                 }
 
-$Function VOID keep_regex(PRIV_TASK, PRIV_CALL, STRING expression)
+$Function VOID keep_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Delete all cookies from internal vmod storage that does not match expression `expression`.
@@ -140,7 +140,7 @@ Example
 
                 sub vcl_recv {
                         cookie.parse("cookie1: value1; cookie2: value2; cookie3: value3");
-                        cookie.keep_regex("^cookie1,cookie2");
+                        cookie.keep_re("^cookie1,cookie2");
                         // get_string() will now yield
                         // "cookie1: value1; cookie2: value2;";
                 }
@@ -177,7 +177,7 @@ Example
                         std.log("cookie1 value is: " + cookie.get("cookie1"));
                 }
 
-$Function STRING get_regex(PRIV_TASK, PRIV_CALL, STRING expression)
+$Function STRING get_re(PRIV_TASK, PRIV_CALL, STRING expression)
 
 Description
         Get the value of the first cookie in internal vmod storage that matches regular expression `expression`. If nothing matches, an empty string is returned.
@@ -187,7 +187,7 @@ Example
                 import std;
                 sub vcl_recv {
                         cookie.parse("cookie1: value1; cookie2: value2;");
-                        std.log("cookie1 value is: " + cookie.get_regex("^cookie1$"));
+                        std.log("cookie1 value is: " + cookie.get_re("^cookie1$"));
                 }
 
 $Function STRING get_string(PRIV_TASK)

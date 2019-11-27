@@ -1,4 +1,4 @@
-varnishtest "Test keep_regex in vmod-cookie"
+varnishtest "Test keep_re in vmod-cookie"
 
 server s1 {
        rxreq
@@ -10,11 +10,11 @@ varnish v1 -vcl+backend {
 
 	sub vcl_deliver {
 		cookie.parse("foo=bar; baz=qux;");
-		cookie.keep_regex("NOTHING_MATCHES_SO_NOTHING_KEPT$");
+		cookie.keep_re("NOTHING_MATCHES_SO_NOTHING_KEPT$");
 		set resp.http.X-empty = cookie.get_string();
 
 		cookie.parse("biscuit=standard; bredela=eggwhites; empire=jellytots;");
-		cookie.keep_regex("^b");
+		cookie.keep_re("^b");
 		set resp.http.X-bees = cookie.get_string();
 	}
 } -start

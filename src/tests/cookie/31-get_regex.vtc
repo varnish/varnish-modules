@@ -1,4 +1,4 @@
-varnishtest "Test get_regex in vmod-cookie"
+varnishtest "Test get_re in vmod-cookie"
 
 server s1 {
        rxreq
@@ -13,9 +13,9 @@ varnish v1 -vcl+backend {
 		cookie.set("chocolatechip", "verychippy");
 		cookie.set("empire", "jellytots");
 
-		set resp.http.X-first = cookie.get_regex("DOES_NOT_EXIST");
-		set resp.http.X-second = cookie.get_regex("biscuit");
-		set resp.http.X-third = cookie.get_regex("DOES_NOT_EXIST_EITHER");
+		set resp.http.X-first = cookie.get_re("DOES_NOT_EXIST");
+		set resp.http.X-second = cookie.get_re("biscuit");
+		set resp.http.X-third = cookie.get_re("DOES_NOT_EXIST_EITHER");
 	}
 } -start
 

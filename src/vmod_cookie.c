@@ -247,7 +247,7 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 }
 
 VCL_STRING
-vmod_get_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
 {
 	struct vmod_cookie *vcp = cobj_get(priv);
@@ -460,7 +460,7 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 
 
 VCL_VOID
-vmod_keep_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+vmod_keep_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
 {
 	re_filter(ctx, priv, priv_call, expression, whitelist);
@@ -468,7 +468,7 @@ vmod_keep_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 
 
 VCL_VOID
-vmod_filter_regex(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
+vmod_filter_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
 {
 	re_filter(ctx, priv, priv_call, expression, blacklist);
