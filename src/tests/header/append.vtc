@@ -17,6 +17,7 @@ varnish v1 -vcl+backend {
 	sub vcl_backend_response {
 		if (bereq.url == "/foo") {
 			set beresp.http.foo = "null";
+			header.append(header.dyn(beresp, 35 + 7), "is the answer");
 		} elsif ( bereq.url == "/bar") {
 			header.append(beresp.http.foo, "blatti");
 		}
@@ -29,6 +30,7 @@ client c1 {
 	rxresp
 	expect resp.status == 200
 	expect resp.http.foo == "null"
+	expect resp.http.42 == "is the answer"
 } -run
 
 client c2 {

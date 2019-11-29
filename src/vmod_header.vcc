@@ -102,6 +102,29 @@ Description
 Example
     :: header.regsub(req, "^(?i)Foo(\\d): (?-i)bar=(.*)$", "Bar\\1: \\2")
 
+$Function HEADER dyn(HTTP, STRING)
+
+Description
+        Return a dynamic header name.
+
+	Most other functions of this vmod require a *HEADER* argument,
+	which usually is a VCL-defined header like ``req.http.foo``.
+
+	This function allows to construct a header name from an
+	arbitrary string, which may also be dynamically created, for
+	example from a variable.
+
+	*Notice* that there are no syntactic checks on the *STRING*
+	argument by purpose in order to support exotic use cases. It
+	is entirely up to the user and at their own risk to supply a
+	string which represents a valid HTTP header name (or not).
+
+Example
+    ::
+    # create this request header
+    # 42: is the answer
+    header.append(header.dyn(req, 35 + 7), "is the answer");
+
 ACKNOWLEDGEMENTS
 ================
 

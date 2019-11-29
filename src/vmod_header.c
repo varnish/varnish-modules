@@ -1,8 +1,11 @@
 /*-
  * Copyright (c) 2011-2016 Varnish Software
+ * Copyright 2019 UPLEX - Nils Goroll Systemoptimierung
  * All rights reserved.
  *
- * Author: Kristian Lyngstol <kristian@bohemians.org>
+ * Authors: Kristian Lyngstol <kristian@bohemians.org>
+ *          Geoffrey <geoffrey.simmons@uplex.de>
+ *          Nils Goroll <nils.goroll@uplex.de>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,6 +34,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "vmod_config.h"
 
@@ -345,4 +349,74 @@ vmod_regsub(VRT_CTX, struct vmod_priv *priv, VCL_HTTP hp, VCL_STRING regex,
 		hp->hd[u].e = strchr(rewrite, '\0');
 		http_VSLH(hp, u);
 	}
+}
+
+/* basically the inverse of VRT_selecthttp() */
+static enum gethdr_e
+selectwhere(VRT_CTX, VCL_HTTP hp)
+{
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(hp, HTTP_MAGIC);
+
+	if (hp == ctx->http_req)
+		return (HDR_REQ);
+	if (hp == ctx->http_req_top)
+		return (HDR_REQ_TOP);
+	if (hp == ctx->http_bereq)
+		return (HDR_BEREQ);
+	if (hp == ctx->http_beresp)
+		return (HDR_BERESP);
+	if (hp ==  ctx->http_resp)
+		return (HDR_RESP);
+	WRONG("impossible VCL_HTTP");
+}
+
+// XXX would need to know the limit
+const struct gethdr_s hdr_null[HDR_BERESP + 1] = {
+	[HDR_REQ]	= { HDR_REQ,		"\0"},
+	[HDR_REQ_TOP]	= { HDR_REQ_TOP,	"\0"},
+	[HDR_RESP]	= { HDR_RESP,		"\0"},
+	[HDR_OBJ]	= { HDR_OBJ,		"\0"},
+	[HDR_BEREQ]	= { HDR_BEREQ,		"\0"},
+	[HDR_BERESP]	= { HDR_BERESP,	"\0"}
+};
+
+
+VCL_HEADER
+vmod_dyn(VRT_CTX, VCL_HTTP hp, VCL_STRING name)
+{
+	// usual assertions are in selectwhere()
+	enum gethdr_e where = selectwhere(ctx, hp);
+	char *what;
+	const char *p;
+	struct gethdr_s *hdr;
+	size_t l;
+
+	if (name == NULL || *name == '\0')
+		return (&hdr_null[where]);
+
+	p = strchr(name, ':');
+	if (p != NULL)
+		l = p - name;
+	else
+		l = strlen(name);
+
+	assert(l <= CHAR_MAX);
+
+	hdr = WS_Alloc(ctx->ws, sizeof *hdr);
+	what = WS_Alloc(ctx->ws, l + 3);
+	if (hdr == NULL || what == NULL) {
+		VRT_fail(ctx, "out of workspace");
+		// avoid null check in caller
+		return (&hdr_null[where]);
+	}
+
+	what[0] = (char)l + 1;
+	(void) strncpy(&what[1], name, l);
+	what[l+1] = ':';
+	what[l+2] = '\0';
+
+	hdr->where = where;
+	hdr->what = what;
+	return (hdr);
 }
