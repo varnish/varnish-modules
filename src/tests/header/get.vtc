@@ -18,8 +18,14 @@ varnish v1 -vcl+backend {
 	sub vcl_backend_response {
 		if (bereq.url == "/") {
 			set beresp.http.xusr = header.get(beresp.http.foo,"realcookie=");
+			set beresp.http.dyn-xusr = header.get(
+			    header.dyn(beresp,"foo"),
+			    "realcookie=");
 		} elsif (bereq.url == "/two") {
 			set beresp.http.xusr = header.get(beresp.http.foo,"^realcookie=");
+			set beresp.http.dyn-xusr = header.get(
+			    header.dyn(beresp,"foo"),
+			    "^realcookie=");
 		}
 		return(deliver);
 	}
@@ -30,11 +36,13 @@ client c1 {
 	rxresp
 	expect resp.status == 200
 	expect resp.http.xusr == "realcookie=YAI"
+	expect resp.http.dyn-xusr == "realcookie=YAI"
 
 	txreq -url "/two"
 	rxresp
 	expect resp.status == 200
 	expect resp.http.xusr == "realcookie=YAI"
+	expect resp.http.dyn-xusr == "realcookie=YAI"
 } -run
 
 
