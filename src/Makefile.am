@@ -121,6 +121,7 @@ VMOD_TESTS = \
 	tests/cookie/31-get_regex.vtc \
 	tests/cookie/32-filter_regex.vtc \
 	tests/cookie/33-keep_regex.vtc \
+	tests/cookie/34-vcl_discard.vtc \
 	tests/cookie/r28.vtc \
 	tests/header/append.vtc \
 	tests/header/copy.vtc \
