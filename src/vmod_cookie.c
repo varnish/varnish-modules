@@ -242,6 +242,17 @@ compile_re(VRT_CTX, VCL_STRING expression) {
 	return(vre);
 }
 
+static void
+free_re(void *priv)
+{
+	vre_t *vre;
+
+	AN(priv);
+	vre = priv;
+	VRE_free(&vre);
+	AZ(vre);
+}
+
 VCL_STRING
 vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
     VCL_STRING expression)
@@ -265,7 +276,7 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 		}
 
 		priv_call->priv = vre;
-		priv_call->free = free;
+		priv_call->free = free_re;
 		AZ(pthread_mutex_unlock(&mtx));
 	}
 
@@ -419,7 +430,7 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 		}
 
 		priv_call->priv = vre;
-		priv_call->free = free;
+		priv_call->free = free_re;
 		AZ(pthread_mutex_unlock(&mtx));
 	}
 
