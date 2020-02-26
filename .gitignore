@@ -30,6 +30,10 @@ stamp-h1
 vcc_*_if.[ch]
 vmod_*.rst
 
+# vsctool
+VSC_*.[ch]
+VSC_*.rst
+
 # docs
 ! /docs/vmod_*.rst
 

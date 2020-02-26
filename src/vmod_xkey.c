@@ -43,9 +43,13 @@
 #include "vtree.h"
 
 #include "vcc_xkey_if.h"
+#include "VSC_xkey.h"
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 static int n_init = 0;
+
+static struct vsc_seg *vsc_seg = NULL;
+static struct VSC_xkey *vsc = NULL;
 
 uintptr_t xkey_cb_handle;
 
@@ -266,7 +270,8 @@ xkey_hashtree_insert(const unsigned char *digest, unsigned len)
 	if (key != NULL) {
 		xkey_hashhead_delete(&head);
 		CAST_OBJ_NOTNULL(head, (void *)key, XKEY_HASHHEAD_MAGIC);
-	}
+	} else
+		vsc->g_keys++;
 	return (head);
 }
 
@@ -345,6 +350,7 @@ xkey_remove(struct xkey_ochead **pochead)
 			VRBT_REMOVE(xkey_hashtree, &xkey_hashtree,
 			    &hashhead->key);
 			xkey_hashhead_delete(&hashhead);
+			vsc->g_keys--;
 		}
 		oc->objcore = NULL;
 		VTAILQ_REMOVE(&ochead->ocs, oc, list_ochead);
@@ -602,7 +608,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	switch (e) {
 	case VCL_EVENT_LOAD:
 		AZ(pthread_mutex_lock(&mtx));
-		if (n_init == 0)
+		if (n_init == 0) {
 #ifdef HAVE_ENUM_EXP_EVENT_E
 			xkey_cb_handle =
 			    EXP_Register_Callback(xkey_cb, NULL);
@@ -610,6 +616,12 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
 			    OEV_INSERT|OEV_EXPIRE);
 #endif
+			AZ(vsc);
+			AZ(vsc_seg);
+			vsc = VSC_xkey_New(NULL, &vsc_seg, "");
+			AN(vsc);
+			AN(vsc_seg);
+		}
 		AN(xkey_cb_handle);
 		n_init++;
 		AZ(pthread_mutex_unlock(&mtx));
@@ -628,6 +640,8 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 #endif
 			AZ(xkey_cb_handle);
 			xkey_cleanup();
+			VSC_xkey_Destroy(&vsc_seg);
+			vsc = NULL;
 		}
 		AZ(pthread_mutex_unlock(&mtx));
 		break;
