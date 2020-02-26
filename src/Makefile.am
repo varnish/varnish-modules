@@ -62,7 +62,9 @@ nodist_libvmod_vsthrottle_la_SOURCES = vcc_vsthrottle_if.c vcc_vsthrottle_if.h
 nodist_libvmod_saintmode_la_SOURCES = vcc_saintmode_if.c vcc_saintmode_if.h
 nodist_libvmod_tcp_la_SOURCES = vcc_tcp_if.c vcc_tcp_if.h
 nodist_libvmod_var_la_SOURCES = vcc_var_if.c vcc_var_if.h
-nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
+nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h VSC_xkey.c VSC_xkey.h
+
+vmod_xkey.3: VSC_xkey.rst
 
 @BUILD_VMOD_BODYACCESS@
 @BUILD_VMOD_COOKIE@
@@ -73,6 +75,7 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 @BUILD_VMOD_VAR@
 @BUILD_VMOD_VSTHROTTLE@
 @BUILD_VMOD_XKEY@
+@BUILD_VSC_XKEY@
 
 if WITH_VMOD_SOFTPURGE
 vmod_LTLIBRARIES += libvmod_softpurge.la
@@ -157,7 +160,9 @@ VMOD_TESTS = \
 	tests/xkey/test06.vtc \
 	tests/xkey/test07.vtc \
 	tests/xkey/test08.vtc \
-	tests/xkey/test09.vtc
+	tests/xkey/test09.vtc \
+	tests/xkey/test10.vtc \
+	tests/xkey/test11.vtc
 
 SOFTPURGE_TESTS = \
 	tests/softpurge/01-load.vtc \
@@ -187,4 +192,5 @@ EXTRA_DIST = \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \
-	vmod_xkey.vcc
+	vmod_xkey.vcc \
+	xkey.vsc

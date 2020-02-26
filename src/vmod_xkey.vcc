@@ -113,3 +113,7 @@ Description
         object's TTL but keeps it available for grace mode and conditional
         requests for the remainder of its configured grace and keep time.
 
+Counters
+--------
+
+.. include:: VSC_xkey.rst

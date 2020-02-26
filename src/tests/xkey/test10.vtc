@@ -1,0 +1,70 @@
+varnishtest "Test g_keys counter multiple keys/objects"
+
+server s1 {
+	rxreq
+	txresp -hdr "xkey: 1"
+	rxreq
+	txresp -hdr "xkey: 2"
+	rxreq
+	txresp -hdr "xkey: 1" -hdr "xkey: 2"
+} -start
+
+varnish v1 -vcl+backend {
+	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
+
+	sub vcl_recv {
+		if (req.http.xkey-purge) {
+			if (xkey.purge(req.http.xkey-purge) != 0) {
+				return (synth(200, "Purged"));
+			} else {
+				return (synth(404, "No key"));
+			}
+		}
+	}
+
+	sub vcl_backend_response {
+		set beresp.ttl = 60s;
+		set beresp.grace = 0s;
+		set beresp.keep = 0s;
+	}
+
+	sub vcl_synth {
+		set resp.http.reason = resp.reason;
+	}
+} -start
+
+varnish v1 -expect XKEY.g_keys == 0
+
+client c1 {
+	txreq -url /1
+	rxresp
+} -run
+
+varnish v1 -expect XKEY.g_keys == 1
+
+client c1 {
+	txreq -url /2
+	rxresp
+} -run
+
+varnish v1 -expect XKEY.g_keys == 2
+
+client c1 {
+	txreq -url /3
+	rxresp
+} -run
+
+varnish v1 -expect n_object == 3
+varnish v1 -expect XKEY.g_keys == 2
+
+client c1 {
+	txreq -hdr "xkey-purge: 1"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.reason == "Purged"
+} -run
+
+delay 1
+
+varnish v1 -expect n_object == 1
+varnish v1 -expect XKEY.g_keys == 1
