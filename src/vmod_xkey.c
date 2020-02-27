@@ -270,8 +270,10 @@ xkey_hashtree_insert(const unsigned char *digest, unsigned len)
 	if (key != NULL) {
 		xkey_hashhead_delete(&head);
 		CAST_OBJ_NOTNULL(head, (void *)key, XKEY_HASHHEAD_MAGIC);
-	} else
+	} else {
 		vsc->g_keys++;
+		vsc->g_bytes += sizeof(*oc);
+	}
 	return (head);
 }
 
@@ -351,6 +353,7 @@ xkey_remove(struct xkey_ochead **pochead)
 			    &hashhead->key);
 			xkey_hashhead_delete(&hashhead);
 			vsc->g_keys--;
+			vsc->g_bytes -= sizeof(*oc);
 		}
 		oc->objcore = NULL;
 		VTAILQ_REMOVE(&ochead->ocs, oc, list_ochead);
