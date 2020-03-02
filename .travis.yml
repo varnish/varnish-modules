@@ -1,13 +1,13 @@
 ---
 sudo: required
-dist: trusty
+dist: bionic
 
 language: c
 
 before_install:
   - sudo apt-get update -q
   - sudo apt-get install -qq apt-transport-https python-docutils
-  - curl -s https://packagecloud.io/install/repositories/varnishcache/varnish41/script.deb.sh | sudo bash
+  - curl -s https://packagecloud.io/install/repositories/varnishcache/varnish-weekly/script.deb.sh | sudo bash
   - sudo apt-get -q update
   - sudo apt-get install varnish varnish-dev
 
