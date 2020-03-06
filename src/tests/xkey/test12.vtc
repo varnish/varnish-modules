@@ -34,28 +34,8 @@ varnish v1 -vcl+backend {
 } -start
 
 # g_hashhead_bytes  = 104 bytes per xkey
-#
-# head->key         = 64 bytes # the actual hash of the key
-# head->magic       =  4 bytes # some kind of "magic"
-# head->list        = 16 bytes # just need size of pointer
-# head->ocs         = 16 bytes # just need size of pointer
-# alignment         =  4 bytes # makes multiples of 8
-
 # g_ochead_bytes    = 80 bytes per cached object
-#
-# ochead->key       = 40 bytes # xkey_ptrkey + rbt entry
-# ochead->magic     =  4 bytes # some kind of "magic"
-# ochead->list      = 16 bytes # tailq entry w/2 pointers
-# ochead->ocs       = 16 bytes # tailq head w/2 pointers
-
 # g_oc_bytes        = 56 bytes per cached object
-#
-# oc->magic         =  4 bytes # some kind of "magic"
-# oc->list_ochead   = 16 bytes # tailq entry w/2 pointers
-# oc->list_hashhead = 16 bytes # tailq entry w/2 pointers
-# oc->hashhead      =  8 bytes # just need size of pointer
-# oc->objcore       =  8 # just need size of pointer
-# alignment         =  4 bytes # makes multiples of 8
 
 # no cache, no xkeys
 varnish v1 -expect XKEY.g_hashhead_bytes == 0  \
