@@ -153,6 +153,7 @@ xkey_hashhead_new(void)
 		VTAILQ_INIT(&head->ocs);
 	}
 	vsc->g_hashhead_bytes += sizeof(*head);
+	vsc->g_bytes += sizeof(*head);
 	return (head);
 }
 
@@ -166,6 +167,7 @@ xkey_hashhead_delete(struct xkey_hashhead **phead)
 	CHECK_OBJ_NOTNULL(head, XKEY_HASHHEAD_MAGIC);
 	AN(VTAILQ_EMPTY(&head->ocs));
 	vsc->g_hashhead_bytes -= sizeof(*head);
+	vsc->g_bytes -= sizeof(*head);
 	if (xkey_pool.n_hashhead < POOL_MAX) {
 		memset(&head->key, 0, sizeof(head->key));
 		VTAILQ_INSERT_HEAD(&xkey_pool.hashheads, head, list);
@@ -190,6 +192,7 @@ xkey_ochead_new(void)
 		VTAILQ_INIT(&head->ocs);
 	}
 	vsc->g_ochead_bytes += sizeof(*head);
+	vsc->g_bytes += sizeof(*head);
 	return (head);
 }
 
@@ -203,6 +206,7 @@ xkey_ochead_delete(struct xkey_ochead **phead)
 	CHECK_OBJ_NOTNULL(head, XKEY_OCHEAD_MAGIC);
 	AN(VTAILQ_EMPTY(&head->ocs));
 	vsc->g_ochead_bytes -= sizeof(*head);
+	vsc->g_bytes -= sizeof(*head);
 	if (xkey_pool.n_ochead < POOL_MAX) {
 		memset(&head->key, 0, sizeof(head->key));
 		VTAILQ_INSERT_HEAD(&xkey_pool.ocheads, head, list);
@@ -225,6 +229,7 @@ xkey_oc_new(void)
 		ALLOC_OBJ(oc, XKEY_OC_MAGIC);
 		AN(oc);
 		vsc->g_oc_bytes += sizeof(*oc);
+		vsc->g_bytes += sizeof(*oc);
 	}
 	return (oc);
 }
@@ -239,6 +244,7 @@ xkey_oc_delete(struct xkey_oc **poc)
 	CHECK_OBJ_NOTNULL(oc, XKEY_OC_MAGIC);
 	AZ(oc->objcore);
 	vsc->g_oc_bytes -= sizeof(*oc);
+	vsc->g_bytes -= sizeof(*oc);
 	if (xkey_pool.n_oc < POOL_MAX) {
 		VTAILQ_INSERT_HEAD(&xkey_pool.ocs, oc, list_hashhead);
 		xkey_pool.n_oc++;
