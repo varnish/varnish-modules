@@ -60,7 +60,8 @@ varnish v1 -vcl+backend {
 # no cache, no xkeys
 varnish v1 -expect XKEY.g_hashhead_bytes == 0  \
            -expect XKEY.g_ochead_bytes == 0 \
-           -expect XKEY.g_oc_bytes == 0
+           -expect XKEY.g_oc_bytes == 0 \
+           -expect XKEY.g_bytes == 0
 
 client c1 {
 	txreq
@@ -70,7 +71,8 @@ client c1 {
 # one cached response, one xkey
 varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
            -expect XKEY.g_ochead_bytes == 80 \
-           -expect XKEY.g_oc_bytes == 56
+           -expect XKEY.g_oc_bytes == 56 \
+           -expect XKEY.g_bytes == 240
 
 client c1 {
 	txreq -url /something_longish
@@ -80,7 +82,8 @@ client c1 {
 # two cached responses, two xkeys
 varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
            -expect XKEY.g_ochead_bytes == 160 \
-           -expect XKEY.g_oc_bytes == 112
+           -expect XKEY.g_oc_bytes == 112 \
+           -expect XKEY.g_bytes == 480
 
 client c1 {
 	txreq -url /something_else
@@ -90,7 +93,8 @@ client c1 {
 # three cached responses, two xkeys
 varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
            -expect XKEY.g_ochead_bytes == 240 \
-           -expect XKEY.g_oc_bytes == 168
+           -expect XKEY.g_oc_bytes == 168 \
+           -expect XKEY.g_bytes == 616
 
 client c1 {
 	txreq -hdr "xkey-purge: asdf"
@@ -102,4 +106,5 @@ client c1 {
 # one cached response, one xkey
 varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
            -expect XKEY.g_ochead_bytes == 80 \
-           -expect XKEY.g_oc_bytes == 56
+           -expect XKEY.g_oc_bytes == 56 \
+           -expect XKEY.g_bytes == 240
