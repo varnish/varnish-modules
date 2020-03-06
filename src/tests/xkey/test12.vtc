@@ -5,6 +5,8 @@ server s1 {
 	txresp -hdr "xkey: asdf"
 	rxreq
 	txresp -hdr "xkey: fdsa"
+	rxreq
+	txresp -hdr "xkey: asdf"
 } -start
 
 varnish v1 -vcl+backend {
@@ -31,27 +33,64 @@ varnish v1 -vcl+backend {
 	}
 } -start
 
-# TODO: use these tests to interrogate the head object where
-# we += the size(head) in the code now. Make comments indicating
-# expected object/component sizes. Total should be 104 per hashhead
+# g_hashhead_bytes  = 104 bytes per xkey
+#
+# head->key         = 64 bytes # the actual hash of the key
+# head->magic       =  4 bytes # some kind of "magic"
+# head->list        = 16 bytes # just need size of pointer
+# head->ocs         = 16 bytes # just need size of pointer
+# alignment         =  4 bytes # makes multiples of 8
 
-varnish v1 -expect XKEY.g_hashhead == 0
+# g_ochead_bytes    = 80 bytes per cached object
+#
+# ochead->key       = 40 bytes # xkey_ptrkey + rbt entry
+# ochead->magic     =  4 bytes # some kind of "magic"
+# ochead->list      = 16 bytes # tailq entry w/2 pointers
+# ochead->ocs       = 16 bytes # tailq head w/2 pointers
+
+# g_oc_bytes        = 56 bytes per cached object
+#
+# oc->magic         =  4 bytes # some kind of "magic"
+# oc->list_ochead   = 16 bytes # tailq entry w/2 pointers
+# oc->list_hashhead = 16 bytes # tailq entry w/2 pointers
+# oc->hashhead      =  8 bytes # just need size of pointer
+# oc->objcore       =  8 # just need size of pointer
+# alignment         =  4 bytes # makes multiples of 8
+
+# no cache, no xkeys
+varnish v1 -expect XKEY.g_hashhead_bytes == 0  \
+           -expect XKEY.g_ochead_bytes == 0 \
+           -expect XKEY.g_oc_bytes == 0
 
 client c1 {
 	txreq
 	rxresp
 } -run
 
-varnish v1 -expect XKEY.g_hashhead == 104
+# one cached response, one xkey
+varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
+           -expect XKEY.g_ochead_bytes == 80 \
+           -expect XKEY.g_oc_bytes == 56
 
 client c1 {
 	txreq -url /something_longish
 	rxresp
 } -run
 
-delay 1
+# two cached responses, two xkeys
+varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
+           -expect XKEY.g_ochead_bytes == 160 \
+           -expect XKEY.g_oc_bytes == 112
 
-varnish v1 -expect XKEY.g_hashhead == 208
+client c1 {
+	txreq -url /something_else
+	rxresp
+} -run
+
+# three cached responses, two xkeys
+varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
+           -expect XKEY.g_ochead_bytes == 240 \
+           -expect XKEY.g_oc_bytes == 168
 
 client c1 {
 	txreq -hdr "xkey-purge: asdf"
@@ -60,4 +99,7 @@ client c1 {
 	expect resp.http.reason == "Purged"
 } -run
 
-varnish v1 -expect XKEY.g_hashhead == 104
+# one cached response, one xkey
+varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
+           -expect XKEY.g_ochead_bytes == 80 \
+           -expect XKEY.g_oc_bytes == 56
