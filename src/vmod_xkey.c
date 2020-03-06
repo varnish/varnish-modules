@@ -282,9 +282,8 @@ xkey_hashtree_insert(const unsigned char *digest, unsigned len)
 	if (key != NULL) {
 		xkey_hashhead_delete(&head);
 		CAST_OBJ_NOTNULL(head, (void *)key, XKEY_HASHHEAD_MAGIC);
-	} else {
+	} else 
 		vsc->g_keys++;
-	}
 	return (head);
 }
 
