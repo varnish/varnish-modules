@@ -4,7 +4,7 @@ AC_COPYRIGHT([Copyright (c) 2016 Varnish Software Group])
 AC_PREREQ(2.63)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_SRCDIR(src/vmod_cookie.vcc)
+AC_CONFIG_SRCDIR(src/vmod_var.vcc)
 AC_CONFIG_HEADERS(config.h)
 
 AM_INIT_AUTOMAKE([1.12.2 foreign])
@@ -33,7 +33,6 @@ AC_SUBST([VARNISH_LIBRARY_PATH],
 VARNISH_PREREQ([4.1.4])
 VARNISH_VMODS([
 	bodyaccess
-	cookie
 	header
 	saintmode
 	tcp
