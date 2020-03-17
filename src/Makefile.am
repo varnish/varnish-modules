@@ -24,7 +24,6 @@ AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
 vmod_LTLIBRARIES = \
 	libvmod_bodyaccess.la \
-	libvmod_cookie.la \
 	libvmod_header.la \
 	libvmod_saintmode.la \
 	libvmod_tcp.la \
@@ -35,7 +34,6 @@ vmod_LTLIBRARIES = \
 if HAVE_RST2MAN
 dist_man_MANS = \
 	vmod_bodyaccess.3 \
-	vmod_cookie.3 \
 	vmod_header.3 \
 	vmod_saintmode.3 \
 	vmod_tcp.3 \
@@ -47,7 +45,6 @@ endif
 generated_docs = $(dist_man_MANS:.3=.rst)
 
 libvmod_bodyaccess_la_SOURCES = vmod_bodyaccess.c
-libvmod_cookie_la_SOURCES = vmod_cookie.c
 libvmod_header_la_SOURCES = vmod_header.c
 libvmod_vsthrottle_la_SOURCES = vmod_vsthrottle.c
 libvmod_saintmode_la_SOURCES = vmod_saintmode.c
@@ -56,7 +53,6 @@ libvmod_var_la_SOURCES = vmod_var.c
 libvmod_xkey_la_SOURCES = vmod_xkey.c
 
 nodist_libvmod_bodyaccess_la_SOURCES = vcc_bodyaccess_if.c vcc_bodyaccess_if.h
-nodist_libvmod_cookie_la_SOURCES = vcc_cookie_if.c vcc_cookie_if.h
 nodist_libvmod_header_la_SOURCES = vcc_header_if.c vcc_header_if.h
 nodist_libvmod_vsthrottle_la_SOURCES = vcc_vsthrottle_if.c vcc_vsthrottle_if.h
 nodist_libvmod_saintmode_la_SOURCES = vcc_saintmode_if.c vcc_saintmode_if.h
@@ -67,7 +63,6 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h VSC_xkey.c VSC_xkey
 vmod_xkey.3: VSC_xkey.rst
 
 @BUILD_VMOD_BODYACCESS@
-@BUILD_VMOD_COOKIE@
 @BUILD_VMOD_HEADER@
 @BUILD_VMOD_SAINTMODE@
 @BUILD_VMOD_SOFTPURGE@
@@ -110,22 +105,6 @@ VMOD_TESTS = \
 	tests/bodyaccess/test03.vtc \
 	tests/bodyaccess/test04.vtc \
 	tests/bodyaccess/test05.vtc \
-	tests/cookie/01-set-delete-produce.vtc \
-	tests/cookie/02-clean.vtc \
-	tests/cookie/03-null.vtc \
-	tests/cookie/04-keep.vtc \
-	tests/cookie/05-filter.vtc \
-	tests/cookie/05-get.vtc \
-	tests/cookie/06-concurrent-query.vtc \
-	tests/cookie/07-isset.vtc \
-	tests/cookie/08-overflow.vtc \
-	tests/cookie/10-parser.vtc \
-	tests/cookie/30-format_1123.vtc \
-	tests/cookie/31-get_regex.vtc \
-	tests/cookie/32-filter_regex.vtc \
-	tests/cookie/33-keep_regex.vtc \
-	tests/cookie/34-vcl_discard.vtc \
-	tests/cookie/r28.vtc \
 	tests/header/append.vtc \
 	tests/header/copy.vtc \
 	tests/header/get.vtc \
@@ -186,7 +165,6 @@ EXTRA_DIST = \
 	$(VMOD_TESTS) \
 	$(SOFTPURGE_TESTS) \
 	vmod_bodyaccess.vcc \
-	vmod_cookie.vcc \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \
 	vmod_softpurge.vcc \
