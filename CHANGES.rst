@@ -1,5 +1,13 @@
 This is a running log of changes to varnish-modules.
 
+varnish-modules 0.16.0 (2020-03-17)
+-----------------------------------
+
+* Varnish 6.4 release
+* `vmod_cookie` has been dropped, since it's now included in Varnish
+* `vmod_xkey` learned a handful of new counters (src/xkey.vsc for the full list)
+  thanks to Jordan Christiansen.
+
 varnish-modules 0.15.0 (2018-05-15)
 -----------------------------------
 
