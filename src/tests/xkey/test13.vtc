@@ -1,0 +1,74 @@
+varnishtest "Test that xkey gauges do not underflow when using pools"
+
+server s1 -repeat 2 {
+	rxreq
+	txresp -hdr "xkey: a"
+} -start
+
+varnish v1 -vcl+backend {
+	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
+
+	sub vcl_recv {
+		if (req.http.xkey-purge) {
+			if (xkey.purge(req.http.xkey-purge) != 0) {
+				return (synth(200, "Purged"));
+			} else {
+				return (synth(404, "No key"));
+			}
+		}
+	}
+
+	sub vcl_synth {
+		set resp.http.reason = resp.reason;
+	}
+} -start
+
+client c1 {
+	txreq -url /thing
+	rxresp
+} -run
+
+varnish v1 -expect XKEY.g_keys == 1 \
+           -expect XKEY.g_hashhead_bytes > 0 \
+           -expect XKEY.g_ochead_bytes > 0 \
+           -expect XKEY.g_oc_bytes > 0 \
+           -expect XKEY.g_bytes > 0
+
+client c1 {
+	txreq -hdr "xkey-purge: a"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.reason == "Purged"
+} -run
+
+varnish v1 -expect XKEY.g_keys == 0 \
+           -expect XKEY.g_hashhead_bytes == 0 \
+           -expect XKEY.g_ochead_bytes == 0 \
+           -expect XKEY.g_oc_bytes == 0 \
+           -expect XKEY.g_bytes == 0
+
+# Use an item from the pool
+
+client c1 {
+    txreq -url /thing
+    rxresp
+} -run
+
+varnish v1 -expect XKEY.g_keys == 1 \
+           -expect XKEY.g_hashhead_bytes > 0 \
+           -expect XKEY.g_ochead_bytes > 0 \
+           -expect XKEY.g_oc_bytes > 0 \
+           -expect XKEY.g_bytes > 0
+
+client c1 {
+	txreq -hdr "xkey-purge: a"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.reason == "Purged"
+} -run
+
+varnish v1 -expect XKEY.g_keys == 0 \
+           -expect XKEY.g_hashhead_bytes == 0 \
+           -expect XKEY.g_ochead_bytes == 0 \
+           -expect XKEY.g_oc_bytes == 0 \
+           -expect XKEY.g_bytes == 0
