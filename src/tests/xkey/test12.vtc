@@ -1,4 +1,5 @@
 varnishtest "Test xkey bytes gauge"
+feature 64bit
 
 server s1 {
 	rxreq
