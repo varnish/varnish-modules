@@ -100,7 +100,7 @@ set up in the database. When an SKU is updated this will trigger an
 HTTP request towards the Varnish server, clearing out every object
 with the matching xkey header::
 
-    GET / HTTP/1.1
+    PURGE / HTTP/1.1
     Host: www.example.com
     xkey-purge: 166412
 
