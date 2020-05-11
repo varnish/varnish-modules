@@ -65,21 +65,11 @@ vmod_xkey.3: VSC_xkey.rst
 @BUILD_VMOD_BODYACCESS@
 @BUILD_VMOD_HEADER@
 @BUILD_VMOD_SAINTMODE@
-@BUILD_VMOD_SOFTPURGE@
 @BUILD_VMOD_TCP@
 @BUILD_VMOD_VAR@
 @BUILD_VMOD_VSTHROTTLE@
 @BUILD_VMOD_XKEY@
 @BUILD_VSC_XKEY@
-
-if WITH_VMOD_SOFTPURGE
-vmod_LTLIBRARIES += libvmod_softpurge.la
-if HAVE_RST2MAN
-dist_man_MANS += vmod_softpurge.3
-endif #HAVE_RST2MAN
-libvmod_softpurge_la_SOURCES = vmod_softpurge.c foreign/hash/hash_slinger.h
-nodist_libvmod_softpurge_la_SOURCES = vcc_softpurge_if.c vcc_softpurge_if.h
-endif #WITH_VMOD_SOFTPURGE
 
 rst-docs: $(generated_docs)
 	cp $(generated_docs) $(top_srcdir)/docs/
@@ -145,30 +135,15 @@ VMOD_TESTS = \
 	tests/xkey/test12.vtc \
 	tests/xkey/test13.vtc
 
-SOFTPURGE_TESTS = \
-	tests/softpurge/01-load.vtc \
-	tests/softpurge/02-simple-hit.vtc \
-	tests/softpurge/03-simple-miss.vtc \
-	tests/softpurge/10-softpurge-hit.vtc \
-	tests/softpurge/11-really-purged.vtc \
-	tests/softpurge/12-softpurge-variants.vtc \
-	tests/softpurge/13-softpurge-variants-sickbackend.vtc \
-	tests/softpurge/14-mind-the-refcounters.vtc
-
 TESTS = $(VMOD_TESTS)
-if WITH_VMOD_SOFTPURGE
-TESTS += $(SOFTPURGE_TESTS)
-endif
 
 EXTRA_DIST = \
 	foreign \
 	vmod_config.h \
 	$(VMOD_TESTS) \
-	$(SOFTPURGE_TESTS) \
 	vmod_bodyaccess.vcc \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \
-	vmod_softpurge.vcc \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \

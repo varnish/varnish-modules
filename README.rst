@@ -21,8 +21,8 @@ existing features in VMOD.
 Feature complete VMODs
 ----------------------
 
-The VMODs in this category are ``Cookie``, ``xkey``, ``saintmode``,
-``softpurge``, ``bodyaccess``, ``header`` and ``var``.
+The VMODs in this category are ``xkey``, ``saintmode``, ``bodyaccess``,
+``header`` and ``var``.
 
 This software in this repository is considered feature complete and we
 do no longer accept contributions that introduce new features. The
@@ -44,7 +44,9 @@ Moved or replaced VMODs
 VMODs in this category are no longer maintained because their
 functionality is covered by other functionality or newer VMODs.
 
-In this repository there is only one such vmod:
+In this repository there is only two such vmods:
+
+* ``cookie``, that is now part of Varnish.
 
 * ``softpurge`` is now replaced by the ``purge`` VMOD in Varnish.
   Note that this VMOD is also in the "feature complete" category,
@@ -75,7 +77,6 @@ describing HTTP request/response policies with additional capabilities.
 
 Included:
 
-* Simpler handling of HTTP cookies
 * Variable support
 * Request and bandwidth throttling
 * Modify and change complex HTTP headers
@@ -84,7 +85,7 @@ Included:
 * Client request body access
 
 This collection contains the following vmods (previously kept
-individually): cookie, vsthrottle, header, saintmode, softpurge, tcp,
+individually): vsthrottle, header, saintmode, tcp,
 var, xkey, bodyaccess
 
 Supported Varnish version is described in the `CHANGES.rst` file. Normally this
