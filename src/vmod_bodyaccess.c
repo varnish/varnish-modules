@@ -33,12 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_CACHE_CACHE_VARNISHD_H
-#  include <cache/cache_varnishd.h>
-#  include <vcl.h>
-#else
-#  include "vmod_config.h"
-#endif
+#include <cache/cache_varnishd.h>
+#include <vcl.h>
 
 #include "vre.h"
 #include "vsb.h"
@@ -94,27 +90,6 @@ bodyaccess_log(struct bodyaccess_log_ctx *ctx, const void *ptr, size_t len)
 	return (0);
 }
 
-#if defined(HAVE_REQ_BODY_ITER_F)
-static int
-bodyaccess_bcat_cb(struct req *req, void *priv, void *ptr, size_t len)
-{
-
-	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-	AN(priv);
-
-	return (VSB_bcat(priv, ptr, len));
-}
-
-static int
-bodyaccess_log_cb(struct req *req, void *priv, void *ptr, size_t len)
-{
-
-	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
-	AN(priv);
-
-	return (bodyaccess_log(priv, ptr, len));
-}
-#elif defined(HAVE_OBJITERATE_F) && defined(OBJ_ITER_FLUSH)
 static int
 bodyaccess_bcat_cb(void *priv, unsigned flush, const void *ptr, ssize_t len)
 {
@@ -134,29 +109,6 @@ bodyaccess_log_cb(void *priv, unsigned flush, const void *ptr, ssize_t len)
 	(void)flush;
 	return (bodyaccess_log(priv, ptr, len));
 }
-#elif defined(HAVE_OBJITERATE_F)
-static int
-bodyaccess_bcat_cb(void *priv, int flush, const void *ptr, ssize_t len)
-{
-
-	AN(priv);
-
-	(void)flush;
-	return (VSB_bcat(priv, ptr, len));
-}
-
-static int
-bodyaccess_log_cb(void *priv, int flush, const void *ptr, ssize_t len)
-{
-
-	AN(priv);
-
-	(void)flush;
-	return (bodyaccess_log(priv, ptr, len));
-}
-#else
-#  error Unsupported VRB API
-#endif
 
 static void
 bodyaccess_bcat(VRT_CTX, struct vsb *vsb)
