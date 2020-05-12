@@ -47,27 +47,6 @@ CPPFLAGS=$VARNISHAPI_CFLAGS
 
 AC_CHECK_HEADERS([cache/cache_varnishd.h])
 
-AC_CHECK_MEMBER(struct objcore.exp,
-	[AC_DEFINE([HAVE_OBJCORE_EXP], [1],
-		[Define if exp is present in the objcore struct])],
-	[], [#include <cache/cache.h>])
-
-AC_CHECK_MEMBER(struct objcore.hsh_list,
-	[AC_DEFINE([HAVE_OBJCORE_HSH_LIST], [1],
-		[Define if hsh_list is present in the objcore struct])],
-	[], [#include <cache/cache.h>])
-
-AC_CHECK_MEMBER(struct director.admin_health,
-	[AC_DEFINE([HAVE_DIRECTOR_ADMIN_HEALTH], [1],
-		[Define if admin_health is present in the director struct])],
-	[], [
-		#include <cache/cache.h>
-		#include <cache/cache_director.h>
-	])
-
-AC_CHECK_TYPES([req_body_iter_f, objiterate_f, enum exp_event_e],
-	[], [], [#include <cache/cache.h>])
-
 CPPFLAGS=$save_CPPFLAGS
 
 AC_CHECK_TYPE([struct tcp_info],
