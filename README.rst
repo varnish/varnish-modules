@@ -155,6 +155,9 @@ The source git tree lives on Github: https://github.com/varnish/varnish-modules
 All source code is placed in the master git branch. Pull requests and issue
 reporting are appreciated.
 
+autotools
+=========
+
 Unlike building from releases, you need to first bootstrap the build system
 when you work from git::
 
@@ -166,6 +169,17 @@ when you work from git::
 If the ``configure`` step succeeds but the ``make`` step fails, check for
 warnings in the ``./configure`` output or the ``config.log`` file. You may be
 missing bootstrap dependencies not required by release archives.
+
+meson
+=====
+
+Alternatively, you can also use `meson` and `ninja`::
+
+    meson build_dir
+    ninja -C build_dir
+
+The `meson` command only needs to run once, even if the `meson.build` file is
+modified afterward.
 
 Porting
 -------
