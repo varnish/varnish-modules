@@ -56,11 +56,12 @@ SYNOPSIS
    
 This VMOD implements basic variable support in VCL.
 
-It supports strings, integers and real numbers. There are methods to get and
-set each data type.
+It supports strings, integers, real numbers, durations, IP addresses
+and backends. There are methods to get and set each data type.
 
 Global variables have a lifespan that extends across requests and
-VCLs, for as long as the vmod is loaded.
+VCLs, for as long as the vmod is loaded. Global variables only support
+strings.
 
 The remaining functions have PRIV_TASK lifespan and are local to a single
 request or backend request.
