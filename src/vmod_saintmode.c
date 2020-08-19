@@ -153,14 +153,12 @@ vmod_status(VRT_CTX, struct vmod_priv *priv)
 {
 	struct saintmode_objs *sm_objs;
 	struct vmod_saintmode_saintmode *sm;
-	struct vsb *vsb;
-	void *p;
+	struct vsb vsb[1];
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CAST_OBJ_NOTNULL(sm_objs, priv->priv, SAINTMODE_OBJS_MAGIC);
 
-	vsb = VSB_new_auto();
-	AN(vsb);
+	WS_VSB_new(vsb, ctx->ws);
 	VSB_cat(vsb, "{\n\t\"saintmode\": [\n");
 
 	VTAILQ_FOREACH(sm, &sm_objs->sm_list, list) {
@@ -179,15 +177,7 @@ vmod_status(VRT_CTX, struct vmod_priv *priv)
 		VSB_cat(vsb, "\n");
 	}
 
-	VSB_cat(vsb, "\t]\n}\n");
-	VSB_finish(vsb);
-
-	p = WS_Copy(ctx->ws, VSB_data(vsb), -1);
-	if (p == NULL)
-		VSLb(ctx->vsl, SLT_VCL_Log,
-		    "saintmode.vmod_status: workspace overflow");
-	VSB_destroy(&vsb);
-	return (p);
+	return (WS_VSB_finish(vsb, ctx->ws, NULL));
 }
 
 VCL_INT
