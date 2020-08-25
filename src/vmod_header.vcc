@@ -29,7 +29,7 @@ Example::
 
 $ABI vrt
 $Event event_function
-$Function VOID append(HEADER, STRING_LIST)
+$Function VOID append(HEADER, STRANDS)
 
 Description
         Append an extra occurrence to an existing header.

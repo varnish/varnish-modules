@@ -177,6 +177,9 @@ header_http_cphdr(VRT_CTX, const struct http *hp, const char *hdr,
 {
         unsigned u;
 	const char *p;
+	struct strands s;
+
+	s.n = 1;
 
         for (u = HTTP_HDR_FIRST; u < hp->nhd; u++) {
 		if (!header_http_match(ctx, hp, u, NULL, hdr))
@@ -185,7 +188,8 @@ header_http_cphdr(VRT_CTX, const struct http *hp, const char *hdr,
 		p = hp->hd[u].b + hdr[0];
 		while (*p == ' ' || *p == '\t')
 			p++;
-                vmod_append(ctx, dst, p, vrt_magic_string_end);
+		s.p = &p;
+                vmod_append(ctx, dst, &s);
         }
 }
 
@@ -205,25 +209,28 @@ vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 }
 
 VCL_VOID
-vmod_append(VRT_CTX, VCL_HEADER hdr, const char *fmt, ...)
+vmod_append(VRT_CTX, VCL_HEADER hdr, VCL_STRANDS s)
 {
-	va_list ap;
 	struct http *hp;
+	struct strands *st;
 	const char *b;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	if (fmt == NULL)
+
+	/* prefix the strand with $hdr_name + space */
+	st = VRT_AllocStrandsWS(ctx->ws, s->n + 2);
+	if (!st) {
+		VRT_fail(ctx, "vmod_head: workspace allocation failure");
 		return;
+	}
+	st->p[0] = hdr->what + 1;
+	st->p[1] = " ";
+	AN(memcpy(st->p + 2, s->p, s->n * sizeof *s->p));
+
+	b = VRT_StrandsWS(ctx->ws, NULL, st);
 
 	hp = VRT_selecthttp(ctx, hdr->where);
-	va_start(ap, fmt);
-	b = VRT_String(hp->ws, hdr->what + 1, fmt, ap);
-	if (b == NULL)
-		VSLb(ctx->vsl, SLT_LostHeader, "vmod_header: %s",
-		    hdr->what + 1);
-	else
- 		http_SetHeader(hp, b);
-	va_end(ap);
+	http_SetHeader(hp, b);
 }
 
 VCL_STRING
