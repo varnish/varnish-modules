@@ -154,7 +154,7 @@ vmod_hash_req_body(VRT_CTX)
 	txtbody.e = txtbody.b + VSB_len(vsb);
 	SHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
 	VSLbt(ctx->vsl, SLT_Hash, txtbody);
-	VSB_delete(vsb);
+	VSB_destroy(&vsb);
 }
 
 VCL_INT
@@ -227,7 +227,7 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 	i = VRE_exec(priv_call->priv, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
 	    0, NULL);
 
-	VSB_delete(vsb);
+	VSB_destroy(&vsb);
 
 	if (i > 0)
 		return (1);

@@ -186,7 +186,7 @@ vmod_status(VRT_CTX, struct vmod_priv *priv)
 	if (p == NULL)
 		VSLb(ctx->vsl, SLT_VCL_Log,
 		    "saintmode.vmod_status: workspace overflow");
-	VSB_delete(vsb);
+	VSB_destroy(&vsb);
 	return (p);
 }
 
