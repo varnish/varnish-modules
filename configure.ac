@@ -1,5 +1,5 @@
 AC_INIT([varnish-modules], [0.17.0])
-AC_COPYRIGHT([Copyright (c) 2016 Varnish Software Group])
+AC_COPYRIGHT([Copyright (c) 2016-2020 Varnish Software Group])
 
 AC_PREREQ(2.63)
 AC_CONFIG_MACRO_DIR([m4])
