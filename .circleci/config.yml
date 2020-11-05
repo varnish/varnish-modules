@@ -4,6 +4,7 @@ jobs:
   build:
     docker:
       - image: centos:7
+    working_directory: /workspace
     steps:
       - run:
           name: Install dependencies
