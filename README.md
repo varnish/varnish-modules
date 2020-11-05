@@ -1,5 +1,4 @@
-Varnish module collection by Varnish Software
-=============================================
+# Varnish module collection by Varnish Software
 
 This is a collection of modules ("vmods") extending Varnish VCL used for
 describing HTTP request/response policies with additional capabilities.
@@ -23,8 +22,7 @@ always be a high priority. We'll also gladly considering pull requests for new
 features but we recommend opening an issue first to discuss implementation
 plans.
 
-Installation
-------------
+## Installation
 
 Source releases can be downloaded from the [github release page of the project(]https://github.com/varnish/varnish-modules/releases)
 and older releases are located [here](https://download.varnish-software.com/varnish-modules/).
@@ -60,8 +58,7 @@ RUN ./bootstrap && \
     make install
 ```
 
-Usage
------
+## Usage
 
 Each module has a different set of functions and usage, described in
 separate documents in `docs/`. For completeness, here is a snippet from
@@ -77,8 +74,7 @@ separate documents in `docs/`. For completeness, here is a snippet from
     }
 
 
-Moved or replaced VMODs
------------------------
+## Moved or replaced VMODs
 
 VMODs in this category are no longer maintained because their
 functionality is covered by other functionality or newer VMODs.
@@ -91,8 +87,7 @@ In this repository there is only two such vmods:
   Note that this VMOD is also in the "feature complete" category,
   since it is still needed for Varnish Cache 4.1.
 
-Administrativa
---------------
+## Administrativa
 
 The goals of this collection are:
 
@@ -111,8 +106,7 @@ Addition of further vmods is decided on a case-by-case basis. Code quality and
 maintenance requirements will be important in this decision.
 
 
-Contact
--------
+## Contact
 
 This code is maintained by Varnish Software. (https://www.varnish-software.com/)
 
