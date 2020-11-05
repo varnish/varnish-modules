@@ -37,7 +37,7 @@ the usual dependencies, plus the Varnish develpoment files and `python-sphinx`.
 
 Here's a directly usable `Dockerfile` as an example:
 
-```dockerfile
+``` dockerfile
 FROM centos:7
 
 # install Varnish 6.5 from https://packagecloud.io/varnishcache
