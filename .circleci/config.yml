@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: centos:7
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -s https://packagecloud.io/install/repositories/varnishcache/varnish-weekly/script.rpm.sh | bash
+            yum install -y epel-release
+            yum install -y git make automake libtool python-sphinx varnish-devel
+      - run:
+          name: Build and test
+          command: |
+            /bootstrap
+            ./configure
+            make
+            make check -j 4
+            make install
+
