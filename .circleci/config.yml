@@ -15,7 +15,7 @@ jobs:
       - run:
           name: Build and test
           command: |
-            /bootstrap
+            ./bootstrap
             ./configure
             make
             make check -j 4
