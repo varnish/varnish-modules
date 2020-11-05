@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/varnish/varnish-modules/tree/master.svg?style=svg)](https://app.circleci.com/pipelines/github/varnish/varnish-modules?branch=master)
+
 # Varnish module collection by Varnish Software
 
 This is a collection of modules ("vmods") extending Varnish VCL used for
