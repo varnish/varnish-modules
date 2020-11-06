@@ -32,6 +32,7 @@ AC_SUBST([VARNISH_LIBRARY_PATH],
 
 VARNISH_PREREQ([6.5.0])
 VARNISH_VMODS([
+	accept
 	bodyaccess
 	header
 	saintmode

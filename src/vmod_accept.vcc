@@ -1,0 +1,35 @@
+#
+# Copyright (c) 2016 Guillaume Quintard
+# 
+# Author: Guillaume Quintard <guillaume.quintard@gmail.com>
+#
+# (vmodtool requires this format.)
+#
+
+$Module accept 3 Accept VMOD
+
+DESCRIPTION
+===========
+
+vmod_accept aims at ease Accept headers sanitization.
+
+API
+===
+
+$Object rule(STRING string)
+
+Create a rule object, setting the fallback string.
+
+$Method VOID .add(STRING string)
+
+Add ``string`` to the list of valid choices.
+
+$Method VOID .remove(STRING string)
+
+Remove ``string`` to the list of valid choices.
+
+$Method STRING .filter(STRING string)
+
+Parse string and try to find a valid choice. The first one found is returned
+(they are tested in the same order they were added), otherwise, the fallback
+string is returned.

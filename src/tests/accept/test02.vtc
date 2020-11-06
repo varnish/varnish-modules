@@ -1,0 +1,48 @@
+varnishtest "Quality quality assurance"
+
+server s1 {}
+
+varnish v1 -vcl+backend {
+	import accept from "${vmod_builddir}/.libs/libvmod_accept.so";
+
+	sub vcl_init {
+		new rule = accept.rule("foo");
+		rule.add("bar");
+		rule.add("baz");
+	}
+
+	sub vcl_recv {
+		return (synth(200));
+	}
+
+	sub vcl_synth {
+		set resp.http.tst = rule.filter(req.http.tst);
+		return (deliver);
+	}
+} -start
+
+client c1 {
+	txreq -hdr "tst: bar; q = 1"
+	rxresp
+	expect resp.http.tst == "foo"
+
+	txreq -hdr "tst: bar; q= 0.5"
+	rxresp
+	expect resp.http.tst == "foo"
+
+	txreq -hdr "tst: bar; q =0.8"
+	rxresp
+	expect resp.http.tst == "foo"
+
+	txreq -hdr "tst: bar; quick=0.2, baz; q=0.3"
+	rxresp
+	expect resp.http.tst == "bar"
+
+	txreq -hdr "tst: bar; q=0"
+	rxresp
+	expect resp.http.tst == "foo"
+
+	txreq -hdr "tst: bar; level=1; q=0.3, baz;q=0.5"
+	rxresp
+	expect resp.http.tst == "bar"
+} -run

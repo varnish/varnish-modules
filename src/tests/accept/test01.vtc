@@ -1,0 +1,53 @@
+varnishtest "Test accept vmod"
+
+server s1 {}
+
+varnish v1 -vcl+backend {
+	import accept from "${vmod_builddir}/.libs/libvmod_accept.so";
+
+	sub vcl_init {
+		new rule = accept.rule("foo");
+		rule.add("bar");
+		rule.add("baz");
+	}
+
+	sub vcl_recv {
+		return (synth(200));
+	}
+
+	sub vcl_synth {
+		set resp.http.tst = rule.filter(req.http.tst);
+		return (deliver);
+	}
+} -start
+
+client c1 {
+	txreq -hdr "tst: foo"
+	rxresp
+	expect resp.http.tst == "foo"
+
+	txreq -hdr "tst: bar"
+	rxresp
+	expect resp.http.tst == "bar"
+
+	txreq -hdr "tst: BaR"
+	rxresp
+	expect resp.http.tst == "bar"
+
+
+	txreq -hdr "tst: baz"
+	rxresp
+	expect resp.http.tst == "baz"
+
+	txreq -hdr "tst: qux;q=1 ; level=15,bar;baz=no"
+	rxresp
+	expect resp.http.tst == "bar"
+
+	txreq -hdr "tst: baza; baz=0.2    ,  bar, baz"
+	rxresp
+	expect resp.http.tst == "bar"
+
+	txreq -hdr "tst: this , is; a=tricky/one , but,   bar  , is)what$we; want=!"
+	rxresp
+	expect resp.http.tst == "bar"
+} -run
