@@ -1,0 +1,32 @@
+varnishtest "count()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import str from "${vmod_builddir}/.libs/libvmod_str.so";
+
+	sub vcl_deliver {
+		set resp.http.count = str.count(req.http.string);
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.count == "-1"
+
+	txreq -hdr "string: 012345"
+	rxresp
+	expect resp.http.count == "6"
+
+	txreq -hdr "string: 012345 789"
+	rxresp
+	expect resp.http.count == "10"
+
+	txreq -hdr "string: "
+	rxresp
+	expect resp.http.count == "0"
+} -run

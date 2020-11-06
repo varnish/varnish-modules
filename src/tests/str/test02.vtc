@@ -1,0 +1,26 @@
+varnishtest "endswith()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import str from "${vmod_builddir}/.libs/libvmod_str.so";
+
+	sub vcl_deliver {
+		set resp.http.foo = str.endswith("abcde", "cde");
+		set resp.http.bar = str.endswith("cde", "abcde");
+		set resp.http.baz = str.endswith("abc", req.http.none);
+		set resp.http.qux = str.endswith(req.http.none, "abc");
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.foo == "true"
+	expect resp.http.bar == "false"
+	expect resp.http.baz == "false"
+	expect resp.http.qux == "false"
+} -run

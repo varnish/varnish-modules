@@ -35,6 +35,7 @@ VARNISH_VMODS([
 	bodyaccess
 	header
 	saintmode
+	str
 	tcp
 	var
 	vsthrottle

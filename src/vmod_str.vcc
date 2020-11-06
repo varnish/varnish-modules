@@ -1,0 +1,45 @@
+#
+# Copyright (c) 2016 Guillaume Quintard
+# 
+# Author: Guillaume Quintard <guillaume.quintard@gmail.com>
+#
+# (vmodtool requires this format.)
+#
+
+$Module str 3 Str VMOD
+
+DESCRIPTION
+===========
+
+$Function INT count(STRING s)
+
+Returns the number of ascii characters in S, or -1 if S is null.
+
+$Function BOOL startswith(STRING s1, STRING s2)
+
+Returns true if S1 starts with S2.
+
+$Function BOOL endswith(STRING s1, STRING s2)
+
+Returns true if S1 ends with S2.
+
+$Function BOOL contains(STRING s1, STRING s2)
+
+Returns true if S1 contains S2.
+
+$Function STRING take(STRING s, INT n, INT offset = 0)
+
+Returns a string composed of the N first characters of S. If S is shorter than N
+character, the return string is truncated. If S is NULL, NULL is returned.
+
+A negative offset means "from the end of the string" and a negative n means
+"left of the offset".
+
+$Function STRING reverse(STRING s)
+
+Reverse s.
+
+$Function STRING split(STRING S, INT n, STRING sep = " \t")
+
+Split s and return the n-th token. Characters in sep are separators. A negative
+n indicate "from the end of the string".

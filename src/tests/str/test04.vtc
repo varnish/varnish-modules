@@ -1,0 +1,27 @@
+varnishtest "take()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import std;
+	import str from "${vmod_builddir}/.libs/libvmod_str.so";
+
+	sub vcl_deliver {
+		set resp.http.foo = str.take("abcde", 3);
+		set resp.http.bar = str.take("abcde", 7);
+		set resp.http.baz = str.take("abcde", 0);
+		set resp.http.qux = str.take(req.http.none, 3);
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.foo == "abc"
+	expect resp.http.bar == "abcde"
+	expect resp.http.baz == ""
+	expect resp.http.qux == ""
+} -run

@@ -7,16 +7,14 @@ describing HTTP request/response policies with additional capabilities.
 
 Included:
 
-* Variable support
-* Request and bandwidth throttling
-* Modify and change complex HTTP headers
-* 3.0-style saint mode,
-* Advanced cache invalidations, and more.
-* Client request body access
-
-This collection contains the following vmods (previously kept
-individually): vsthrottle, header, saintmode, tcp,
-var, xkey, bodyaccess
+* `bodyaccess`: Client request body access
+* `header`:Modify and change complex HTTP headers
+* `saintmode`: 3.0-style saint mode
+* `str`: String operations
+* `tcp`: TCP connections tweaking
+* `var`: Variable support
+* `vstrottle`: Request and bandwidth throttling
+* `xkey`: Advanced cache invalidations
 
 Modules in this repository are generally not in active development by
 Varnish Software. However, any security related bugs and issues will
