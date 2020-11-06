@@ -11,7 +11,28 @@ $Module accept 3 Accept VMOD
 DESCRIPTION
 ===========
 
-vmod_accept aims at ease Accept headers sanitization.
+accept allows you to sanitize the Accept* headers (mainly Accept,
+Accept-Charset and Accept-Encoding) by specify one fallback string, and then
+adding valid values::
+
+
+        sub vcl_init {
+            new rule = accept.rule("text/plain");
+            rule.add("text/html");
+            rule.add("application/json");
+	}
+
+You can then use the ``rule`` object to filter the headers. The following line
+will set the accept header to "text/html" or "application/json" if any of them
+is found in the original header, and will set it to "text/plain" if neither is
+found::
+
+        sub vcl_recv {
+            set req.http.Accept = rule.filter(req.http.Accept);
+	}
+
+accept will ignore any parameter found and will just return the first choice
+found. More info here: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 
 API
 ===
