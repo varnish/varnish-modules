@@ -27,10 +27,10 @@ first to discuss implementation plans.
 Source releases can be downloaded from the [github release page of the project](https://github.com/varnish/varnish-modules/releases)
 and older releases are located [here](https://download.varnish-software.com/varnish-modules/).
 
-Each release only targets one version of Varnish and the git repository sports a
-branch dedicated to each version, starting from `6.0`. This means that if you
-want to compile modules for Varnish `6.3`, you need to `git checkout` the `6.3`
-branch of this repository
+Each release only targets one version of Varnish (visible in the realease title)
+and the git repository sports a branch dedicated to each version, starting from
+`6.0`. This means that if you want to compile modules for Varnish `6.3`,
+you need to `git checkout` the `6.3` branch of this repository
 
 Compiling, testing and installing relies on the `autotools` suite and requires
 the usual dependencies, plus the Varnish develpoment files and `python-sphinx`.
