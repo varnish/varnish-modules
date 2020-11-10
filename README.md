@@ -32,9 +32,10 @@ and the git repository sports a branch dedicated to each version, starting from
 `6.0`. This means that if you want to compile modules for Varnish `6.3`,
 you need to `git checkout` the `6.3` branch of this repository
 
-Compiling, testing and installing relies on the `autotools` suite and requires
-the usual autotools dependencies (`make automake libtool`), plus the Varnish
-development files (`varnish-dev` or `varnish-devel`) and `python-sphinx`.
+Compiling, testing and installing relies on the `autotools` suite and requires:
+- the usual autotools dependencies (`make`, `automake`, `libtool`)
+- the Varnish development files (`varnish-dev` or `varnish-devel`)
+- `rst2man` (`python-sphinx`)
 
 Note that packages names given here are purely indicative and may vary depending
 on the OS you are using.
