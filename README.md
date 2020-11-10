@@ -33,7 +33,11 @@ and the git repository sports a branch dedicated to each version, starting from
 you need to `git checkout` the `6.3` branch of this repository
 
 Compiling, testing and installing relies on the `autotools` suite and requires
-the usual dependencies, plus the Varnish develpoment files and `python-sphinx`.
+the usual autotools dependencies (`make automake libtool`), plus the Varnish
+develpoment files and `python-sphinx`.
+
+Note that packages names given here are purely indicative and may vary depending
+on the OS you are using.
 
 Here's a directly usable `Dockerfile` as an example:
 
