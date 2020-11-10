@@ -17,11 +17,10 @@ Included:
 * [`vstrottle`](src/vmod_vsthrottle.vcc): Request and bandwidth throttling
 * [`xkey`](src/vmod_xkey.vcc): Advanced cache invalidations
 
-Modules in this repository are generally not in active development by
-Varnish Software. However, any security related bugs and issues will
-always be a high priority. We'll also gladly considering pull requests for new
-features but we recommend opening an issue first to discuss implementation
-plans.
+Modules in this repository are feature-complete and are maintained to stay
+compatible with new Varnish releases and to fix bugs.  We'll also gladly
+considering pull requests for new features but we recommend opening an issue
+first to discuss implementation plans.
 
 ## Installation
 
