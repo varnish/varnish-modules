@@ -7,14 +7,15 @@ describing HTTP request/response policies with additional capabilities.
 
 Included:
 
-* `bodyaccess`: Client request body access
-* `header`:Modify and change complex HTTP headers
-* `saintmode`: 3.0-style saint mode
-* `str`: String operations
-* `tcp`: TCP connections tweaking
-* `var`: Variable support
-* `vstrottle`: Request and bandwidth throttling
-* `xkey`: Advanced cache invalidations
+* [`accept`](src/vmod_accept.vcc): Filter `accept`-like headers
+* [`bodyaccess`](src/vmod_bodyaccess.vcc): Client request body access
+* [`header`](src/vmod_header.vcc): Modify and change complex HTTP headers
+* [`saintmode`](src/vmod_saintmode.vcc): 3.0-style saint mode
+* [`str`](src/vmod_str.vcc): String operations
+* [`tcp`](src/vmod_tcp.vcc): TCP connections tweaking
+* [`var`](src/vmod_var.vcc): Variable support
+* [`vstrottle`](src/vmod_vsthrottle.vcc): Request and bandwidth throttling
+* [`xkey`](src/vmod_xkey.vcc): Advanced cache invalidations
 
 Modules in this repository are generally not in active development by
 Varnish Software. However, any security related bugs and issues will
