@@ -82,7 +82,8 @@ vmod_xkey.3: VSC_xkey.rst
 @BUILD_VSC_XKEY@
 
 rst-docs: $(generated_docs)
-	cp $(generated_docs) $(top_srcdir)/docs/
+	mkdir -p $(top_builddir)/docs/
+	cp $(generated_docs) $(top_builddir)/docs/
 
 doctest:
 	for i in *.vcc; do \
