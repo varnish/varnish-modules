@@ -74,9 +74,9 @@ functionality is covered by other functionality or newer VMODs.
 
 In this repository there is only two such vmods:
 
-* ``cookie``, that is now part of Varnish.
+* ``cookie``, that is now part of Varnish (since 6.4)
 
-* ``softpurge`` is now replaced by the ``purge`` VMOD in Varnish.
+* ``softpurge`` is now replaced by the ``purge`` VMOD in Varnish (since 5.2).
   Note that this VMOD is also in the "feature complete" category,
   since it is still needed for Varnish Cache 4.1.
 
