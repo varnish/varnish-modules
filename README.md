@@ -43,10 +43,11 @@ To compile:
 
 ``` bash
 ./bootstrap
-./configure
+./configure   # run "configure -h" first to list options
 make
 make check    # optional (tests)
-make install  # optional, run as root
+make rst-docs # optional (docs)
+make install  # optional (installation), run as root
 ```
 
 A [Dockerfile](Dockerfile) is available as example.
@@ -54,18 +55,10 @@ A [Dockerfile](Dockerfile) is available as example.
 ## Usage
 
 Each module has a different set of functions and usage, described in
-separate documents in `docs/`. For completeness, here is a snippet from
-`docs/cookie.rst`::
+each `src/vmod_*.vcc` file.
 
-    import cookie;
-
-    sub vcl_recv {
-            cookie.parse(req.http.cookie);
-            cookie.filter_except("SESSIONID,PHPSESSID");
-            set req.http.cookie = cookie.get_string();
-            # Only SESSIONID and PHPSESSID are left in req.http.cookie at this point.
-    }
-
+Note that `make rst-docs` will generate `reStructuredText` docs in the `docs/`
+directory.
 
 ## Moved or replaced VMODs
 
