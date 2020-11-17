@@ -161,9 +161,11 @@ EXTRA_DIST = \
 	foreign \
 	vmod_config.h \
 	$(VMOD_TESTS) \
+	vmod_accept.vcc \
 	vmod_bodyaccess.vcc \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \
+	vmod_str.vcc \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \
