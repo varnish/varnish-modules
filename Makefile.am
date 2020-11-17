@@ -6,7 +6,6 @@ doc_DATA = README.md LICENSE
 
 EXTRA_DIST = \
 	$(doc_DATA) \
-	docs \
 	CHANGES.rst
 
 # lcov support
