@@ -127,6 +127,12 @@ free_func(void *p)
 	FREE_OBJ(vh);
 }
 
+static const struct vmod_priv_methods priv_task_methods[1] = {{
+		.magic = VMOD_PRIV_METHODS_MAGIC,
+		.type = "vmod_var_priv_task",
+		.fini = free_func
+}};
+
 static struct var_head *
 get_vh(struct vmod_priv *priv)
 {
@@ -135,7 +141,7 @@ get_vh(struct vmod_priv *priv)
 	if (priv->priv == NULL) {
 		ALLOC_OBJ(vh, VAR_HEAD_MAGIC);
 		priv->priv = vh;
-		priv->free = free_func;
+		priv->methods = priv_task_methods;
 	} else
 		CAST_OBJ_NOTNULL(vh, priv->priv, VAR_HEAD_MAGIC);
 

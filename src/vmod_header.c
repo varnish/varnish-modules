@@ -51,6 +51,12 @@
  */
 pthread_mutex_t header_mutex;
 
+static const struct vmod_priv_methods priv_call_methods[1] = {{
+		.magic = VMOD_PRIV_METHODS_MAGIC,
+		.type = "vmod_header_re_priv_call",
+		.fini = VRT_re_fini
+}};
+
 /*
  * Initialize the regex *s on priv, if it hasn't already been done.
  */
@@ -61,7 +67,7 @@ header_init_re(struct vmod_priv *priv, const char *s)
 		AZ(pthread_mutex_lock(&header_mutex));
 		if (priv->priv == NULL) {
 			VRT_re_init(&priv->priv, s);
-			priv->free = VRT_re_fini;
+			priv->methods = priv_call_methods;
 		}
 		AZ(pthread_mutex_unlock(&header_mutex));
 	}

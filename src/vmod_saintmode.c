@@ -322,6 +322,12 @@ resolve(VRT_CTX, VCL_BACKEND dir) {
 	return (sm->be);
 }
 
+static const struct vmod_priv_methods priv_vcl_methods[1] = {{
+		.magic = VMOD_PRIV_METHODS_MAGIC,
+		.type = "vmod_saintmode_priv_vcl",
+		.fini = free
+}};
+
 VCL_VOID
 vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
     const char *vcl_name, struct vmod_priv *priv, VCL_BACKEND be,
@@ -350,7 +356,7 @@ vmod_saintmode__init(VRT_CTX, struct vmod_saintmode_saintmode **smp,
 		AN(sm_objs);
 		VTAILQ_INIT(&sm_objs->sm_list);
 		priv->priv = sm_objs;
-		priv->free = free;
+		priv->methods = priv_vcl_methods;
 	}
 
 	CAST_OBJ_NOTNULL(sm_objs, priv->priv, SAINTMODE_OBJS_MAGIC);
