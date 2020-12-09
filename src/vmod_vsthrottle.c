@@ -327,6 +327,12 @@ fini(void *priv)
 	AZ(pthread_mutex_unlock(&init_mtx));
 }
 
+static const struct vmod_priv_methods priv_vcl_methods[1] = {{
+		.magic = VMOD_PRIV_METHODS_MAGIC,
+		.type = "vmod_vsthrottle_priv_vcl",
+		.fini = fini
+}};
+
 int
 vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 {
@@ -336,7 +342,7 @@ vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	(void)ctx;
 
 	priv->priv = &n_init;
-	priv->free = fini;
+	priv->methods = priv_vcl_methods;
 	AZ(pthread_mutex_lock(&init_mtx));
 	if (n_init == 0) {
 		unsigned p;
