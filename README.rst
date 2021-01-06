@@ -22,7 +22,7 @@ Feature complete VMODs
 ----------------------
 
 The VMODs in this category are ``Cookie``, ``xkey``, ``saintmode``,
-``softpurge``, ``bodyaccess``, ``header`` and ``var``.
+``softpurge``, ``str``, ``bodyaccess``, ``header`` and ``var``.
 
 This software in this repository is considered feature complete and we
 do no longer accept contributions that introduce new features. The
@@ -80,11 +80,12 @@ Included:
 * Request and bandwidth throttling
 * Modify and change complex HTTP headers
 * 3.0-style saint mode,
+* String operations,
 * Advanced cache invalidations, and more.
 * Client request body access
 
 This collection contains the following vmods (previously kept
-individually): cookie, vsthrottle, header, saintmode, softpurge, tcp,
+individually): cookie, vsthrottle, header, saintmode, softpurge, str, tcp,
 var, xkey, bodyaccess
 
 Supported Varnish version is described in the `CHANGES.rst` file. Normally this

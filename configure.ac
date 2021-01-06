@@ -36,6 +36,7 @@ VARNISH_VMODS([
 	cookie
 	header
 	saintmode
+	str
 	tcp
 	var
 	vsthrottle

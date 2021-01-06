@@ -27,6 +27,7 @@ vmod_LTLIBRARIES = \
 	libvmod_cookie.la \
 	libvmod_header.la \
 	libvmod_saintmode.la \
+	libvmod_str.la \
 	libvmod_tcp.la \
 	libvmod_var.la \
 	libvmod_vsthrottle.la \
@@ -38,6 +39,7 @@ dist_man_MANS = \
 	vmod_cookie.3 \
 	vmod_header.3 \
 	vmod_saintmode.3 \
+	vmod_str.3 \
 	vmod_tcp.3 \
 	vmod_var.3 \
 	vmod_vsthrottle.3 \
@@ -51,6 +53,7 @@ libvmod_cookie_la_SOURCES = vmod_cookie.c
 libvmod_header_la_SOURCES = vmod_header.c
 libvmod_vsthrottle_la_SOURCES = vmod_vsthrottle.c
 libvmod_saintmode_la_SOURCES = vmod_saintmode.c
+libvmod_str_la_SOURCES = vmod_str.c
 libvmod_tcp_la_SOURCES = vmod_tcp.c
 libvmod_var_la_SOURCES = vmod_var.c
 libvmod_xkey_la_SOURCES = vmod_xkey.c
@@ -60,6 +63,7 @@ nodist_libvmod_cookie_la_SOURCES = vcc_cookie_if.c vcc_cookie_if.h
 nodist_libvmod_header_la_SOURCES = vcc_header_if.c vcc_header_if.h
 nodist_libvmod_vsthrottle_la_SOURCES = vcc_vsthrottle_if.c vcc_vsthrottle_if.h
 nodist_libvmod_saintmode_la_SOURCES = vcc_saintmode_if.c vcc_saintmode_if.h
+nodist_libvmod_str_la_SOURCES = vcc_str_if.c vcc_str_if.h
 nodist_libvmod_tcp_la_SOURCES = vcc_tcp_if.c vcc_tcp_if.h
 nodist_libvmod_var_la_SOURCES = vcc_var_if.c vcc_var_if.h
 nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
@@ -69,6 +73,7 @@ nodist_libvmod_xkey_la_SOURCES = vcc_xkey_if.c vcc_xkey_if.h
 @BUILD_VMOD_HEADER@
 @BUILD_VMOD_SAINTMODE@
 @BUILD_VMOD_SOFTPURGE@
+@BUILD_VMOD_STR@
 @BUILD_VMOD_TCP@
 @BUILD_VMOD_VAR@
 @BUILD_VMOD_VSTHROTTLE@
@@ -131,6 +136,13 @@ VMOD_TESTS = \
 	tests/saintmode/test03.vtc \
 	tests/saintmode/test04.vtc \
 	tests/saintmode/test05.vtc \
+	tests/str/test01.vtc \
+	tests/str/test02.vtc \
+	tests/str/test03.vtc \
+	tests/str/test04.vtc \
+	tests/str/test05.vtc \
+	tests/str/test06.vtc \
+	tests/str/test08.vtc \
 	tests/tcp/01-dumpinfo.vtc \
 	tests/tcp/02-congestion.vtc \
 	tests/tcp/03-read-tcpinfo.vtc \
@@ -180,6 +192,7 @@ EXTRA_DIST = \
 	vmod_header.vcc \
 	vmod_saintmode.vcc \
 	vmod_softpurge.vcc \
+	vmod_str.vcc \
 	vmod_tcp.vcc \
 	vmod_var.vcc \
 	vmod_vsthrottle.vcc \
