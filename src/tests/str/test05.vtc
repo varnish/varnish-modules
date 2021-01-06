@@ -1,0 +1,33 @@
+varnishtest "take(), negative argument"
+# the "0 -x" is a trick to have the vcc parser accept negative numbers
+
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import std;
+	import str from "${vmod_builddir}/.libs/libvmod_str.so";
+
+	sub vcl_deliver {
+		set resp.http.foo = str.take("abcde", 0 - 3);
+		set resp.http.bar = str.take("abcde", 0 - 7);
+		set resp.http.baz = str.take("abcde", 3, 0 - 4);
+		set resp.http.qux = str.take("abcde", 5, 0 - 3);
+		set resp.http.quux = str.take("abcde", 5, 0 - 7);
+		set resp.http.quuz = str.take("abcde", 5, 0 - 15);
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.foo == "cde"
+	expect resp.http.bar == "abcde"
+	expect resp.http.baz == "bcd"
+	expect resp.http.qux == "cde"
+	expect resp.http.quux == "abc"
+	expect resp.http.quuz == ""
+} -run

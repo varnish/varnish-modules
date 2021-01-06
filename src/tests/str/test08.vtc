@@ -1,0 +1,29 @@
+varnishtest "split()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import std;
+	import str from "${vmod_builddir}/.libs/libvmod_str.so";
+
+	sub vcl_deliver {
+		set resp.http.foo = str.split(".-.abc..def.-ghi..", 3, ".-");
+		set resp.http.bar = str.split(".-.abc..def.-ghi..", 7, ".-");
+		set resp.http.baz = str.split(".-.abc..def.-ghi..", 0-3, ".-");
+		set resp.http.qux = str.split(".-.abc..def.-ghi..", 0-4, ".-");
+		set resp.http.quux = str.split(req.http.none, 0-1, ".-");
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.foo == "ghi"
+	expect resp.http.bar == ""
+	expect resp.http.baz == "abc"
+	expect resp.http.qux == ""
+	expect resp.http.quux == ""
+} -run
