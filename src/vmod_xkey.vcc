@@ -75,11 +75,11 @@ set up in the database. When an SKU is updated this will trigger an
 HTTP request towards the Varnish server, clearing out every object
 with the matching xkey header::
 
-    GET / HTTP/1.1
+    PURGE / HTTP/1.1
     Host: www.example.com
-    xkey-purge: 166412
+    xkey: 166412
 
-Note the xkey-purge header. It is probably a good idea to protect
+Note the xkey header. It is probably a good idea to protect
 this with an ACL so random people from the Internet cannot purge your
 cache.
 
