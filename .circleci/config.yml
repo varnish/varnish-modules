@@ -32,8 +32,8 @@ jobs:
           command: |
             ./bootstrap
             ./configure
-            make
-            make check -j 4
+            make -k
+            make check -j4
             make install
 
 # two workflows, identical but for their triggers ()commit/scheduled
