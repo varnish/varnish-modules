@@ -167,7 +167,7 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	unsigned char digest[SHA256_LEN];
 	unsigned part;
 
-	(void)ctx;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (!key)
 		return (1);
@@ -216,7 +216,7 @@ vmod_return_token(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	unsigned char digest[SHA256_LEN];
 	unsigned part;
 
-	(void)ctx;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (!key)
 		return;
@@ -259,7 +259,7 @@ vmod_remaining(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	unsigned char digest[SHA256_LEN];
 	unsigned part;
 
-	(void)ctx;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (!key)
 		return (-1);
@@ -286,7 +286,7 @@ vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	unsigned char digest[SHA256_LEN];
 	unsigned part;
 
-	(void)ctx;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (!key)
 		return (-1);
@@ -304,9 +304,10 @@ vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 }
 
 static void
-fini(void *priv)
+fini(VRT_CTX, void *priv)
 {
 	assert(priv == &n_init);
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	AZ(pthread_mutex_lock(&init_mtx));
 	assert(n_init > 0);
@@ -339,7 +340,7 @@ vmod_event_function(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 	if (e != VCL_EVENT_LOAD)
 		return (0);
 
-	(void)ctx;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	priv->priv = &n_init;
 	priv->methods = priv_vcl_methods;
