@@ -183,10 +183,18 @@ vmod_len_req_body(VRT_CTX)
 	return ((VCL_INT)u);
 }
 
+static void
+bodyaccess_free(VRT_CTX, void *p)
+{
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
+	free(p);
+}
+
 static const struct vmod_priv_methods priv_call_methods[1] = {{
 		.magic = VMOD_PRIV_METHODS_MAGIC,
 		.type = "vmod_bodyaccess_rematch_priv_call",
-		.fini = free
+		.fini = bodyaccess_free
 }};
 
 VCL_INT
