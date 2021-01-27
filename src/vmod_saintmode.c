@@ -322,10 +322,18 @@ resolve(VRT_CTX, VCL_BACKEND dir) {
 	return (sm->be);
 }
 
+static void
+saintmode_free(VRT_CTX, void *p)
+{
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
+	free(p);
+}
+
 static const struct vmod_priv_methods priv_vcl_methods[1] = {{
 		.magic = VMOD_PRIV_METHODS_MAGIC,
 		.type = "vmod_saintmode_priv_vcl",
-		.fini = free
+		.fini = saintmode_free
 }};
 
 VCL_VOID
