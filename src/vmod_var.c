@@ -119,9 +119,11 @@ vh_get_var_alloc(struct var_head *vh, const char *name, const struct vrt_ctx *ct
 }
 
 static void
-free_func(void *p)
+free_func(VRT_CTX, void *p)
 {
 	struct var_head *vh;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	CAST_OBJ_NOTNULL(vh, p, VAR_HEAD_MAGIC);
 	FREE_OBJ(vh);
@@ -182,7 +184,8 @@ vmod_get_string(const struct vrt_ctx *ctx, struct vmod_priv *priv,
     VCL_STRING name)
 {
 	struct var *v;
-	(void)ctx;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (name == NULL)
 		return (NULL);
@@ -211,7 +214,8 @@ VCL_IP
 vmod_get_ip(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING name)
 {
 	struct var *v;
-	(void)ctx;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (name == NULL)
 		return (NULL);
@@ -246,7 +250,8 @@ vmod_get_##vcl_type_l(const struct vrt_ctx *ctx, struct vmod_priv *priv,\
     const char *name)							\
 {									\
 	struct var *v;							\
-	(void)ctx;							\
+									\
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);				\
 									\
 	if (name == NULL)						\
 		return 0;						\
@@ -266,7 +271,9 @@ VCL_VOID
 vmod_clear(const struct vrt_ctx *ctx, struct vmod_priv *priv)
 {
 	struct var_head *vh;
-	(void)ctx;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
 	vh = get_vh(priv);
 	vh_init(vh);
 }
@@ -275,7 +282,8 @@ VCL_VOID
 vmod_global_set(const struct vrt_ctx *ctx, VCL_STRING name, VCL_STRING value)
 {
 	struct var *v;
-	(void)ctx;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	if (name == NULL)
 		return;
