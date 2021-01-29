@@ -65,7 +65,7 @@ logexpect l1 -v v1 -d 1 -g vxid -q {Begin ~ "^req"} {
 
 ## Errors
 
-varnish v1 -vcl {
+varnish v1 -errvcl "Expected argument: REGEX regex" {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 	backend b { .host="${bad_ip}"; }
 
@@ -74,22 +74,7 @@ varnish v1 -vcl {
 	}
 }
 
-logexpect l1 -v v1 -d 0 -g vxid {
- 	expect 0 * Begin req
- 	expect * = VCL_Error {^header\.regsub\(\): regex is NULL$}
- 	expect * = End
-} -start
-
-client c1 {
-	txreq
-	rxresp
-	expect resp.status == 503
-	expect resp.reason == "VCL failed"
-} -run
-
-logexpect l1 -wait
-
-varnish v1 -vcl {
+varnish v1 -errvcl "Expected argument: REGEX regex" {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 	backend b { .host="${bad_ip}"; }
 
@@ -97,18 +82,3 @@ varnish v1 -vcl {
 		header.regsub(req, "(", "a");
 	}
 }
-
-logexpect l1 -v v1 -d 0 -g vxid {
- 	expect 0 * Begin req
- 	expect * = VCL_Error {^header\.regsub\(\): cannot compile '\('}
- 	expect * = End
-} -start
-
-client c1 {
-	txreq
-	rxresp
-	expect resp.status == 503
-	expect resp.reason == "VCL failed"
-} -run
-
-logexpect l1 -wait
