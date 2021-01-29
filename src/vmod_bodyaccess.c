@@ -183,30 +183,14 @@ vmod_len_req_body(VRT_CTX)
 	return ((VCL_INT)u);
 }
 
-static void
-bodyaccess_free(VRT_CTX, void *p)
-{
-	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-
-	free(p);
-}
-
-static const struct vmod_priv_methods priv_call_methods[1] = {{
-		.magic = VMOD_PRIV_METHODS_MAGIC,
-		.type = "vmod_bodyaccess_rematch_priv_call",
-		.fini = bodyaccess_free
-}};
-
 VCL_INT
-vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
+vmod_rematch_req_body(VRT_CTX, VCL_REGEX re)
 {
 	struct vsb *vsb;
-	const char *error;
-	int erroroffset;
-	vre_t *t = NULL;
 	int i;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	AN(re);
 
 	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
@@ -220,25 +204,13 @@ vmod_rematch_req_body(VRT_CTX, struct vmod_priv *priv_call, VCL_STRING re)
 		return (-1);
 	}
 
-	AN(re);
-
-	if(priv_call->priv == NULL) {
-		t = VRE_compile(re, 0, &error, &erroroffset);
-		if (t == NULL) {
-			VSLb(ctx->vsl, SLT_VCL_Error,
-			    "Regular expression not valid");
-			return (-1);
-		}
-		priv_call->priv = t;
-		priv_call->methods = priv_call_methods;
-	}
 
 	vsb = VSB_new_auto();
 	AN(vsb);
 
 	bodyaccess_bcat(ctx, vsb);
 
-	i = VRE_exec(priv_call->priv, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
+	i = VRE_exec(re, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
 	    0, NULL);
 
 	VSB_destroy(&vsb);

@@ -50,7 +50,7 @@ These functions applies only to standard REST methods.
 Caching is *not* allowed on PUT requests.
 
 $ABI strict
-$Function INT rematch_req_body(PRIV_CALL, STRING re)
+$Function INT rematch_req_body(REGEX re)
 
 Description
         Returns -1 if an error occurrs.
