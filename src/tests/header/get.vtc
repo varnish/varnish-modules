@@ -10,6 +10,9 @@ server s1 {
 	rxreq
 	expect req.url == "/two"
 	txresp -status 200 -hdr "foo: sillycookie=blah" -hdr "foo: realcookie=YAI"
+	rxreq
+	expect req.url == "/three"
+	txresp -status 200 -hdr "foo: sillycookie=blah" -hdr "foo: realcookie=YAI"
 } -start
 
 varnish v1 -vcl+backend {
@@ -20,6 +23,8 @@ varnish v1 -vcl+backend {
 			set beresp.http.xusr = header.get(beresp.http.foo,"realcookie=");
 		} elsif (bereq.url == "/two") {
 			set beresp.http.xusr = header.get(beresp.http.foo,"^realcookie=");
+		} elsif (bereq.url == "/three") {
+			set beresp.http.xusr = header.get(beresp.http.foo,"^realcookie=(");
 		}
 		return(deliver);
 	}
@@ -35,6 +40,8 @@ client c1 {
 	rxresp
 	expect resp.status == 200
 	expect resp.http.xusr == "realcookie=YAI"
+
+	txreq -url "/three"
+	rxresp
+	expect resp.status == 503
 } -run
-
-

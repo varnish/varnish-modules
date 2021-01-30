@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "vmod_config.h"
+#include "vre.h"
 
 #include "vcc_header_if.h"
 
@@ -50,10 +51,20 @@ pthread_mutex_t header_mutex;
  * XXX: We have to recheck the condition after grabbing the lock to avoid a
  * XXX: race condition.
  */
-static void
-header_init_re(struct vmod_priv *priv, const char *s)
+static int
+header_init_re(VRT_CTX, struct vmod_priv *priv, const char *s)
 {
+	vre_t *t;
+	int erroffset;
+	const char *err = NULL;
+
 	if (priv->priv == NULL) {
+		t = VRE_compile(s, 0, &err, &erroffset);
+		if (!t) {
+			VRT_fail(ctx, "header: \"%s\" isn't a valid regex",
+			   s);
+			return 0;
+		}
 		assert(pthread_mutex_lock(&header_mutex) == 0);
 		if (priv->priv == NULL) {
 			VRT_re_init(&priv->priv, s);
@@ -61,6 +72,7 @@ header_init_re(struct vmod_priv *priv, const char *s)
 		}
 		pthread_mutex_unlock(&header_mutex);
 	}
+	return 1;
 }
 
 /*
@@ -234,7 +246,8 @@ vmod_get(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 	const char *p;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	header_init_re(priv, s);
+	if (!header_init_re(ctx, priv, s))
+		return (NULL);
 
 	hp = VRT_selecthttp(ctx, hdr->where);
 	u = header_http_findhdr(ctx, hp, hdr->what, priv->priv);
@@ -263,7 +276,8 @@ vmod_remove(VRT_CTX, struct vmod_priv *priv, VCL_HEADER hdr, VCL_STRING s)
 	struct http *hp;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	header_init_re(priv, s);
+	if (!header_init_re(ctx, priv, s))
+		return;
 
 	hp = VRT_selecthttp(ctx, hdr->where);
 	header_http_Unset(ctx, hp, hdr->what, priv->priv);
