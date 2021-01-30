@@ -1,0 +1,55 @@
+version: 2.1
+
+# use circleci's pipeline argument to ease configuration.
+# this allows you to track the right packages, and to add extra dependencies if needed
+# just change the default here
+parameters:
+  pc-repo:
+    description: the packagecloud repository to find the Varnish Cache packages. It should match the version you are building against
+    type: string
+    default: "varnish60lts"
+  dep-pkgs:
+    description: which packages to install to build your vmod(s)
+    type: string
+    default: "make automake libtool python-sphinx"
+
+# for now, we just build for centos:7, be we can do it for more platforms if needed
+jobs:
+  build:
+    docker:
+      - image: centos:7
+    working_directory: /workspace
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            curl -s https://packagecloud.io/install/repositories/varnishcache/<< pipeline.parameters.pc-repo >>/script.rpm.sh | bash
+            yum install -y epel-release
+            yum install -y git varnish-devel << pipeline.parameters.dep-pkgs >>
+      - checkout
+      - run:
+          name: Build and test
+          command: |
+            ./bootstrap
+            ./configure
+            make -k
+            make check -j4
+            make install
+
+# two workflows, identical but for their triggers ()commit/scheduled
+workflows:
+  version: 2
+  # run the build job for all commits
+  commit: &jobs
+    jobs:
+      - build
+  # every week, run build too, in case packages got updated
+  nightly:
+    <<: *jobs
+    triggers:
+      - schedule:
+          cron: "0 4 * * *"
+          filters:
+            branches:
+              only:
+                - master
