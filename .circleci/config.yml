@@ -33,7 +33,7 @@ jobs:
             ./bootstrap
             ./configure
             make -k
-            make check -j4
+            make check -j4 VERBOSE=1
             make install
 
 # two workflows, identical but for their triggers ()commit/scheduled
