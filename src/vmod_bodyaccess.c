@@ -129,10 +129,13 @@ bodyaccess_bcat(VRT_CTX, struct vsb *vsb)
 VCL_VOID
 vmod_hash_req_body(VRT_CTX)
 {
+	struct VSHA256Context sha256ctx;
 	struct vsb *vsb;
 	txt txtbody;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
+	AZ(ctx->specific);
 
 	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
@@ -152,7 +155,13 @@ vmod_hash_req_body(VRT_CTX)
 	bodyaccess_bcat(ctx, vsb);
 	txtbody.b = VSB_data(vsb);
 	txtbody.e = txtbody.b + VSB_len(vsb);
-	SHA256_Update(ctx->specific, txtbody.b, txtbody.e - txtbody.b);
+
+	VSHA256_Init(&sha256ctx);
+	VSHA256_Update(&sha256ctx, ctx->req->digest, sizeof ctx->req->digest);
+	VSHA256_Update(&sha256ctx, VSB_data(vsb), VSB_len(vsb));
+	VSHA256_Update(&sha256ctx, "", 1);
+	VSHA256_Final(ctx->req->digest, &sha256ctx);
+
 	VSLbt(ctx->vsl, SLT_Hash, txtbody);
 	VSB_destroy(&vsb);
 }
