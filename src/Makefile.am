@@ -109,6 +109,8 @@ VMOD_TESTS = \
 	tests/bodyaccess/test04.vtc \
 	tests/bodyaccess/test05.vtc \
 	tests/header/append.vtc \
+	tests/header/append_maxhdr_overflow.vtc \
+	tests/header/append_overflow.vtc \
 	tests/header/copy.vtc \
 	tests/header/get.vtc \
 	tests/header/import.vtc \

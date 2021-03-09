@@ -1,0 +1,18 @@
+varnishtest "header.append overflow"
+
+varnish v1 -vcl {
+	backend proforma None;
+
+	import vtc;
+	import header from "${vmod_builddir}/.libs/libvmod_header.so";
+
+	sub vcl_recv {
+		vtc.workspace_alloc(client, -2);
+		header.append(req.http.foo, "bar");
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+} -run

@@ -1,0 +1,45 @@
+varnishtest "header.append with http_max_hdr and overflow"
+
+varnish v1 -arg "-p http_max_hdr=32" -vcl {
+	backend proforma None;
+
+	import vtc;
+	import std;
+	import header from "${vmod_builddir}/.libs/libvmod_header.so";
+
+	sub vcl_recv {
+		std.log(vtc.workspace_free(client));
+		header.append(req.http.foo, "bar");
+	}
+} -start
+
+client c1 {
+	txreq \
+		-hdr "0: 1" \
+		-hdr "1: 1" \
+		-hdr "2: 1" \
+		-hdr "3: 1" \
+		-hdr "4: 1" \
+		-hdr "5: 1" \
+		-hdr "6: 1" \
+		-hdr "7: 1" \
+		-hdr "8: 1" \
+		-hdr "9: 1" \
+		-hdr "a: 1" \
+		-hdr "b: 1" \
+		-hdr "c: 1" \
+		-hdr "d: 1" \
+		-hdr "e: 1" \
+		-hdr "f: 1" \
+		-hdr "10: 1" \
+		-hdr "11: 1" \
+		-hdr "12: 1" \
+		-hdr "13: 1" \
+		-hdr "14: 1" \
+		-hdr "15: 1" \
+		-hdr "16: 1" \
+		-hdr "17: 1" \
+		-hdr "18: 1" \
+		-hdr "19: 1"
+	rxresp
+} -run
