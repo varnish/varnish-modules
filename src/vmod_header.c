@@ -226,6 +226,10 @@ vmod_append(VRT_CTX, VCL_HEADER hdr, VCL_STRANDS s)
 	st->p = p;
 
 	b = VRT_StrandsWS(ctx->ws, NULL, st);
+	if (b == NULL) {
+		VRT_fail(ctx, "vmod_header: workspace allocation failure");
+		return;
+	}
 
 	hp = VRT_selecthttp(ctx, hdr->where);
 	http_SetHeader(hp, b);
