@@ -173,18 +173,20 @@ VCL_VOID
 vmod_append(VRT_CTX, VCL_HEADER hdr, VCL_STRANDS s)
 {
 	struct http *hp;
-	struct strands st[1];
-	const char *p[s->n + 2];
+	struct strands *st;
 	const char *b;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
 	/* prefix the strand with $hdr_name + space */
-	p[0] = hdr->what + 1;
-	p[1] = " ";
-	AN(memcpy(p + 2, s->p, s->n * sizeof *s->p));
-	st->n = s->n + 2;
-	st->p = p;
+	st = VRT_AllocStrandsWS(ctx->ws, s->n + 2);
+	if (!st) {
+		VRT_fail(ctx, "vmod_head: workspace allocation failure");
+		return;
+	}
+	st->p[0] = hdr->what + 1;
+	st->p[1] = " ";
+	AN(memcpy(st->p + 2, s->p, s->n * sizeof *s->p));
 
 	b = VRT_StrandsWS(ctx->ws, NULL, st);
 	if (b == NULL) {
