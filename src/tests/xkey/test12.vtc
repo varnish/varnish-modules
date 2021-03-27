@@ -34,8 +34,8 @@ varnish v1 -vcl+backend {
 	}
 } -start
 
-# g_hashhead_bytes  = 104 bytes per xkey
-# g_ochead_bytes    = 80 bytes per cached object
+# g_hashhead_bytes  = 96 bytes per xkey
+# g_ochead_bytes    = 72 bytes per cached object
 # g_oc_bytes        = 56 bytes per cached object
 
 # no cache, no xkeys
@@ -50,10 +50,10 @@ client c1 {
 } -run
 
 # one cached response, one xkey
-varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
-           -expect XKEY.g_ochead_bytes == 80 \
+varnish v1 -expect XKEY.g_hashhead_bytes == 96 \
+           -expect XKEY.g_ochead_bytes == 72 \
            -expect XKEY.g_oc_bytes == 56 \
-           -expect XKEY.g_bytes == 240
+           -expect XKEY.g_bytes == 224
 
 client c1 {
 	txreq -url /something_longish
@@ -61,10 +61,10 @@ client c1 {
 } -run
 
 # two cached responses, two xkeys
-varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
-           -expect XKEY.g_ochead_bytes == 160 \
+varnish v1 -expect XKEY.g_hashhead_bytes == 192 \
+           -expect XKEY.g_ochead_bytes == 144 \
            -expect XKEY.g_oc_bytes == 112 \
-           -expect XKEY.g_bytes == 480
+           -expect XKEY.g_bytes == 448
 
 client c1 {
 	txreq -url /something_else
@@ -72,10 +72,10 @@ client c1 {
 } -run
 
 # three cached responses, two xkeys
-varnish v1 -expect XKEY.g_hashhead_bytes == 208 \
-           -expect XKEY.g_ochead_bytes == 240 \
+varnish v1 -expect XKEY.g_hashhead_bytes == 192 \
+           -expect XKEY.g_ochead_bytes == 216 \
            -expect XKEY.g_oc_bytes == 168 \
-           -expect XKEY.g_bytes == 616
+           -expect XKEY.g_bytes == 576
 
 client c1 {
 	txreq -hdr "xkey-purge: asdf"
@@ -85,7 +85,7 @@ client c1 {
 } -run
 
 # one cached response, one xkey
-varnish v1 -expect XKEY.g_hashhead_bytes == 104 \
-           -expect XKEY.g_ochead_bytes == 80 \
+varnish v1 -expect XKEY.g_hashhead_bytes == 96 \
+           -expect XKEY.g_ochead_bytes == 72 \
            -expect XKEY.g_oc_bytes == 56 \
-           -expect XKEY.g_bytes == 240
+           -expect XKEY.g_bytes == 224
