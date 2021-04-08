@@ -21,11 +21,26 @@ jobs:
     working_directory: /workspace
     steps:
       - run:
-          name: Install dependencies
+          name: Install dependencies (on master, install varnish from source)
           command: |
-            curl -s https://packagecloud.io/install/repositories/varnishcache/<< pipeline.parameters.pc-repo >>/script.rpm.sh | bash
             yum install -y epel-release
-            yum install -y git varnish-devel << pipeline.parameters.dep-pkgs >>
+            yum install -y \
+                automake \
+                git \
+                jemalloc-devel \
+                libedit-devel \
+                libtool \
+                libunwind-devel \
+                make \
+                pcre-devel \
+                python-sphinx \
+                python3
+            git clone https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache
+            cd /tmp/varnish-cache
+            ./autogen.des
+            ./configure --libdir=/usr/lib64
+            make -j 8
+            make install
       - checkout
       - run:
           name: Build and test
