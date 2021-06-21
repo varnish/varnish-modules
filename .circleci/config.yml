@@ -1,46 +1,45 @@
 version: 2.1
 
-# use circleci's pipeline argument to ease configuration.
-# this allows you to track the right packages, and to add extra dependencies if needed
-# just change the default here
-parameters:
-  pc-repo:
-    description: the packagecloud repository to find the Varnish Cache packages. It should match the version you are building against
-    type: string
-    default: "varnish-weekly"
-  dep-pkgs:
-    description: which packages to install to build your vmod(s)
-    type: string
-    default: "make automake libtool python-sphinx"
-
-# for now, we just build for centos:7, be we can do it for more platforms if needed
 jobs:
+  # for arm, we only have ubuntu, so we use that everywhere
   build:
-    docker:
-      - image: centos:7
-    working_directory: /workspace
+    parameters:
+      rclass:
+        description: resource_class to use
+        type: string
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: << parameters.rclass >>
+    working_directory: /tmp/workspace
     steps:
       - run:
           name: Install dependencies (on master, install varnish from source)
           command: |
-            yum install -y epel-release
-            yum install -y \
+            export DEBIAN_FRONTEND=noninteractive
+            export DEBCONF_NONINTERACTIVE_SEEN=true
+            sudo -E -- apt-get update
+            sudo -E -- apt-get install -y \
                 automake \
                 git \
-                jemalloc-devel \
-                libedit-devel \
+                libjemalloc-dev \
+                libedit-dev \
                 libtool \
-                libunwind-devel \
+                libunwind-dev \
                 make \
-                pcre-devel \
-                python-sphinx \
-                python3
+                libpcre3-dev \
+                python3-docutils \
+                python3 \
+                python3-sphinx
             git clone https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache
             cd /tmp/varnish-cache
             ./autogen.des
-            ./configure --libdir=/usr/lib64
+            if [ "arm.medium" = "<< parameters.rclass >>" ]; then
+                ./configure --libdir=/usr/lib/aarch64-linux-gnu/
+            else
+                ./configure --libdir=/usr/lib/x86_64-linux-gnu/
+            fi
             make -j 8
-            make install
+            sudo make install
       - checkout
       - run:
           name: Build and test
@@ -49,15 +48,21 @@ jobs:
             ./configure
             make -k
             make check -j4 VERBOSE=1
-            make install
+            sudo make install
 
-# two workflows, identical but for their triggers ()commit/scheduled
+
+# two workflows, identical but for their triggers (commit/scheduled)
 workflows:
   version: 2
   # run the build job for all commits
   commit: &jobs
     jobs:
-      - build
+      - build:
+          name: x64
+          rclass: medium
+      - build:
+          name: aarch64
+          rclass: arm.medium
   # every week, run build too, in case packages got updated
   nightly:
     <<: *jobs
