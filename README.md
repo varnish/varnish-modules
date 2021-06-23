@@ -14,7 +14,7 @@ Included:
 * [`str`](src/vmod_str.vcc): String operations
 * [`tcp`](src/vmod_tcp.vcc): TCP connections tweaking
 * [`var`](src/vmod_var.vcc): Variable support
-* [`vstrottle`](src/vmod_vsthrottle.vcc): Request and bandwidth throttling
+* [`vsthrottle`](src/vmod_vsthrottle.vcc): Request and bandwidth throttling
 * [`xkey`](src/vmod_xkey.vcc): Advanced cache invalidations
 
 Modules in this repository are feature-complete and are maintained to stay
