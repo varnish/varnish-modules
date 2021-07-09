@@ -11,7 +11,7 @@ RUN set -e; \
 	    libtool \
 	    libunwind-devel \
 	    make \
-	    pcre-devel \
+	    pcre2-devel \
 	    python-sphinx \
 	    python3; \
 	git clone https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache; \

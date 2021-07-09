@@ -31,8 +31,8 @@ varnish v1 -vcl+backend {
 
 varnish v1 -cliok "param.set debug +syncvsl"
 varnish v1 -cliok "param.set fetch_chunksize 4k"
-varnish v1 -cliok "param.set pcre_match_limit 10000"
-varnish v1 -cliok "param.set pcre_match_limit_recursion 10000"
+varnish v1 -cliok "param.set pcre2_match_limit 10000"
+varnish v1 -cliok "param.set pcre2_depth_limit 10000"
 varnish v1 -start
 
 client c1 {

@@ -210,8 +210,7 @@ vmod_rematch_req_body(VRT_CTX, VCL_REGEX re)
 
 	bodyaccess_bcat(ctx, vsb);
 
-	i = VRE_exec(re, VSB_data(vsb), VSB_len(vsb), 0, 0, NULL,
-	    0, NULL);
+	i = VRE_match(re, VSB_data(vsb), VSB_len(vsb), 0, NULL);
 
 	VSB_destroy(&vsb);
 
