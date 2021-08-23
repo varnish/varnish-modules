@@ -381,7 +381,7 @@ xkey_cleanup(void)
 	VRBT_FOREACH(hashkey, xkey_hashtree, &xkey_hashtree) {
 		CAST_OBJ_NOTNULL(hashhead, (void *)hashkey,
 		    XKEY_HASHHEAD_MAGIC);
-		VTAILQ_CONCAT(&xkey_pool.ocs, &hashhead->ocs, list_ochead);
+		VTAILQ_CONCAT(&xkey_pool.ocs, &hashhead->ocs, list_hashhead);
 		VTAILQ_INSERT_HEAD(&xkey_pool.hashheads, hashhead, list);
 	}
 	VRBT_INIT(&xkey_hashtree);
@@ -394,19 +394,22 @@ xkey_cleanup(void)
 
 	while (!VTAILQ_EMPTY(&xkey_pool.hashheads)) {
 		hashhead = VTAILQ_FIRST(&xkey_pool.hashheads);
+		CHECK_OBJ_NOTNULL(hashhead, XKEY_HASHHEAD_MAGIC);
 		VTAILQ_REMOVE(&xkey_pool.hashheads, hashhead, list);
 		FREE_OBJ(hashhead);
 	}
 
 	while (!VTAILQ_EMPTY(&xkey_pool.ocheads)) {
 		ochead = VTAILQ_FIRST(&xkey_pool.ocheads);
+		CHECK_OBJ_NOTNULL(ochead, XKEY_OCHEAD_MAGIC);
 		VTAILQ_REMOVE(&xkey_pool.ocheads, ochead, list);
 		FREE_OBJ(ochead);
 	}
 
 	while (!VTAILQ_EMPTY(&xkey_pool.ocs)) {
 		oc = VTAILQ_FIRST(&xkey_pool.ocs);
-		VTAILQ_REMOVE(&xkey_pool.ocs, oc, list_ochead);
+		CHECK_OBJ_NOTNULL(oc, XKEY_OC_MAGIC);
+		VTAILQ_REMOVE(&xkey_pool.ocs, oc, list_hashhead);
 		FREE_OBJ(oc);
 	}
 }
