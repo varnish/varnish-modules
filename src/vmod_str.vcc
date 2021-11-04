@@ -6,7 +6,7 @@
 # (vmodtool requires this format.)
 #
 
-$Module str 3 Str VMOD
+$Module str 3 "Str VMOD"
 
 DESCRIPTION
 ===========
