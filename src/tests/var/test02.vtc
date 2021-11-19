@@ -14,6 +14,10 @@ varnish v1 -vcl+backend {
 		var.global_set("bar", "altered_barval");
 	}
 
+	sub vcl_recv {
+		var.global_get(req.http.NULL);
+	}
+
 	sub vcl_deliver {
 		set resp.http.x-foo = var.global_get("foo");
 		set resp.http.x-bar = var.global_get("bar");

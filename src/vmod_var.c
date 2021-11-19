@@ -321,6 +321,9 @@ vmod_global_get(const struct vrt_ctx *ctx, VCL_STRING name)
 	struct var *v;
 	const char *r = NULL;
 
+	if (!name)
+		return (NULL);
+
 	AZ(pthread_mutex_lock(&var_list_mtx));
 	VTAILQ_FOREACH(v, &global_vars, list) {
 		CHECK_OBJ_NOTNULL(v, VAR_MAGIC);
