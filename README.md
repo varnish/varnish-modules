@@ -51,6 +51,9 @@ make rst-docs # optional (docs)
 make install  # optional (installation), run as root
 ```
 
+Note: If you downloaded/cloned the source code and not the release archive, you
+need to run `make rst-docs` before being able to install.
+
 A [Dockerfile](Dockerfile) is available as example.
 
 ## Usage
