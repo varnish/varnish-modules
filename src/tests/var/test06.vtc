@@ -1,0 +1,48 @@
+varnishtest "Test that running out of workspace memory fails the request"
+
+server s1 {
+	rxreq
+	txresp
+	rxreq
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import var from "${vmod_builddir}/.libs/libvmod_var.so";
+        import vtc;
+
+	sub vcl_deliver {
+               if (req.url == "/a") {
+                   # Leave only a single byte in the workspace free.
+                   vtc.workspace_alloc(client, -1);
+                   # The allocation of the the actual struct var is next and will fail now.
+                   var.set("a", "0");
+               }
+               if (req.url == "/b") {
+                   # Leave enough bytes in the workspace for the
+                   # struct var allocation to succeed, but fail when
+                   # copying the variable name.
+                   vtc.workspace_alloc(client, -64);
+                   var.set("b000000000000000000000000000000000000000000000000000000000000000", "0");
+               }
+	}
+} -start
+
+logexpect l1 -v v1 {
+	expect * * VCL_Error "vmod_var: alloc var: out of workspace"
+	expect * * VCL_Error "vmod_var: copy name: out of workspace"
+} -start
+
+client c1 {
+	txreq -url "/a"
+	rxresp
+	expect resp.status >= 500
+} -run
+
+client c1 {
+	txreq -url "/b"
+	rxresp
+	expect resp.status >= 500
+} -run
+
+logexpect l1 -wait
