@@ -139,6 +139,7 @@ VMOD_TESTS = \
 	tests/var/test03.vtc \
 	tests/var/test04.vtc \
 	tests/var/test05.vtc \
+	tests/var/test06.vtc \
 	tests/vsthrottle/test01.vtc \
 	tests/vsthrottle/test02.vtc \
 	tests/vsthrottle/test03.vtc \
