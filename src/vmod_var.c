@@ -109,10 +109,18 @@ vh_get_var_alloc(struct var_head *vh, const char *name, const struct vrt_ctx *ct
 	if (!v) {
 		/* Allocate and add */
 		v = (struct var*)WS_Alloc(ctx->ws, sizeof(struct var));
-		AN(v);
+		if (v == NULL)
+		{
+			VRT_fail(ctx, "vmod_var: alloc var: out of workspace");
+			return NULL;
+		}
 		v->magic = VAR_MAGIC;
 		v->name = WS_Copy(ctx->ws, name, -1);
-		AN(v->name);
+		if (v->name == NULL)
+                {
+			VRT_fail(ctx, "vmod_var: copy name: out of workspace");
+			return NULL;
+		}
 		VTAILQ_INSERT_HEAD(&vh->vars, v, list);
 	}
 	return v;
@@ -172,7 +180,8 @@ vmod_set_string(const struct vrt_ctx *ctx, struct vmod_priv *priv,
 	if (name == NULL)
 		return;
 	v = vh_get_var_alloc(get_vh(priv), name, ctx);
-	AN(v);
+	if (v == NULL)
+		return;
 	v->type = STRING;
 	if (value == NULL)
 		value = "";
@@ -204,7 +213,8 @@ vmod_set_ip(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING name,
 	if (name == NULL)
 		return;
 	v = vh_get_var_alloc(get_vh(priv), name, ctx);
-	AN(v);
+	if (v == NULL)
+		return;
 	v->type = IP;
 	AN(ip);
 	v->value.IP = WS_Copy(ctx->ws, ip, vsa_suckaddr_len);;
@@ -234,7 +244,8 @@ vmod_set_##vcl_type_l(const struct vrt_ctx *ctx, struct vmod_priv *priv,\
 	if (name == NULL)						\
 		return;							\
 	v = vh_get_var_alloc(get_vh(priv), name, ctx);			\
-	AN(v);								\
+	if (v == NULL)                                                  \
+		return;                                                 \
 	v->type = vcl_type_u;						\
 	v->value.vcl_type_u = value;					\
 }
