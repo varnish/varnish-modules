@@ -68,6 +68,9 @@ header for a certain page might look like this::
     xkey: 166412
     xkey: 234323
 
+Alternatively you may instead use a single header with space separated
+values like ``xkey: 8155054 166412 234323``.
+
 This requires a bit of VCL to be in place. The VCL can be found above.
 
 Then, in order to keep the web in sync with the database, a trigger is
@@ -78,6 +81,13 @@ with the matching xkey header::
     PURGE / HTTP/1.1
     Host: www.example.com
     xkey: 166412
+
+Several ``xkey-purge`` headers are also supported like in the response
+example above, and you may also here use a single header with space
+seperated values like ``xkey-purge: 166412 234323``.
+
+Unlike `xkey` header for responses, purge header is fully configurable
+by means of adjusting the name of the header in the VCL example above.
 
 Note the xkey header. It is probably a good idea to protect
 this with an ACL so random people from the Internet cannot purge your
