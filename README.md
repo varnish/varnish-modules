@@ -24,8 +24,7 @@ first to discuss implementation plans.
 
 ## Installation
 
-Source releases can be downloaded from the [github release page of the project](https://github.com/varnish/varnish-modules/releases)
-and older releases are located [here](https://download.varnish-software.com/varnish-modules/).
+Source releases can be downloaded from the [github release page of the project](https://github.com/varnish/varnish-modules/releases).
 
 Each release only targets one version of Varnish (visible in the realease title)
 and the git repository sports a branch dedicated to each version, starting from
