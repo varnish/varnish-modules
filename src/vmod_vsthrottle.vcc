@@ -175,3 +175,21 @@ Example
 	set resp.http.Retry-After
 		= vsthrottle.blocked(client.identity, 15, 10s, 30s);
      }
+
+$Function VOID remove_bucket(STRING key, INT limit, DURATION period,
+                           DURATION block=0)
+
+Arguments:
+  - Same arguments as is_denied()
+
+Description
+
+  Remove the token bucket identified by the four parameters, if it exists.
+
+
+Example
+  ::
+
+     sub vcl_deliver {
+	    vsthrottle.remove_bucket(client.identity, 15, 10s, 30s);
+     }

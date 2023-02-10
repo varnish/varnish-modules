@@ -303,6 +303,30 @@ vmod_blocked(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 	return (ret);
 }
 
+VCL_VOID
+vmod_remove_bucket(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
+		   VCL_DURATION block)
+{
+	struct tbucket *b;
+	struct vsthrottle *v;
+	unsigned char digest[SHA256_LEN];
+	unsigned part;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
+	if (!key)
+		return;
+	do_digest(digest, key, limit, period, block);
+
+	part = digest[0] & N_PART_MASK;
+	v = &vsthrottle[part];
+	AZ(pthread_mutex_lock(&v->mtx));
+	b = get_bucket(digest, limit, period, VTIM_mono());
+	VRBT_REMOVE(tbtree, &v->buckets, b);
+	FREE_OBJ(b);
+	AZ(pthread_mutex_unlock(&v->mtx));
+}
+
 static void
 fini(VRT_CTX, void *priv)
 {
