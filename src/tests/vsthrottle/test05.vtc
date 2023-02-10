@@ -1,0 +1,44 @@
+varnishtest "Test vsthrottle remove_bucket()"
+
+server s1 {
+       rxreq
+       txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
+
+	sub vcl_deliver {
+		set resp.http.foo-count0 = vsthrottle.remaining("foo", 5, 1s);
+		if (!vsthrottle.is_denied("foo", 5, 1s)) {
+			set resp.http.f1 = "OK";
+		}
+
+		if (!vsthrottle.is_denied("foo", 5, 1s)) {
+			set resp.http.f2 = "OK";
+		}
+
+		if (!vsthrottle.is_denied("foo", 5, 1s)) {
+			set resp.http.f3 = "OK";
+		}
+
+		set resp.http.foo-count1 = vsthrottle.remaining("foo", 5, 1s);
+
+		vsthrottle.remove_bucket("foo", 5, 1s);
+
+		set resp.http.foo-count2 = vsthrottle.remaining("foo", 5, 1s);
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+	expect resp.http.foo-count0 == "5"
+	expect resp.http.f1 == "OK"
+	expect resp.http.f2 == "OK"
+	expect resp.http.f3 == "OK"
+	expect resp.http.foo-count1 == "2"
+	expect resp.http.foo-count2 == "5"
+}
+
+client c1 -run
