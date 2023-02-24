@@ -241,7 +241,7 @@ run_gc(double now, unsigned part)
 	/* XXX: Assert mtx is held ... */
 	VRBT_FOREACH_SAFE(x, tbtree, buckets, y) {
 		CHECK_OBJ_NOTNULL(x, TBUCKET_MAGIC);
-		if (now - x->last_used > x->period) {
+		if (now - x->last_used > x->period && (x->block == 0 || now > x->block)) {
 			VRBT_REMOVE(tbtree, buckets, x);
 			FREE_OBJ(x);
 		}
