@@ -95,7 +95,8 @@ AM_TESTS_ENVIRONMENT = \
 	PATH="$(VMOD_TEST_PATH)" \
 	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH)"
 TEST_EXTENSIONS = .vtc
-VTC_LOG_COMPILER = varnishtest -v
+# because of vsthrottle/test05.vtc we need larger buffers than usual
+VTC_LOG_COMPILER = varnishtest -v -b 10M
 AM_VTC_LOG_FLAGS = \
 	-Dvmod_builddir=$(abs_top_builddir)/src \
 	-Dvmod_directors="directors from \"$(VARNISHAPI_VMODDIR)/libvmod_directors.so\""
