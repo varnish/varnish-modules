@@ -1,0 +1,48 @@
+varnishtest "Make sure the GC doesn't remove buckets in the blocked state (gh#206)"
+
+varnish v1 -vcl {
+	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
+
+	backend default none;
+
+	sub vcl_recv {
+		if (vsthrottle.is_denied(req.url, 1, 5s, 1y)) {
+			return (synth(429));
+		} else {
+			return (synth(200));
+		}
+	}
+} -start
+
+client c1 {
+	# first request goes through
+	txreq -url "/a"
+	rxresp
+	expect resp.status == 200
+
+	# the next 998 requests get blocked
+	loop 998 {
+		txreq -url "/a"
+		rxresp
+		expect resp.status == 429
+	}
+} -run
+
+# wait out the regular period, but not the "block" one
+delay 6
+
+client c2 {
+	# the 1000th request has a different hash but falls into the same part
+	# as the first 999 ones. As a result, the garbage collector is called
+	# and the "/a" bucket hasn't been touched for more than the regular
+	# period
+	txreq -url "/3"
+	rxresp
+	expect resp.status == 200
+
+	# the "/a" bucket should have survived, and deny us access
+	txreq -url "/a"
+	rxresp
+	expect resp.status == 429
+} -run
+
