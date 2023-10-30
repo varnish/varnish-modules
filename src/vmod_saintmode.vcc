@@ -8,11 +8,11 @@ newer. The code is in part based on Poul-Henning Kamp's saintmode
 implementation in Varnish 3.0.
 
 Saintmode lets you deal with a backend that is failing in random ways
-for specific requests. It maintains a blacklist per backend, marking
+for specific requests. It maintains a denylist per backend, marking
 the backend as sick for specific objects. When the number of objects
 marked as sick for a backend reaches a set threshold, the backend is
-considered sick for all requests. Each blacklisted object carries a
-TTL, which denotes the time it will stay blacklisted.
+considered sick for all requests. Each denylisted object carries a
+TTL, which denotes the time it will stay denylisted.
 
 Saintmode in Varnish 4.1 is implemented as a director VMOD. We instantiate a
 saintmode object and give it a backend as an argument. The resulting object can
@@ -38,7 +38,7 @@ Example::
 
     sub vcl_init {
         # Instantiate sm1, sm2 for backends tile1, tile2
-        # with 10 blacklisted objects as the threshold for marking the
+        # with 10 denylisted objects as the threshold for marking the
         # whole backend sick.
         new sm1 = saintmode.saintmode(tile1, 10);
         new sm2 = saintmode.saintmode(tile2, 10);
@@ -61,7 +61,7 @@ Example::
         if (beresp.status >= 500) {
             # This marks the backend as sick for this specific
             # object for the next 20s.
-            saintmode.blacklist(20s);
+            saintmode.denylist(20s);
             # Retry the request. This will result in a different backend
             # being used.
             return (retry);
@@ -72,7 +72,7 @@ Example::
 
 
 $ABI vrt
-$Function VOID blacklist(PRIV_VCL, DURATION expires)
+$Function VOID denylist(PRIV_VCL, DURATION expires)
 
 Marks the backend as sick for a specific object. Used in vcl_backend_response.
 Corresponds to the use of ``beresp.saintmode`` in Varnish 3.0. Only available
@@ -82,7 +82,7 @@ Example::
 
     sub vcl_backend_response {
         if (beresp.http.broken-app) {
-            saintmode.blacklist(20s);
+            saintmode.denylist(20s);
             return (retry);
         }
     }
@@ -123,7 +123,7 @@ $Object saintmode(PRIV_VCL, BACKEND backend, INT threshold)
 
 Constructs a saintmode director object. The ``threshold`` argument sets
 the saintmode threshold, which is the maximum number of items that can be
-blacklisted before the whole backend is regarded as sick. Corresponds with the
+denylisted before the whole backend is regarded as sick. Corresponds with the
 ``saintmode_threshold`` parameter of Varnish 3.0.
 
 Example::
@@ -144,9 +144,9 @@ Example::
     }
 
 
-$Method INT .blacklist_count()
+$Method INT .denylist_count()
 
-Returns the number of objects currently blacklisted for a saintmode
+Returns the number of objects currently denylisted for a saintmode
 director object.
 
 Example:
@@ -154,11 +154,17 @@ Example:
 ::
 
    sub vcl_deliver {
-       set resp.http.troublecount = sm.blacklist_count();
+       set resp.http.troublecount = sm.denylist_count();
    }
 
 $Method BOOL .is_healthy()
 
-Checks if the object is currently blacklisted for a saintmode director object.
+Checks if the object is currently denylisted for a saintmode director object.
 If there are no valid objects available (called from vcl_hit or vcl_recv),
 the function will fall back to the backend's health function.
+
+DEPRECATED
+==========
+
+$Alias .denylist .blacklist
+$Alias .denylist_count .blacklist_count
