@@ -1,0 +1,53 @@
+varnishtest "xkey.purge() from backend context"
+
+server s1 {
+	rxreq
+	txresp -hdr "xkey: foo" 
+
+	rxreq
+	txresp -hdr "xkey: bar" -hdr "xkey-purge: foo"
+
+	rxreq
+	txresp -hdr "xkey: foo" 
+} -start
+
+varnish v1 -vcl+backend {
+	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
+
+	sub vcl_backend_response {
+		if (beresp.http.xkey-purge) {
+			set beresp.http.purged = xkey.purge(beresp.http.xkey-purge);
+		}
+	}
+} -start
+
+# get a first object
+client c1 {
+	txreq -url "/foo"
+	rxresp
+} -run
+
+delay 1
+
+varnish v1 -expect n_object == 1
+
+# fetching the second object invalidates the first one
+client c1 {
+	txreq -url "/bar"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.purged == 1
+} -run
+
+delay 1
+
+varnish v1 -expect n_object == 1
+
+client c1 {
+	txreq -url "/foo"
+	rxresp
+} -run
+
+delay 1
+
+varnish v1 -expect n_object == 2
