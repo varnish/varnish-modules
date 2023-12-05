@@ -106,20 +106,20 @@ find_sm(const struct saintmode_objs *sm_objs,
 }
 
 VCL_VOID
-vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
+vmod_denylist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	struct trouble *tp;
 	struct saintmode_objs *sm_objs;
 	struct vmod_saintmode_saintmode *sm;
 
 	if (priv->priv == NULL) {
-		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.blacklist(): "
+		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.denylist(): "
 		    "Saintmode is not configured");
 		return;
 	}
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	if (ctx->method != VCL_MET_BACKEND_RESPONSE) {
-		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.blacklist() called"
+		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.denylist() called"
 		    " outside of vcl_backend_response");
 		return;
 	}
@@ -128,7 +128,7 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	CAST_OBJ_NOTNULL(sm_objs, priv->priv, SAINTMODE_OBJS_MAGIC);
 	sm = find_sm(sm_objs, ctx->bo->director_resp);
 	if (!sm) {
-		VSLb(ctx->vsl, SLT_VCL_Error, "Error: saintmode.blacklist(): "
+		VSLb(ctx->vsl, SLT_VCL_Error, "Error: saintmode.denylist(): "
 		    "Saintmode not configured for this backend.");
 		return;
 	}
@@ -141,7 +141,7 @@ vmod_blacklist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	VTAILQ_INSERT_HEAD(&sm->troublelist, tp, list);
 	sm->n_trouble++;
 
-	VSLb(ctx->vsl, SLT_VCL_Log, "saintmode: object put on blacklist "
+	VSLb(ctx->vsl, SLT_VCL_Log, "saintmode: object put on denylist "
 	    "for backend %s for %.2f seconds", sm->be->vcl_name, expires);
 
 	pthread_mutex_unlock(&sm->mtx);
@@ -181,7 +181,7 @@ vmod_status(VRT_CTX, struct vmod_priv *priv)
 }
 
 VCL_INT
-vmod_saintmode_blacklist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
+vmod_saintmode_denylist_count(VRT_CTX, struct vmod_saintmode_saintmode *sm)
 {
 	unsigned c = 0;
 
@@ -238,7 +238,7 @@ is_digest_healthy(const struct director *dir,
 	if (vsl) {
 		if (bl)
 			VSLb(vsl, SLT_VCL_Log,
-			     "saintmode: unhealthy: object blacklisted for "
+			     "saintmode: unhealthy: object denylisted for "
 			     "backend %s", sm->be->vcl_name);
 		else if (retval == 0)
 			VSLb(vsl, SLT_VCL_Log,

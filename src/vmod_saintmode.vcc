@@ -166,5 +166,5 @@ the function will fall back to the backend's health function.
 DEPRECATED
 ==========
 
-$Alias .denylist .blacklist
-$Alias .denylist_count .blacklist_count
+$Alias blacklist denylist
+$Alias .blacklist_count saintmode.denylist_count
