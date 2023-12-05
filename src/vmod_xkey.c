@@ -515,8 +515,6 @@ purge(VRT_CTX, VCL_STRING key, VCL_INT do_soft)
 	int i = 0;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
-	CHECK_OBJ_NOTNULL(ctx->req->wrk, WORKER_MAGIC);
 
 	if (!key || !*key)
 		return (0);
