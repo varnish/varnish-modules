@@ -159,7 +159,8 @@ VMOD_TESTS = \
 	tests/xkey/test10.vtc \
 	tests/xkey/test11.vtc \
 	tests/xkey/test12.vtc \
-	tests/xkey/test13.vtc
+	tests/xkey/test13.vtc \
+	tests/xkey/test14.vtc
 
 TESTS = $(VMOD_TESTS)
 
