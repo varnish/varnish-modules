@@ -32,7 +32,7 @@ jobs:
                 python3-sphinx
             git clone https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache
             cd /tmp/varnish-cache
-            git checkout aa3f6787b8e5cac4d014d3c0548b9179d8357597
+            git checkout d92ca50874db7397345601cb2d16b425a9df7f6f
             ./autogen.des
             if [ "arm.medium" = "<< parameters.rclass >>" ]; then
                 ./configure --libdir=/usr/lib/aarch64-linux-gnu/
