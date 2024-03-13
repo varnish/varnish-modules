@@ -25,7 +25,12 @@ varnish v1 -vcl+backend {
 		var.set("foo2", "bar2");
 		set resp.http.x-foo = var.get("foo");
 		var.clear();
-		set resp.http.x-foo2 = "" + var.get("foo2");
+		set resp.http.x-foo2 = var.get("foo2");
+		if (!var.get("foo2")) {
+			set resp.http.x-foo2-undefined = "true";
+		} else {
+			set resp.http.x-foo2-undefined = "false";
+		}
 		var.set_int("i1", 123);
 		set resp.http.i1 = var.get_int("i1") + 1;
 		var.set_real("r1", 2);
@@ -45,6 +50,7 @@ client c1 {
 	rxresp
 	expect resp.http.x-foo == "bar"
 	expect resp.http.x-foo2 == ""
+	expect resp.http.x-foo2-undefined == "true"
 	expect resp.http.i1 == "124"
 	expect resp.http.r1 == "2.000"
 	expect resp.http.d1 == "60.000"

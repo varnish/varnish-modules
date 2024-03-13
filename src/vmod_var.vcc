@@ -66,7 +66,7 @@ Set `key` to `value`.
 
 $Function STRING get(PRIV_TASK, STRING )
 
-Get `key` with data type STRING. If stored `key` is not a STRING an empty string is returned.
+Get `key` with data type STRING. If stored `key` is not a STRING a NULL string is returned.
 
 $Function VOID global_set(STRING, STRING)
 
