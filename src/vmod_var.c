@@ -98,7 +98,7 @@ vh_get_var(struct var_head *vh, const char *name)
 	}
 	return NULL;
 }
-
+#include <stdio.h>
 static struct var *
 vh_get_var_alloc(struct var_head *vh, const char *name, const struct vrt_ctx *ctx)
 {
@@ -107,6 +107,7 @@ vh_get_var_alloc(struct var_head *vh, const char *name, const struct vrt_ctx *ct
 	v = vh_get_var(vh, name);
 
 	if (!v) {
+printf("============================ asking for %ld, there's %ld left\n", sizeof(struct var), ctx->ws->e - ctx->ws->f);
 		/* Allocate and add */
 		v = (struct var*)WS_Alloc(ctx->ws, sizeof(struct var));
 		if (v == NULL)
