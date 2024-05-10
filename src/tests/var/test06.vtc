@@ -12,6 +12,8 @@ varnish v1 -vcl+backend {
         import vtc;
 
 	sub vcl_deliver {
+	       # prime the PRIV_TASK allocation
+	       var.set("x", "42");
                if (req.url == "/a") {
                    # Leave only a single byte in the workspace free.
                    vtc.workspace_alloc(client, -1);
