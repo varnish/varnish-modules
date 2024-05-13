@@ -43,3 +43,13 @@ $Function STRING split(STRING S, INT n, STRING sep = " \t")
 
 Split s and return the n-th token. Characters in sep are separators. A negative
 n indicate "from the end of the string".
+
+$Function BOOL token_intersect(STRING str1, STRING str2, [STRING separators])
+
+Checks if the set tokens in one string intersects the set of
+tokens in the other string. In other words, it returns true if
+there is a token which exists in both strings.
+
+If the separators argument is not supplied, the space and comma
+characters are the separators. Empty tokens are ignored in both
+strings.

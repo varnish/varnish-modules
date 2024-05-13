@@ -101,7 +101,9 @@ vmod_take(VRT_CTX, VCL_STRING s, VCL_INT n, VCL_INT o)
 	s += o;
 
 	p = WS_Copy(ctx->ws, s, n + 1);
-	if (p != NULL)
+	if (p == NULL)
+		VRT_fail(ctx, "str.substr(): Out of workspace");
+	else
 		p[n] = '\0';
 	return (p);
 }
@@ -111,6 +113,7 @@ vmod_reverse(VRT_CTX, VCL_STRING s)
 {
 	char *p;
 	size_t l, l2;
+	unsigned u;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
@@ -118,8 +121,13 @@ vmod_reverse(VRT_CTX, VCL_STRING s)
 		return (NULL);
 
 	l = l2 = strlen(s);
-	if (l >= WS_ReserveSize(ctx->ws, l + 1)) {
+	u = WS_ReserveSize(ctx->ws, l + 1);
+	if (u > 0 && u < l + 1) {
 		WS_Release(ctx->ws, 0);
+		u = 0;
+	}
+	if (u == 0) {
+		VRT_fail(ctx, "str.reverse(): Out of workspace");
 		return (NULL);
 	}
 
@@ -135,76 +143,116 @@ vmod_reverse(VRT_CTX, VCL_STRING s)
 	return (p);
 }
 
-static unsigned
-isin(char c, const char *set)
-{
-	const char *p = set;
-
-	while (*p) {
-		if (*p == c)
-			return (1);
-		p++;
-	}
-
-	return (0);
-}
-
 VCL_STRING
 vmod_split(VRT_CTX, VCL_STRING s, VCL_INT i, VCL_STRING sep)
 {
-	const char *b, *e = s;
-	char *p;
-	unsigned nomore = 0, n;
-	int inc = 1;
+	const char *lim, *b, *e;
+	unsigned fld;
+	int inc;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
-	if (s == NULL || sep == NULL || i == 0)
+	if (s == NULL || *s == '\0' || i == 0 || sep == NULL || *sep == '\0')
 		return (NULL);
 
-	/* depending on the direction, set e to be just left or just right of
-	 * the string */
-	if (i < 0) {
-		inc = -1;
-		e += strlen(s);
-	} else
-		e--;
-
-	while (1) {
-		b = e + inc;
-		while (isin(*b, sep)) {
-			if ((inc > 0 && *b == '\0') || (inc < 0 && b == s))
-				return (NULL);
-			b += inc;
-		}
-
-		e = b + inc;
-		while (!isin(*e, sep)) {
-			if ((inc > 0 && *e == '\0') || (inc < 0 && e == s)) {
-				nomore = 1;
-				break;
-			}
-			e += inc;
-		}
-
-		i -= inc;
-		if (i == 0)
-			break;
-		if (nomore)
-			return (NULL);
-	}
-
-	if (e > b) {
-		assert(inc == 1);
-		n = e - b;
+	if (i > 0) {
+		inc = 1;
+		fld = i;
+		lim = s + strlen(s);
 	} else {
-		assert(inc == -1);
-		n = b - e;
-		b = e + 1;
+		inc = -1;
+		fld = -i;
+		lim = s - 1;
+		s = lim + strlen(s);
 	}
 
-	p = WS_Copy(ctx->ws, b, n + 1);
-	if (p != NULL)
-		p[n] = '\0';
-	return (p);
+	do {
+		while (s != lim && strchr(sep, *s) != NULL)
+			s += inc;
+		b = s;
+		while (s != lim && strchr(sep, *s) == NULL)
+			s += inc;
+		e = s;
+		fld -= (b != e);
+	} while (s != lim && fld > 0);
+
+	if (fld > 0)
+		return (NULL);
+
+	if (i < 0) {
+		s = b;
+		b = e + 1;
+		e = s + 1;
+	}
+
+	assert(b < e);
+	s = WS_Printf(ctx->ws, "%.*s", (int)(e - b), b);
+	if (s == NULL)
+		VRT_fail(ctx, "str.split(): Out of workspace");
+	return (s);
+}
+
+/* The following function takes a pointer to a char pointer. It will
+ * update the char pointer so that it points to the first
+ * non-separator character, and then return the number of
+ * non-separator characters from this point in the string. This lets
+ * the vmod function do its work without touching the input strings,
+ * and consume to no workspace.
+ */
+
+static int
+tokenize(const char **begin, const char *separators)
+{
+	const char *b;
+	int l;
+
+	b = *begin;
+	while (*b != '\0' && strchr(separators, *b))
+		b++;
+	if (*b == '\0') {
+		*begin = NULL;
+		return (0);
+	}
+	l = 0;
+	while (b[l] != '\0' && !strchr(separators, b[l]))
+		l++;
+	*begin = b;
+	return (l);
+}
+
+VCL_BOOL
+vmod_token_intersect(VRT_CTX, struct arg_vmod_str_token_intersect *args)
+{
+	const char * separators;
+	const char *token1, *token2;
+	int l1, l2;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
+	if (!args->str1 || !args->str2)
+		return (0);
+
+	separators = (args->valid_separators ? args->separators : " ,");
+	for (token1 = args->str1; *token1 != '\0'; token1++) {
+		l1 = tokenize(&token1, separators);
+		if (l1 == 0)
+			return (0);
+		// we have a token in str1, search for it in str2
+		for (token2 = args->str2; *token2 != '\0'; token2++) {
+			l2 = tokenize(&token2, separators);
+			if (l2 == 0)
+				break;
+			if (l2 == l1 && 0 == strncmp(token1, token2, l2))
+				return (1);
+			token2 += l2;
+			// did we jump all the way to a null character?
+			if (*token2 == '\0')
+				break;
+		}
+		token1 += l1;
+		// we might have jumped to the null character.
+		if (*token1 == '\0')
+			return (0);
+	}
+	return (0); // not found
 }
