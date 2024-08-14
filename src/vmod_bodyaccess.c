@@ -134,7 +134,7 @@ vmod_hash_req_body(VRT_CTX)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
-	if (!ctx->req->req_body_cached) {
+	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
 		   "Unbuffered req.body");
 		return;
@@ -165,7 +165,7 @@ vmod_len_req_body(VRT_CTX)
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->req, REQ_MAGIC);
 
-	if (!ctx->req->req_body_cached) {
+	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
 		   "Unbuffered req.body");
 		return (-1);
@@ -192,7 +192,7 @@ vmod_rematch_req_body(VRT_CTX, VCL_REGEX re)
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	AN(re);
 
-	if (!ctx->req->req_body_cached) {
+	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error,
 		   "Unbuffered req.body");
 		return(-1);
@@ -242,7 +242,7 @@ vmod_log_req_body(VRT_CTX, VCL_STRING prefix, VCL_INT length)
 	log_ctx.pfx = prefix;
 	log_ctx.len = length;
 
-	if (!ctx->req->req_body_cached) {
+	if (ctx->req->req_body_status != BS_CACHED) {
 		VSLb(ctx->vsl, SLT_VCL_Error, "Unbuffered req.body");
 		return;
 	}
