@@ -2,6 +2,13 @@ $Module xkey 3 "Surrogate keys support for Varnish Cache"
 DESCRIPTION
 ===========
 
+PLEASE NOTE that this VMOD is currently in maintenance mode and has 
+known performance issues, particularly regarding scalability, which 
+will not be addressed in this implementation. For a more robust 
+solution with proven scalability, improved syntax support, and 
+proper softpurge functionality, consider using yKey, included in 
+Varnish Enterprise.
+
 This vmod adds secondary hashes to objects, allowing fast purging on
 all objects with this hash key.
 
