@@ -8,7 +8,7 @@ jobs:
         description: resource_class to use
         type: string
     machine:
-      image: ubuntu-2004:202101-01
+      image: default
     resource_class: << parameters.rclass >>
     working_directory: /tmp/workspace
     steps:
