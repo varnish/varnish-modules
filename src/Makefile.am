@@ -124,6 +124,8 @@ VMOD_TESTS = \
 	tests/saintmode/test03.vtc \
 	tests/saintmode/test04.vtc \
 	tests/saintmode/test05.vtc \
+	tests/saintmode/test06.vtc \
+	tests/saintmode/test07.vtc \
 	tests/str/test01.vtc \
 	tests/str/test02.vtc \
 	tests/str/test03.vtc \
