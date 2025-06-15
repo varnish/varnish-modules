@@ -46,17 +46,10 @@
  * FIXME: duplication from varnishd.
  */
 static int
-header_http_IsHdr(const txt *hh, const char *hdr)
+header_http_IsHdr(const txt *hh, hdr_t hdr)
 {
-	unsigned l;
-
-	Tcheck(*hh);
-	AN(hdr);
-	l = hdr[0];
-	assert(l == strlen(hdr + 1));
-	assert(hdr[l] == ':');
-	hdr++;
-	return (!strncasecmp(hdr, hh->b, l));
+	CHECK_HDR(hdr);
+	return (!strncasecmp(hdr->str, hh->b, hdr->len));
 }
 
 /*
@@ -68,7 +61,7 @@ header_http_IsHdr(const txt *hh, const char *hdr)
  */
 static int
 header_http_match(VRT_CTX, const struct http *hp, unsigned u, VCL_REGEX re,
-    const char *hdr)
+    hdr_t hdr)
 {
 	const char *start;
 	unsigned l;
@@ -80,7 +73,7 @@ header_http_match(VRT_CTX, const struct http *hp, unsigned u, VCL_REGEX re,
 	if (hp->hd[u].b == NULL)
 		return (0);
 
-	l = hdr[0];
+	l = hdr->len;
 
 	if (!header_http_IsHdr(&hp->hd[u], hdr))
 		return (0);
@@ -105,7 +98,7 @@ header_http_match(VRT_CTX, const struct http *hp, unsigned u, VCL_REGEX re,
  * expression re.
  */
 static unsigned
-header_http_findhdr(VRT_CTX, const struct http *hp, const char *hdr, VCL_REGEX re)
+header_http_findhdr(VRT_CTX, const struct http *hp, hdr_t hdr, VCL_REGEX re)
 {
         unsigned u;
 
@@ -121,7 +114,7 @@ header_http_findhdr(VRT_CTX, const struct http *hp, const char *hdr, VCL_REGEX r
  * matches re. Same as http_Unset(), plus regex.
  */
 static void
-header_http_Unset(VRT_CTX, struct http *hp, const char *hdr, VCL_REGEX re)
+header_http_Unset(VRT_CTX, struct http *hp, hdr_t hdr, VCL_REGEX re)
 {
 	unsigned u, v;
 
@@ -148,7 +141,7 @@ header_http_Unset(VRT_CTX, struct http *hp, const char *hdr, VCL_REGEX re)
  * XXX: the future.
  */
 static void
-header_http_cphdr(VRT_CTX, const struct http *hp, const char *hdr,
+header_http_cphdr(VRT_CTX, const struct http *hp, hdr_t hdr,
     VCL_HEADER dst)
 {
         unsigned u;
@@ -161,7 +154,7 @@ header_http_cphdr(VRT_CTX, const struct http *hp, const char *hdr,
 		if (!header_http_match(ctx, hp, u, NULL, hdr))
 			continue;
 
-		p = hp->hd[u].b + hdr[0];
+		p = hp->hd[u].b + hdr->len;
 		while (*p == ' ' || *p == '\t')
 			p++;
 		s.p = &p;
@@ -184,7 +177,7 @@ vmod_append(VRT_CTX, VCL_HEADER hdr, VCL_STRANDS s)
 		VRT_fail(ctx, "vmod_head: workspace allocation failure");
 		return;
 	}
-	st->p[0] = hdr->what + 1;
+	st->p[0] = hdr->what->str;
 	st->p[1] = " ";
 	AN(memcpy(st->p + 2, s->p, s->n * sizeof *s->p));
 
@@ -212,7 +205,7 @@ vmod_get(VRT_CTX, VCL_HEADER hdr, VCL_REGEX re)
 	u = header_http_findhdr(ctx, hp, hdr->what, re);
 	if (u == 0)
 		return (NULL);
-	p = hp->hd[u].b + hdr->what[0];
+	p = hp->hd[u].b + hdr->what->len;
 	while (*p == ' ' || *p == '\t')
 		p++;
 	return (p);
@@ -321,12 +314,12 @@ selectwhere(VRT_CTX, VCL_HTTP hp)
 
 // XXX would need to know the limit
 const struct gethdr_s hdr_null[HDR_BERESP + 1] = {
-	[HDR_REQ]	= { HDR_REQ,		"\0"},
-	[HDR_REQ_TOP]	= { HDR_REQ_TOP,	"\0"},
-	[HDR_RESP]	= { HDR_RESP,		"\0"},
-	[HDR_OBJ]	= { HDR_OBJ,		"\0"},
-	[HDR_BEREQ]	= { HDR_BEREQ,		"\0"},
-	[HDR_BERESP]	= { HDR_BERESP,	"\0"}
+	[HDR_REQ]	= { HDR_REQ,		(hdr_t) "\0"},
+	[HDR_REQ_TOP]	= { HDR_REQ_TOP,	(hdr_t) "\0"},
+	[HDR_RESP]	= { HDR_RESP,		(hdr_t) "\0"},
+	[HDR_OBJ]	= { HDR_OBJ,		(hdr_t) "\0"},
+	[HDR_BEREQ]	= { HDR_BEREQ,		(hdr_t) "\0"},
+	[HDR_BERESP]	= { HDR_BERESP,		(hdr_t) "\0"}
 };
 
 
@@ -365,6 +358,6 @@ vmod_dyn(VRT_CTX, VCL_HTTP hp, VCL_STRING name)
 	what[l+2] = '\0';
 
 	hdr->where = where;
-	hdr->what = what;
+	CAST_HDR(hdr->what, what);
 	return (hdr);
 }
