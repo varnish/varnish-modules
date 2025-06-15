@@ -30,7 +30,7 @@ jobs:
                 python3-docutils \
                 python3 \
                 python3-sphinx
-            git clone https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache
+            git clone --recursive https://github.com/varnishcache/varnish-cache.git /tmp/varnish-cache
             cd /tmp/varnish-cache
             ./autogen.des
             if [ "arm.medium" = "<< parameters.rclass >>" ]; then
