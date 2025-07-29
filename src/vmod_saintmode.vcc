@@ -74,9 +74,10 @@ Example::
 $ABI vrt
 $Function VOID denylist(PRIV_VCL, DURATION expires)
 
-Marks the backend as sick for a specific object. Used in vcl_backend_response.
+Marks the backend as sick for a specific object. Used in vcl_backend_response
+and vcl_backend_error.
 Corresponds to the use of ``beresp.saintmode`` in Varnish 3.0. Only available
-in vcl_backend_response.
+in vcl_backend_response and vcl_backend_error.
 
 Example::
 
