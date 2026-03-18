@@ -1,41 +1,41 @@
 #
-.. varnish_vsc_begin::	xkey
+.. vinyl_vsc_begin::	xkey
 	:oneliner:	xkey Counters
 	:order:		70
 
 	Metrics from vmod_xkey
 
-.. varnish_vsc:: g_keys
+.. vinyl_vsc:: g_keys
 	:type:		gauge
 	:oneliner:	Number of surrogate keys
 
 	Number of surrogate keys in use. Increases after a request that includes a new key in the xkey header. Decreases when a key is purged or when all cache objects associated with a key expire.
 
-.. varnish_vsc:: g_hashhead_bytes
+.. vinyl_vsc:: g_hashhead_bytes
 	:type:		gauge
 	:level:		debug
 	:oneliner:  Bytes used by all xkey_hashhead objects
 
 	Total bytes used by hashhead objects. Tracks linearly with the number of surrogate keys in use.
 
-.. varnish_vsc:: g_ochead_bytes
+.. vinyl_vsc:: g_ochead_bytes
 	:type:		gauge
 	:level:		debug
 	:oneliner:  Bytes used by all xkey_ochead objects
 
 	Total bytes used by ochead objects. Increases when an object is added to a key or a key is added to an object. Decreases when the relationship is removed.
 
-.. varnish_vsc:: g_oc_bytes
+.. vinyl_vsc:: g_oc_bytes
 	:type:		gauge
 	:level:		debug
 	:oneliner:  Bytes used by all xkey_oc objects
 
 	Total bytes used by oc objects. Tracks linearly with the number of cached objects that are referenced by surrogate keys.
 
-.. varnish_vsc:: g_bytes
+.. vinyl_vsc:: g_bytes
 	:type:		gauge
 	:oneliner:  Bytes used by xkeys
 
 	Current number of bytes used by xkeys and their references to the object cache.
 
-.. varnish_vsc_end::	xkey
+.. vinyl_vsc_end::	xkey
