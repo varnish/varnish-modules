@@ -1,4 +1,4 @@
-AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign \
+AM_CFLAGS = $(VCACHEAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/foreign \
 	-Wall \
 	-Werror \
 	-Wall \
@@ -20,7 +20,7 @@ AM_CFLAGS = $(VARNISHAPI_CFLAGS) $(CODE_COVERAGE_CFLAGS) -I$(top_srcdir)/src/for
 	-Wno-sign-compare
 
 AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS)
-AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
+AM_LDFLAGS = $(VCACHEAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
 vmod_LTLIBRARIES = \
 	libvmod_accept.la \
@@ -93,13 +93,13 @@ doctest:
 
 AM_TESTS_ENVIRONMENT = \
 	PATH="$(VMOD_TEST_PATH)" \
-	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH)"
+	LD_LIBRARY_PATH="$(VCACHE_LIBRARY_PATH)"
 TEST_EXTENSIONS = .vtc
 # because of vsthrottle/test05.vtc we need larger buffers than usual
-VTC_LOG_COMPILER = varnishtest -v -b 10M
+VTC_LOG_COMPILER = vtest -v -b 10M
 AM_VTC_LOG_FLAGS = \
 	-Dvmod_builddir=$(abs_top_builddir)/src \
-	-Dvmod_directors="directors from \"$(VARNISHAPI_VMODDIR)/libvmod_directors.so\""
+	-Dvmod_directors="directors from \"$(VCACHEAPI_VMODDIR)/libvmod_directors.so\""
 
 VMOD_TESTS = \
 	tests/accept/test01.vtc \

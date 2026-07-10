@@ -25,13 +25,12 @@ if test "x$RST2MAN" = "xno"; then
 fi
 AM_CONDITIONAL(HAVE_RST2MAN, [test "$RST2MAN" != no])
 
-# Will be available after Varnish 5.0
-PKG_CHECK_VAR([VARNISHAPI_LIBDIR], [varnishapi], [libdir])
-AC_SUBST([VARNISH_LIBRARY_PATH],
-	[$VARNISHAPI_LIBDIR:$VARNISHAPI_LIBDIR/varnish])
+PKG_CHECK_VAR([VCACHEAPI_LIBDIR], [vcacheapi], [libdir])
+#AC_SUBST([VCACHE_LIBRARY_PATH],
+#	[$VCACHEAPI_LIBDIR:$VCACHEAPI_LIBDIR/varnish])
 
-VARNISH_PREREQ([9.0.0])
-VARNISH_VMODS([
+VCACHE_PREREQ([9.0.0])
+VCACHE_VMODS([
 	accept
 	bodyaccess
 	header
@@ -42,10 +41,10 @@ VARNISH_VMODS([
 	vsthrottle
 	xkey
 ])
-VARNISH_COUNTERS([xkey])
+VCACHE_COUNTERS([xkey])
 
 save_CPPFLAGS=$CPPFLAGS
-CPPFLAGS=$VARNISHAPI_CFLAGS
+CPPFLAGS=$VCACHEAPI_CFLAGS
 
 AC_CHECK_HEADERS([cache/cache_varnishd.h])
 

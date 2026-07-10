@@ -22,12 +22,12 @@ SunOS)
 	LIBTOOLIZE=libtoolize
 esac
 
-# check for varnishapi.m4 in custom paths
-dataroot=$(pkg-config --variable=datarootdir varnishapi 2>/dev/null)
+# check for vcacheapi.m4 in custom paths
+dataroot=$(pkg-config --variable=datarootdir vcacheapi 2>/dev/null)
 if [ -z "$dataroot" ] ; then
 	cat >&2 <<'EOF'
 Package varnishapi was not found in the pkg-config search path.
-Perhaps you should add the directory containing `varnishapi.pc'
+Perhaps you should add the directory containing `vcacheapi.pc'
 to the PKG_CONFIG_PATH environment variable
 EOF
 	exit 1
