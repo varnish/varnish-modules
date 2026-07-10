@@ -1,11 +1,11 @@
-varnishtest "startswith()"
+vtest "startswith()"
 
 server s1 {
        rxreq
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import std;
 	import str from "${vmod_builddir}/.libs/libvmod_str.so";
 

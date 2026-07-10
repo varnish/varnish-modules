@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cache/cache_varnishd.h>
+#include <cache/cache_int.h>
 
 #include "vsha256.h"
 #include "vtree.h"

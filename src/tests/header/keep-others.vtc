@@ -2,7 +2,7 @@
 # The remove-function was removing somewhat vigorously.
 # This check ensures that other headers are kept intact.
 
-varnishtest "Header-vmod: Ensure other headers remain untouched"
+vtest "Header-vmod: Ensure other headers remain untouched"
 
 server s1 {
 	timeout 10
@@ -17,7 +17,7 @@ server s1 {
 	txresp -status 200 -hdr "foo: one=1" -hdr "foo: two=2" -hdr "foo: three=3" -hdr "Content-Type: text/html"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 
 	sub vcl_backend_response {

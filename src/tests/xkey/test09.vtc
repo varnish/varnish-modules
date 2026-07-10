@@ -1,4 +1,4 @@
-varnishtest "Test xkey vmod multiple keys, comma separated"
+vtest "Test xkey vmod multiple keys, comma separated"
 # https://github.com/varnish/varnish-modules/issues/102
 
 server s1 {
@@ -9,7 +9,7 @@ server s1 {
 	txresp -hdr "xkey: qwer, rewq"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -40,7 +40,7 @@ client c1 {
 	rxresp
 } -run
 
-varnish v1 -expect n_object == 2
+vcache v1 -expect n_object == 2
 
 client c1 {
 	# Test the purge using the asdf key, so we check that we didn't include the comma
@@ -52,7 +52,7 @@ client c1 {
 
 delay 1
 
-varnish v1 -expect n_object == 1
+vcache v1 -expect n_object == 1
 
 client c1 {
 	txreq -hdr "xkey-purge: rewq"
@@ -63,4 +63,4 @@ client c1 {
 
 delay 1
 
-varnish v1 -expect n_object == 0
+vcache v1 -expect n_object == 0

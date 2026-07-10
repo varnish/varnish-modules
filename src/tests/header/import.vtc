@@ -1,4 +1,4 @@
-varnishtest "Header-vmod: Test basic import"
+vtest "Header-vmod: Test basic import"
 
 server s1 {
 	timeout 10
@@ -7,7 +7,7 @@ server s1 {
 	txresp -status 200 -hdr "foo: 1"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 } -start
 

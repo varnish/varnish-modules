@@ -1,4 +1,4 @@
-varnishtest "Test xkey vmod"
+vtest "Test xkey vmod"
 
 server s1 {
 	rxreq
@@ -8,7 +8,7 @@ server s1 {
 	txresp -hdr "xkey: asdf" -hdr "X-HashTwo: fdsa"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -38,7 +38,7 @@ client c1 {
 	rxresp
 } -run
 
-varnish v1 -expect n_object == 1
+vcache v1 -expect n_object == 1
 
 client c1 {
 	txreq -hdr "xkey-purge: asdf"
@@ -49,7 +49,7 @@ client c1 {
 
 delay 1
 
-varnish v1 -expect n_object == 0
+vcache v1 -expect n_object == 0
 
 # Check again using the legacy X-HashTwo header
 
@@ -58,7 +58,7 @@ client c1 {
 	rxresp
 } -run
 
-varnish v1 -expect n_object == 1
+vcache v1 -expect n_object == 1
 
 client c1 {
 	txreq -hdr "xkey-purge: fdsa"
@@ -69,4 +69,4 @@ client c1 {
 
 delay 1
 
-varnish v1 -expect n_object == 0
+vcache v1 -expect n_object == 0

@@ -1,4 +1,4 @@
-varnishtest "Test saintmode vmod"
+vtest "Test saintmode vmod"
 
 server s1 {
        rxreq
@@ -22,7 +22,7 @@ server s2 {
        txresp -hdr "Backend: s2"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
 	import directors;
 
@@ -51,7 +51,7 @@ varnish v1 -vcl+backend {
 
 } -start
 
-varnish v1 -cliok "backend.list"
+vcache v1 -cliok "backend.list"
 
 client c1 {
 	txreq -url "/a"

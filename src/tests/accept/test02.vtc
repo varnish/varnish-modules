@@ -1,8 +1,8 @@
-varnishtest "Quality quality assurance"
+vtest "Quality quality assurance"
 
 server s1 {} -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import accept from "${vmod_builddir}/.libs/libvmod_accept.so";
 
 	sub vcl_init {

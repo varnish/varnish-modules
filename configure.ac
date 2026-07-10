@@ -1,4 +1,4 @@
-AC_INIT([varnish-modules], [0.28.0])
+AC_INIT([varnish-modules], [0.29.0])
 AC_COPYRIGHT([Copyright (c) 2016-2024 Varnish Software Group])
 
 AC_PREREQ(2.63)
@@ -25,8 +25,11 @@ if test "x$RST2MAN" = "xno"; then
 fi
 AM_CONDITIONAL(HAVE_RST2MAN, [test "$RST2MAN" != no])
 
-VARNISH_PREREQ([9.0.0])
-VARNISH_VMODS([
+VCACHE_REQUIRE(
+	[[varnish],[9.1.0]],
+	[[vinyl],[9.1.0]]
+)
+VCACHE_VMODS([
 	accept
 	bodyaccess
 	header
@@ -37,12 +40,10 @@ VARNISH_VMODS([
 	vsthrottle
 	xkey
 ])
-VARNISH_COUNTERS([xkey])
+VCACHE_COUNTERS([xkey])
 
 save_CPPFLAGS=$CPPFLAGS
-CPPFLAGS=$VARNISHAPI_CFLAGS
-
-AC_CHECK_HEADERS([cache/cache_varnishd.h])
+CPPFLAGS=$VCACHEAPI_CFLAGS
 
 CPPFLAGS=$save_CPPFLAGS
 

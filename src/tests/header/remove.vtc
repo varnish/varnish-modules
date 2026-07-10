@@ -1,5 +1,5 @@
 
-varnishtest "Header-vmod: Test removing"
+vtest "Header-vmod: Test removing"
 
 server s1 {
 	timeout 10
@@ -24,7 +24,7 @@ server s1 {
 	
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 
 	sub vcl_backend_response {

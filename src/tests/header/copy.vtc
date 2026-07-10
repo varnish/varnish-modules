@@ -1,10 +1,10 @@
 
 # This assumes that:
 #  1. Append works
-#  2. The first header is the only tested in varnishtest when multiple
+#  2. The first header is the only tested in vtest when multiple
 #     copies are present
 
-varnishtest "Header-vmod: Test copying"
+vtest "Header-vmod: Test copying"
 
 server s1 {
 	timeout 10
@@ -13,7 +13,7 @@ server s1 {
 	txresp -status 200 -hdr "foo: one=1" -hdr "foo: two=2" -hdr "foo: three=3"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 
 	sub vcl_backend_response {

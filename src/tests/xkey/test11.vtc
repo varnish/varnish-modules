@@ -1,11 +1,11 @@
-varnishtest "Test xkey counter initialization and cleanup"
+vtest "Test xkey counter initialization and cleanup"
 
 server s1 {
 	rxreq
 	txresp -hdr "xkey: asdf"
 } -start
 
-varnish v1 -arg "-p debug=+vclrel" -vcl+backend {
+vcache v1 -arg "-p debug=+vclrel" -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -34,15 +34,17 @@ client c1 {
 	rxresp
 } -run
 
-varnish v1 -expect XKEY.g_keys == 1
+vcache v1 -expect XKEY.g_keys == 1
 
 # Transition to a new VCL with xkey without crashing.
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 }
 
 # Removing xkey also removes all XKEY counters.
-varnish v1 -vcl+backend ""
-varnish v1 -cli "vcl.discard vcl1"
-varnish v1 -cli "vcl.discard vcl2"
-varnish v1 -expect !XKEY.g_keys
+vcache v1 -vcl+backend ""
+vcache v1 -cli "vcl.discard vcl1"
+vcache v1 -cli "vcl.discard vcl2"
+vcache v1 -expect !XKEY.g_keys
+
+shell "varnishstat -n ${v1_name} -1f 'XKEY*'" -expect ""

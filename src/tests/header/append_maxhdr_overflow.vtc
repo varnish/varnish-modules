@@ -1,6 +1,6 @@
-varnishtest "header.append with http_max_hdr and overflow"
+vtest "header.append with http_max_hdr and overflow"
 
-varnish v1 -arg "-p http_max_hdr=32" -vcl {
+vcache v1 -arg "-p http_max_hdr=32" -vcl {
 	backend proforma None;
 
 	import vtc;

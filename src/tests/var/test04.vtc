@@ -1,4 +1,4 @@
-varnishtest "Test vcl reload"
+vtest "Test vcl reload"
 
 barrier b1 cond 2
 
@@ -8,7 +8,7 @@ server s1 {
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 
 	sub vcl_recv {
@@ -26,7 +26,7 @@ client c1 {
 	expect resp.http.x-foo == "bar"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 
 	sub vcl_recv {

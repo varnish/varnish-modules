@@ -1,6 +1,6 @@
-varnishtest "Test the block parameter"
+vtest "Test the block parameter"
 
-varnish v1 -vcl {
+vcache v1 -vcl {
 	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
         backend b { .host = "${bad_ip}"; }
 
@@ -47,7 +47,7 @@ client c1 {
 # If block <= 0s, then is_denied() ignores it. So this is just the
 # same test as in test01.vtc, except that block is set with such a
 # value.
-varnish v1 -vcl {
+vcache v1 -vcl {
 	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
         backend b { .host = "${bad_ip}"; }
 
