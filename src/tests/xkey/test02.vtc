@@ -1,11 +1,11 @@
-varnishtest "Test xkey vmod multiple keys"
+vtest "Test xkey vmod multiple keys"
 
 server s1 {
 	rxreq
 	txresp -hdr "xkey: asdf fdsa"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -34,7 +34,7 @@ client c1 {
 	rxresp
 } -run
 
-varnish v1 -expect n_object == 1
+vcache v1 -expect n_object == 1
 
 client c1 {
 	txreq -hdr "xkey-purge: fdsa"
@@ -45,4 +45,4 @@ client c1 {
 
 delay 1
 
-varnish v1 -expect n_object == 0
+vcache v1 -expect n_object == 0

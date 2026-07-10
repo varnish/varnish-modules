@@ -1,4 +1,4 @@
-varnishtest "Test hash on req body"
+vtest "Test hash on req body"
 
 server s1 {
 	rxreq
@@ -10,7 +10,7 @@ server s1 {
 	txresp -hdr "OK: yes"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
 

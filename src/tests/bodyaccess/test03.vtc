@@ -1,4 +1,4 @@
-varnishtest "test regex match on req body"
+vtest "test regex match on req body"
 
 server s1 {
 	rxreq
@@ -9,7 +9,7 @@ server s1 {
 
 # rematch_req_body is case sensitive.
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
 
@@ -29,11 +29,11 @@ varnish v1 -vcl+backend {
 	}
 }
 
-varnish v1 -cliok "param.set debug +syncvsl"
-varnish v1 -cliok "param.set fetch_chunksize 4k"
-varnish v1 -cliok "param.set pcre2_match_limit 10000"
-varnish v1 -cliok "param.set pcre2_depth_limit 10000"
-varnish v1 -start
+vcache v1 -cliok "param.set debug +syncvsl"
+vcache v1 -cliok "param.set fetch_chunksize 4k"
+vcache v1 -cliok "param.set pcre2_match_limit 10000"
+vcache v1 -cliok "param.set pcre2_depth_limit 10000"
+vcache v1 -start
 
 client c1 {
 	txreq -req "POST" -body {VarNISH}

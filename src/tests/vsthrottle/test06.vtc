@@ -1,6 +1,6 @@
-varnishtest "Make sure the GC doesn't remove buckets in the blocked state (gh#206)"
+vtest "Make sure the GC doesn't remove buckets in the blocked state (gh#206)"
 
-varnish v1 -vcl {
+vcache v1 -vcl {
 	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
 
 	backend default none;

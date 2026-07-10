@@ -1,4 +1,4 @@
-varnishtest "Test enabling pacing"
+vtest "Test enabling pacing"
 
 feature cmd "uname | grep Linux"
 
@@ -7,7 +7,7 @@ server s1 {
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import tcp from "${vmod_builddir}/.libs/libvmod_tcp.so";
 
 	sub vcl_deliver {

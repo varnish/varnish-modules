@@ -1,11 +1,11 @@
-varnishtest "Test global variables"
+vtest "Test global variables"
 
 server s1 {
        rxreq
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 
 	sub vcl_init {

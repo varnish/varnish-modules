@@ -1,11 +1,11 @@
-varnishtest "Test that running out of workspace memory fails the request"
+vtest "Test that running out of workspace memory fails the request"
 
 server s0 {
 	rxreq
 	txresp
 } -dispatch
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import var from "${vmod_builddir}/.libs/libvmod_var.so";
 	import vtc;
 

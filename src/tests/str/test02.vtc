@@ -1,11 +1,11 @@
-varnishtest "endswith()"
+vtest "endswith()"
 
 server s1 {
        rxreq
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import str from "${vmod_builddir}/.libs/libvmod_str.so";
 
 	sub vcl_deliver {

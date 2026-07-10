@@ -1,6 +1,6 @@
-varnishtest "header.append overflow"
+vtest "header.append overflow"
 
-varnish v1 -vcl {
+vcache v1 -vcl {
 	backend proforma None;
 
 	import vtc;

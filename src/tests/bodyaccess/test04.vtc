@@ -1,4 +1,4 @@
-varnishtest "chunked test"
+vtest "chunked test"
 
 server s1 {
 	rxreq
@@ -9,9 +9,9 @@ server s1 {
 	txresp -hdr "OK: yes"
 } -start
 
-varnish v1 -cli "param.set vsl_mask +Hash"
+vcache v1 -cli "param.set vsl_mask +Hash"
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import bodyaccess from "${vmod_builddir}/.libs/libvmod_bodyaccess.so";
 	import std;
 

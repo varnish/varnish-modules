@@ -1,4 +1,4 @@
-varnishtest "Header-vmod: Test substitution"
+vtest "Header-vmod: Test substitution"
 
 server s1 {
 	loop 2 {
@@ -10,7 +10,7 @@ server s1 {
 	}
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 
 	sub vcl_recv {
@@ -65,7 +65,7 @@ logexpect l1 -v v1 -d 1 -g vxid -q {Begin ~ "^req"} {
 
 ## Errors
 
-varnish v1 -errvcl "Expected argument: REGEX regex" {
+vcache v1 -errvcl "Expected argument: REGEX regex" {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 	backend b { .host="${bad_ip}"; }
 
@@ -74,7 +74,7 @@ varnish v1 -errvcl "Expected argument: REGEX regex" {
 	}
 }
 
-varnish v1 -errvcl "Expected argument: REGEX regex" {
+vcache v1 -errvcl "Expected argument: REGEX regex" {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 	backend b { .host="${bad_ip}"; }
 

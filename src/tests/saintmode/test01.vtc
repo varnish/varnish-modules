@@ -1,4 +1,4 @@
-varnishtest "Test saintmode vmod"
+vtest "Test saintmode vmod"
 
 server s1 {
        rxreq
@@ -29,7 +29,7 @@ server s1 {
        txresp -hdr "Saint: yes"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
 
 	sub vcl_init {

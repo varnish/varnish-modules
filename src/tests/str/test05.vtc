@@ -1,4 +1,4 @@
-varnishtest "take(), negative argument"
+vtest "take(), negative argument"
 # the "0 -x" is a trick to have the vcc parser accept negative numbers
 
 
@@ -7,7 +7,7 @@ server s1 {
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import std;
 	import str from "${vmod_builddir}/.libs/libvmod_str.so";
 

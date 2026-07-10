@@ -1,4 +1,4 @@
-varnishtest "varnish-modules issue #54"
+vtest "varnish-modules issue #54"
 
 server s1 {
        rxreq
@@ -8,7 +8,7 @@ server s1 {
        txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
 	import directors;
 

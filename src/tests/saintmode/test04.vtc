@@ -1,4 +1,4 @@
-varnishtest "varnish-modules issue #27"
+vtest "varnish-modules issue #27"
 # Check health of objects
 
 server s1 {
@@ -19,7 +19,7 @@ server s1 {
 	txresp
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
 	import directors;
 

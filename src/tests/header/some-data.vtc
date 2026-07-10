@@ -3,7 +3,7 @@
 # problem.
 
 
-varnishtest "Header-vmod: Send some data too"
+vtest "Header-vmod: Send some data too"
 
 server s1 {
 	timeout 10
@@ -18,7 +18,7 @@ server s1 {
 	txresp -status 200 -hdr "foo: one=1" -hdr "foo: two=2" -hdr "foo: three=3" -hdr "Content-Type: text/html" -body "Hello"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import header from "${vmod_builddir}/.libs/libvmod_header.so";
 
 	sub vcl_backend_response {

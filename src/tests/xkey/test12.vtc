@@ -1,4 +1,4 @@
-varnishtest "Test xkey bytes gauge"
+vtest "Test xkey bytes gauge"
 feature 64bit
 
 server s1 {
@@ -10,7 +10,7 @@ server s1 {
 	txresp -hdr "xkey: asdf"
 } -start
 
-varnish v1 -vcl+backend {
+vcache v1 -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -39,7 +39,7 @@ varnish v1 -vcl+backend {
 # g_oc_bytes        = 56 bytes per cached object
 
 # no cache, no xkeys
-varnish v1 -expect XKEY.g_hashhead_bytes == 0  \
+vcache v1 -expect XKEY.g_hashhead_bytes == 0  \
            -expect XKEY.g_ochead_bytes == 0 \
            -expect XKEY.g_oc_bytes == 0 \
            -expect XKEY.g_bytes == 0
@@ -50,7 +50,7 @@ client c1 {
 } -run
 
 # one cached response, one xkey
-varnish v1 -expect XKEY.g_hashhead_bytes == 96 \
+vcache v1 -expect XKEY.g_hashhead_bytes == 96 \
            -expect XKEY.g_ochead_bytes == 72 \
            -expect XKEY.g_oc_bytes == 56 \
            -expect XKEY.g_bytes == 224
@@ -61,7 +61,7 @@ client c1 {
 } -run
 
 # two cached responses, two xkeys
-varnish v1 -expect XKEY.g_hashhead_bytes == 192 \
+vcache v1 -expect XKEY.g_hashhead_bytes == 192 \
            -expect XKEY.g_ochead_bytes == 144 \
            -expect XKEY.g_oc_bytes == 112 \
            -expect XKEY.g_bytes == 448
@@ -72,7 +72,7 @@ client c1 {
 } -run
 
 # three cached responses, two xkeys
-varnish v1 -expect XKEY.g_hashhead_bytes == 192 \
+vcache v1 -expect XKEY.g_hashhead_bytes == 192 \
            -expect XKEY.g_ochead_bytes == 216 \
            -expect XKEY.g_oc_bytes == 168 \
            -expect XKEY.g_bytes == 576
@@ -85,7 +85,7 @@ client c1 {
 } -run
 
 # one cached response, one xkey
-varnish v1 -expect XKEY.g_hashhead_bytes == 96 \
+vcache v1 -expect XKEY.g_hashhead_bytes == 96 \
            -expect XKEY.g_ochead_bytes == 72 \
            -expect XKEY.g_oc_bytes == 56 \
            -expect XKEY.g_bytes == 224
