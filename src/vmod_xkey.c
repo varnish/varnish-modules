@@ -42,6 +42,15 @@
 #include "VSC_xkey.h"
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+/*
+ * reg_mtx serialises the n_init refcount and the Obj{,Un}SubscribeEvents()
+ * calls. It must be distinct from mtx: ObjSendEvent() invokes xkey_cb() (which
+ * takes mtx) while holding the core oev_rwl, so subscribing/unsubscribing while
+ * holding mtx would create an mtx <-> oev_rwl cycle (a real deadlock on the
+ * last discard racing a global insert/expire event). With reg_mtx the order is
+ * reg_mtx -> oev_rwl -> mtx, a strict hierarchy.
+ */
+static pthread_mutex_t reg_mtx = PTHREAD_MUTEX_INITIALIZER;
 static int n_init = 0;
 
 static struct vsc_seg *vsc_seg = NULL;
@@ -570,7 +579,7 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 
 	switch (e) {
 	case VCL_EVENT_LOAD:
-		AZ(pthread_mutex_lock(&mtx));
+		AZ(pthread_mutex_lock(&reg_mtx));
 		if (n_init == 0) {
 			xkey_cb_handle = ObjSubscribeEvents(xkey_cb, NULL,
 			    OEV_INSERT|OEV_EXPIRE);
@@ -582,22 +591,29 @@ vmod_event(VRT_CTX, struct vmod_priv *priv, enum vcl_event_e e)
 		}
 		AN(xkey_cb_handle);
 		n_init++;
-		AZ(pthread_mutex_unlock(&mtx));
+		AZ(pthread_mutex_unlock(&reg_mtx));
 		break;
 	case VCL_EVENT_DISCARD:
-		AZ(pthread_mutex_lock(&mtx));
+		AZ(pthread_mutex_lock(&reg_mtx));
 		assert(n_init > 0);
 		n_init--;
 		AN(xkey_cb_handle);
 		if (n_init == 0) {
-			/* Do cleanup */
+			/*
+			 * Unsubscribe outside mtx: this wrlocks oev_rwl and
+			 * drains in-flight xkey_cb() callbacks, which take mtx.
+			 * After it returns no callback can run, so the cleanup
+			 * below can safely take mtx to free the tree.
+			 */
 			ObjUnsubscribeEvents(&xkey_cb_handle);
 			AZ(xkey_cb_handle);
+			AZ(pthread_mutex_lock(&mtx));
 			xkey_cleanup();
+			AZ(pthread_mutex_unlock(&mtx));
 			VSC_xkey_Destroy(&vsc_seg);
 			vsc = NULL;
 		}
-		AZ(pthread_mutex_unlock(&mtx));
+		AZ(pthread_mutex_unlock(&reg_mtx));
 		break;
 	default:
 		break;
