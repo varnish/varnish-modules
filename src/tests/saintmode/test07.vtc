@@ -1,0 +1,28 @@
+varnishtest "Test saintmode blacklist in vcl_backend_error"
+
+varnish v1 -vcl+backend {
+	import saintmode from "${vmod_builddir}/.libs/libvmod_saintmode.so";
+
+	backend ko {
+		.host = "192.0.2.1";
+		.port = "80";
+	}
+
+	sub vcl_init {
+		new sm = saintmode.saintmode(ko, 1);
+	}
+
+	sub vcl_backend_fetch {
+		set bereq.backend = sm.backend();
+	}
+
+	sub vcl_backend_error {
+		saintmode.blacklist(0.5s);
+	}
+} -start
+
+client c1 {
+	txreq -url "/foo"
+	rxresp
+	expect resp.status == 503
+} -run
