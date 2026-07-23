@@ -53,7 +53,7 @@ $ABI strict
 $Function INT rematch_req_body(REGEX re)
 
 Description
-        Returns -1 if an error occurrs.
+        Returns -1 if an error occurs.
         Returns 0 if the request body doesn't contain the string *re*.
         Returns 1 if the request body contains the string *re*.
 
