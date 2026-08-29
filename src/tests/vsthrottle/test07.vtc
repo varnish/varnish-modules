@@ -1,0 +1,32 @@
+varnishtest "Fractional refill carries over between calls (gh#237)"
+
+# limit=4, period=4s: one token per second. Requests 0.5s apart each
+# earn floor(0.5) = 0 tokens. Before the fix last_used was reset on
+# every admission, so that half token was lost every time and the
+# 5th request was denied. Now the remainder carries over and two
+# tokens have been earned by then.
+
+varnish v1 -vcl {
+	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
+	backend default none;
+
+	sub vcl_recv {
+		if (vsthrottle.is_denied("frac", 4, 4s)) {
+			return (synth(429));
+		}
+		return (synth(200));
+	}
+} -start
+
+client c1 {
+	loop 4 {
+		txreq
+		rxresp
+		expect resp.status == 200
+		delay 0.5
+	}
+
+	txreq
+	rxresp
+	expect resp.status == 200
+} -run
