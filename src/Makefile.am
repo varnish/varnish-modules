@@ -147,6 +147,7 @@ VMOD_TESTS = \
 	tests/vsthrottle/test04.vtc \
 	tests/vsthrottle/test05.vtc \
 	tests/vsthrottle/test06.vtc \
+	tests/vsthrottle/test07.vtc \
 	tests/xkey/test01.vtc \
 	tests/xkey/test02.vtc \
 	tests/xkey/test03.vtc \

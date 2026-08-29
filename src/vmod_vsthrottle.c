@@ -133,11 +133,22 @@ static void
 calc_tokens(struct tbucket *b, double now)
 {
 	double delta = now - b->last_used;
+	long earned;
+
 	assert(delta >= 0);
 
-	b->tokens += (long) ((delta / b->period) * b->capacity);
+	earned = (long) ((delta / b->period) * b->capacity);
+	b->tokens += earned;
 	if (b->tokens > b->capacity)
 		b->tokens = b->capacity;
+	/*
+	 * Only whole tokens are credited.  Advance last_used by the time
+	 * they account for, not to now, so the remainder carries over to
+	 * the next call instead of being lost.  last_used therefore lags
+	 * now by less than period / capacity.
+	 */
+	if (earned > 0)
+		b->last_used += earned * b->period / b->capacity;
 	/* VSL(SLT_VCL_Log, 0, "tokens: %ld", b->tokens); */
 }
 
@@ -187,7 +198,6 @@ vmod_is_denied(VRT_CTX, VCL_STRING key, VCL_INT limit, VCL_DURATION period,
 		b->tokens -= 1;
 		if (!blocked)
 			ret = 0;
-		b->last_used = now;
 	}
 	else if (block > 0. && !blocked)
 		b->block = now + block;
