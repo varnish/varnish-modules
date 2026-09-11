@@ -5,7 +5,7 @@ server s1 {
 	txresp -hdr "xkey: asdf"
 } -start
 
-varnish v1 -vcl+backend {
+varnish v1 -arg "-p debug=+vclrel" -vcl+backend {
 	import xkey from "${vmod_builddir}/.libs/libvmod_xkey.so";
 
 	sub vcl_recv {
@@ -45,5 +45,4 @@ varnish v1 -vcl+backend {
 varnish v1 -vcl+backend ""
 varnish v1 -cli "vcl.discard vcl1"
 varnish v1 -cli "vcl.discard vcl2"
-
-shell "varnishstat -n ${v1_name} -1f 'XKEY*'" -expect ""
+varnish v1 -expect !XKEY.g_keys
