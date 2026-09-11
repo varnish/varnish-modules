@@ -25,11 +25,6 @@ if test "x$RST2MAN" = "xno"; then
 fi
 AM_CONDITIONAL(HAVE_RST2MAN, [test "$RST2MAN" != no])
 
-# Will be available after Varnish 5.0
-PKG_CHECK_VAR([VARNISHAPI_LIBDIR], [varnishapi], [libdir])
-AC_SUBST([VARNISH_LIBRARY_PATH],
-	[$VARNISHAPI_LIBDIR:$VARNISHAPI_LIBDIR/varnish])
-
 VARNISH_PREREQ([9.0.0])
 VARNISH_VMODS([
 	accept
