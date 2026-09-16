@@ -118,9 +118,9 @@ vmod_denylist(VRT_CTX, struct vmod_priv *priv, VCL_DURATION expires) {
 	}
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
-	if (ctx->method != VCL_MET_BACKEND_RESPONSE) {
+	if (!ctx->bo || !ctx->bo->director_resp) {
 		VSLb(ctx->vsl, SLT_VCL_Error, "saintmode.denylist() called"
-		    " outside of vcl_backend_response");
+				" outside of vcl_backend_response and vcl_backend_error");
 		return;
 	}
 
