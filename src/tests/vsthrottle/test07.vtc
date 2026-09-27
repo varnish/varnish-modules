@@ -1,4 +1,4 @@
-varnishtest "Fractional refill carries over between calls (gh#237)"
+vtest "Fractional refill carries over between calls (gh#237)"
 
 # limit=4, period=4s: one token per second. Requests 0.5s apart each
 # earn floor(0.5) = 0 tokens. Before the fix last_used was reset on
@@ -6,7 +6,7 @@ varnishtest "Fractional refill carries over between calls (gh#237)"
 # 5th request was denied. Now the remainder carries over and two
 # tokens have been earned by then.
 
-varnish v1 -vcl {
+vcache v1 -vcl {
 	import vsthrottle from "${vmod_builddir}/.libs/libvmod_vsthrottle.so";
 	backend default none;
 
