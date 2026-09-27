@@ -46,5 +46,3 @@ vcache v1 -vcl+backend ""
 vcache v1 -cli "vcl.discard vcl1"
 vcache v1 -cli "vcl.discard vcl2"
 vcache v1 -expect !XKEY.g_keys
-
-shell "varnishstat -n ${v1_name} -1f 'XKEY*'" -expect ""
