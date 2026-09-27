@@ -25,6 +25,7 @@ Makefile.in
 /m4/lt~obsolete.m4
 ar-lib
 stamp-h1
+src/vmod_vcs_version.txt
 
 # vmodtool
 vcc_*_if.[ch]
